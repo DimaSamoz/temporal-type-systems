@@ -13,8 +13,6 @@ open import Data.Product
 open import Data.Sum renaming (_⊎_ to _∨_)
 
 
-infixr 30 _⇴_
-infixl 55 _∘_
 
 
 -- || Objects and arrows
@@ -26,6 +24,7 @@ infixl 55 _∘_
 -- Arrows
 _⇴_ : τ -> τ -> Set
 a ⇴ b = ∀(n : ℕ) -> a n -> b n
+infixr 30 _⇴_
 
 -- || Identity and composition
 
@@ -36,6 +35,7 @@ id n = λ a -> a
 -- Composition of arrows
 _∘_ : {A B C : τ} -> B ⇴ C -> A ⇴ B -> A ⇴ C
 (g ∘ f) n = λ a -> g n (f n a)
+infixl 55 _∘_
 
 -- || Category laws
 
@@ -61,6 +61,7 @@ id-right = refl
 -- Products
 _⊗_ : τ -> τ -> τ
 (A ⊗ B) n = A n × B n
+infixl 70 _⊗_
 
 -- Initial object
 ⊥ : τ
@@ -69,7 +70,9 @@ _⊗_ : τ -> τ -> τ
 -- Products
 _⊕_ : τ -> τ -> τ
 (A ⊕ B) n = A n ∨ B n
+infixl 65 _⊕_
 
 -- Exponentials
 _⇒_ : τ -> τ -> τ
 (A ⇒ B) n = A n -> B n
+infixr 50 _⇒_

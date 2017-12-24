@@ -9,8 +9,6 @@ open import Category
 open import Data.Nat
 open import Data.Product
 
-infixr 70 ◇_
-
 -- || Delay and iteration
 
 -- One-step delay operator
@@ -31,3 +29,4 @@ delay A by n = iter ▹ n A
 -- Arbitrary delay
 ◇_ : τ -> τ
 (◇_ A) n = Σ ℕ (λ k -> (delay A by k) n)
+infixr 70 ◇_
