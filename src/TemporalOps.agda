@@ -32,3 +32,10 @@ infix 67 delay_by_
 ◇_ : τ -> τ
 (◇_ A) n = Σ ℕ (λ k -> (delay A by k) n)
 infixr 65 ◇_
+
+-- Time indexing (for clarity, synonym of function appliation at any level)
+_at_ : ∀ {a b} {A : Set a} {B : A → Set b} →
+      ((x : A) → B x) → ((x : A) → B x)
+f at n = f n
+infixl 45 _at_
+
