@@ -12,9 +12,10 @@ open import Data.Product
 -- || Delay and iteration
 
 -- One-step delay operator
-▹ : τ -> τ
-▹ A zero    = ⊤ zero
-▹ A (suc n) = A n
+▹_ : τ -> τ
+▹_ A zero    = ⊤ zero
+▹_ A (suc n) = A n
+infixr 70 ▹_
 
 -- General iteration
 -- iter f n v = fⁿ(v)
@@ -24,9 +25,10 @@ iter F (suc n) A = F (iter F n A)
 
 -- Multi-step delay
 delay_by_ : τ -> ℕ -> τ
-delay A by n = iter ▹ n A
+delay A by n = iter ▹_ n A
+infix 67 delay_by_
 
 -- Arbitrary delay
 ◇_ : τ -> τ
 (◇_ A) n = Σ ℕ (λ k -> (delay A by k) n)
-infixr 70 ◇_
+infixr 65 ◇_

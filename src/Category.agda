@@ -61,7 +61,7 @@ id-right = refl
 -- Products
 _⊗_ : τ -> τ -> τ
 (A ⊗ B) n = A n × B n
-infixl 70 _⊗_
+infixl 60 _⊗_
 
 -- Initial object
 ⊥ : τ
@@ -70,7 +70,7 @@ infixl 70 _⊗_
 -- Products
 _⊕_ : τ -> τ -> τ
 (A ⊕ B) n = A n ∨ B n
-infixl 65 _⊕_
+infixl 55 _⊕_
 
 -- Exponentials
 _⇒_ : τ -> τ -> τ
