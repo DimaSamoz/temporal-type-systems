@@ -39,3 +39,10 @@ _at_ : ∀ {a b} {A : Set a} {B : A → Set b} →
 f at n = f n
 infixl 45 _at_
 
+-- || Lemmas for the delay operator
+
+-- Delaying by n steps and waiting n steps later doesn't change the result
+delay-plus : ∀{A} -> (n l k : ℕ)
+          -> delay A by (n + l) at (n + k) ≡ delay A by l at k
+delay-plus zero l k = refl
+delay-plus (suc n) = delay-plus n
