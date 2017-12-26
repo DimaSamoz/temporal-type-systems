@@ -5,11 +5,11 @@
 -}
 module Category where
 
-open import Data.Nat
-open import Relation.Binary.PropositionalEquality
-import Data.Unit using (⊤)
-import Data.Empty using (⊥)
-open import Data.Product
+open import Data.Nat public
+open import Relation.Binary.PropositionalEquality public
+open import Data.Unit using () renaming (⊤ to top) public
+open import Data.Empty using () renaming (⊥ to bot) public
+open import Data.Product public
 open import Data.Sum renaming (_⊎_ to _∨_)
 
 
@@ -56,7 +56,7 @@ id-right = refl
 
 -- Final object
 ⊤ : τ
-⊤ n = Data.Unit.⊤
+⊤ n = top
 
 -- Products
 _⊗_ : τ -> τ -> τ
@@ -65,7 +65,7 @@ infixl 70 _⊗_
 
 -- Initial object
 ⊥ : τ
-⊥ n = Data.Empty.⊥
+⊥ n = bot
 
 -- Products
 _⊕_ : τ -> τ -> τ
