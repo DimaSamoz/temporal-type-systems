@@ -41,8 +41,23 @@ infixr 65 ◇_
 
 -- || Lemmas for the delay operator
 
--- Delaying by n steps and waiting n steps later doesn't change the result
+-- Extra delay is cancelled out by extra waiting.
 delay-plus : ∀{A} -> (n l k : ℕ)
           -> delay A by (n + l) at (n + k) ≡ delay A by l at k
 delay-plus zero l k = refl
 delay-plus (suc n) = delay-plus n
+
+-- || Derived lemmas - they can all be expressed in terms of delay-plus,
+-- || but they are given explicitly for simplicity.
+
+-- Delay by n is cancelled out by waiting n extra steps.
+delay-plus-left0 : ∀{A} -> (n k : ℕ)
+              -> delay A by n at (n + k) ≡ A at k
+delay-plus-left0 zero k = refl
+delay-plus-left0 (suc n) k = delay-plus-left0 n k
+
+-- Extra delay by n steps is cancelled out by waiting for n steps.
+delay-plus-right0 : ∀{A} -> (n l : ℕ)
+              -> delay A by (n + l) at n ≡ delay A by l at 0
+delay-plus-right0 zero l = refl
+delay-plus-right0 (suc n) l = delay-plus-right0 n l
