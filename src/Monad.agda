@@ -7,7 +7,6 @@ open import Functor
 open import TemporalOps
 
 open import Data.Nat.Properties using (+-suc; +-comm; +-right-identity; +-assoc)
-open import Function using (_∋_)
 
 -- (Very verbose) cmparison view
 -- Like 'compare', but only distinguishes ≤ or >.
@@ -47,3 +46,19 @@ compareLeq (suc n)            (suc .(n + l)) | snd==[ .n + l ] =
           | delay-plus {λ k → Σ ℕ (λ m → delay A by m at k)} n (0 + suc l) 0
           | sym (delay-plus {A} n (suc l) 0)
           = n + suc l , v
+
+
+-- || Monad laws
+
+-- Left identity
+μ-left-id : ∀{A : τ} {n : ℕ} {a : ◇ A at n}
+               -> (μ {A} ∘ fmap-◇ {A} {◇ A} η at n) a ≡ (μ ∘ η at n) a
+μ-left-id {A} {n} {k , v} with compareLeq k n
+μ-left-id {A} {.k} {.(k + suc l) , v} | fst==suc[ k + l ]
+    = {!   !}
+    where open ≡-Reasoning
+μ-left-id {A} {.(k + l)} {k , v}      | snd==[ .k + l ] = {!   !}
+
+
+-- join . fmap join = join . join
+-- join . fmap return = join . return = id
