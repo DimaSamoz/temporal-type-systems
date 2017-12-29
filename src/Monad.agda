@@ -8,7 +8,7 @@ open import TemporalOps
 
 open import Data.Nat.Properties using (+-suc; +-comm; +-right-identity; +-assoc)
 
--- (Very verbose) cmparison view
+-- (Very verbose) comparison view
 -- Like 'compare', but only distinguishes ≤ or >.
 data LeqOrdering : ℕ -> ℕ -> Set where
     fst==suc[_+_] : ∀ k l → LeqOrdering (k + suc l) k
@@ -32,21 +32,15 @@ compareLeq (suc n)            (suc .(n + l)) | snd==[ .n + l ] =
 μ : {A : τ} -> ◇ ◇ A ⇴ ◇ A
 μ n (k , v) with compareLeq k n
 μ {A} .(k + l) (k , v)       | snd==[ .k + l ]
-    rewrite sym (+-right-identity k)
-          | +-assoc k 0 l
-          | delay-plus {λ n → Σ ℕ (λ m → delay A by m at n)} k 0 (0 + l)
+    rewrite delay-plus-left0 {λ n → Σ ℕ (λ m → delay A by m at n)} k l
     with v
-...       | j , y
+... | j , y
     rewrite sym (delay-plus {A} k j l)
-          | +-comm k j
-          = j + k , y
+    = k + j , y
 μ {A} n (.(n + suc l) , v) | fst==suc[ .n + l ]
-    rewrite sym (+-right-identity n)
-          | +-assoc n 0 (suc l)
-          | delay-plus {λ k → Σ ℕ (λ m → delay A by m at k)} n (0 + suc l) 0
-          | sym (delay-plus {A} n (suc l) 0)
-          = n + suc l , v
-
+    rewrite delay-plus-right0 {λ k → Σ ℕ (λ m → delay A by m at k)} n (suc l)
+          | sym (delay-plus-right0 {A} n (suc l))
+    = n + suc l , v
 
 -- || Monad laws
 
