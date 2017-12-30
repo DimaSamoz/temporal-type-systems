@@ -9,6 +9,11 @@ open import Category
 open import Data.Nat
 open import Data.Product
 
+-- Box operator
+□_ : τ -> τ
+(□_ A) n = (n : ℕ) -> A n
+infixr 65 □_
+
 -- || Delay and iteration
 
 -- One-step delay operator
