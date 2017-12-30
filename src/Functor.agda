@@ -72,3 +72,19 @@ fmap-◇-∘ {n = zero} {suc k , v} = refl
 fmap-◇-∘ {A} {B} {C} {n = suc n} {suc k , v} {g} {f}
     rewrite delay-plus {A} 1 k n
           | fmap-delay-∘ {A} {B} {C} {n} {k} {g} {f} = refl
+
+-- || Functoriality of □
+
+-- Lifting of □
+fmap-□ : {A B : τ} -> A ⇴ B -> □ A ⇴ □ B
+fmap-□ f n a = λ k → f k (a k)
+
+-- □ preserves identities
+fmap-□-id : ∀{A : τ}
+         -> fmap-□ id ≡ id {□ A}
+fmap-□-id = refl
+
+-- □ preserves composition
+fmap-□-∘ : ∀ {A B C : τ} {g : B ⇴ C} {f : A ⇴ B}
+        -> fmap-□ (g ∘ f) ≡ fmap-□ g ∘ fmap-□ f
+fmap-□-∘ = refl
