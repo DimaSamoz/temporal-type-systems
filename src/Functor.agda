@@ -3,28 +3,10 @@
 module Functor where
 
 open import Categories
+open Categories.Category using (obj)
+-- open Category.Category {{...}}
 open import TemporalOps
 open import Relation.Binary.PropositionalEquality
-
-
--- || Functoriality of ▹
-
--- Lifting of ▹
-fmap-▹ : {A B : τ} -> A ⇴ B -> ▹ A ⇴ ▹ B
-fmap-▹ f zero =  λ _ → top.tt
-fmap-▹ f (suc n) = f n
-
--- ▹ preserves identities
-fmap-▹-id : ∀{A : τ} {n : ℕ}
-         -> fmap-▹ id at n ≡ id {▹ A} at n
-fmap-▹-id {n = zero} = refl
-fmap-▹-id {n = suc n} = refl
-
--- ▹ preserves composition
-fmap-▹-∘ : ∀ {A B C : τ} {n : ℕ} {g : B ⇴ C} {f : A ⇴ B}
-        -> fmap-▹ (g ∘ f) at n ≡ fmap-▹ g ∘ fmap-▹ f at n
-fmap-▹-∘ {n = zero} = refl
-fmap-▹-∘ {n = suc n} = refl
 
 
 -- || Functoriality of delay
@@ -88,3 +70,61 @@ fmap-□-id = refl
 fmap-□-∘ : ∀ {A B C : τ} {g : B ⇴ C} {f : A ⇴ B}
         -> fmap-□ (g ∘ f) ≡ fmap-□ g ∘ fmap-□ f
 fmap-□-∘ = refl
+-- Functor between two categories
+record Functor (ℂ : Category) (𝔻 : Category) : Set₁ where
+    private module ℂ = Category ℂ
+    private module 𝔻 = Category 𝔻
+    field
+        -- || Definitions
+        -- Object map
+        omap : obj ℂ -> obj 𝔻
+        -- Arrow map
+        fmap : ∀{A B : obj ℂ} -> (A ℂ.~> B) -> (omap A 𝔻.~> omap B)
+
+        -- || Laws
+        -- Functor preseres identities
+        fmap-id : ∀{A : obj ℂ} -> fmap (ℂ.id {A}) 𝔻.≈ 𝔻.id
+        -- Functor preserves composition
+        fmap-∘ : ∀{A B C : obj ℂ} {g : B ℂ.~> C} {f : A ℂ.~> B}
+              -> fmap (g ℂ.∘ f) 𝔻.≈ fmap g 𝔻.∘ fmap f
+
+-- Endofunctor on a category
+record Endofunctor (ℂ : Category) : Set₁ where
+    field
+        {{functor}} : Functor ℂ ℂ
+
+open Categories.Category {{...}}
+
+
+-- || Functor and endofunctor instances for temporal operators
+
+-- ▹ instances
+instance
+    F-▹ : Functor ℝeactive ℝeactive
+    F-▹ = record
+        { omap = ▹_
+        ; fmap = fmap-▹
+        ; fmap-id = λ {_ n a} -> fmap-▹-id {_} {n} {a}
+        ; fmap-∘ = λ {_ _ _ _ _ n a} -> fmap-▹-∘ {n = n} {a = a}
+        }
+        where
+        -- Lifting of ▹
+        fmap-▹ : {A B : τ} -> A ⇴ B -> ▹ A ⇴ ▹ B
+        fmap-▹ f zero =  λ _ → top.tt
+        fmap-▹ f (suc n) = f n
+        -- ▹ preserves identities
+        fmap-▹-id : ∀ {A : τ} {n : ℕ} {a : (▹ A) n}
+                 -> (fmap-▹ (id {A}) at n) a ≡ a
+        fmap-▹-id {n = zero} = refl
+        fmap-▹-id {n = suc n} = refl
+        -- ▹ preserves composition
+        fmap-▹-∘ : ∀ {A B C : τ} {g : B ⇴ C} {f : A ⇴ B} {n : ℕ} {a : (▹ A) n}
+                -> (fmap-▹ (g ∘ f) at n) a ≡ (fmap-▹ g ∘ fmap-▹ f at n) a
+        fmap-▹-∘ {n = zero} = refl
+        fmap-▹-∘ {n = suc n} = refl
+
+    EF-▹ : Endofunctor ℝeactive
+    EF-▹ = record {}
+
+
+
