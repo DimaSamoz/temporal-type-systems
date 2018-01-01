@@ -2,7 +2,7 @@
 {- Functoriality of temporal operators -}
 module Functor where
 
-open import Category
+open import Categories
 open import TemporalOps
 open import Relation.Binary.PropositionalEquality
 

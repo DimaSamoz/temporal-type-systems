@@ -3,7 +3,7 @@
     Objects: types indexed by time (natural numbers)
     Arrows: functions indexed by time
 -}
-module Category where
+module Categories where
 
 open import Data.Nat public
 open import Relation.Binary.PropositionalEquality public

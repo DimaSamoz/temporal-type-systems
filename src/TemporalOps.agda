@@ -4,7 +4,7 @@
 module TemporalOps where
 
 open import Types
-open import Category
+open import Categories
 
 open import Data.Nat
 open import Data.Product
