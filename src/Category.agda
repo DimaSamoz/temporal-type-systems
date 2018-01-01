@@ -12,45 +12,77 @@ open import Data.Empty using () renaming (⊥ to bot) public
 open import Data.Product public
 open import Data.Sum renaming (_⊎_ to _∨_)
 
+-- Type class for categories.
+-- Based on https://github.com/UlfNorell/category-theory-experiments
+record Category : Set₂ where
+    infixr 50 _~>_
+    infixl 40 _≈_
+    infix 60 _∘_
+    field
+        -- || Data
+        -- Objects
+        obj  : Set₁
+        -- Arrows
+        _~>_ : obj -> obj -> Set
 
+        -- || Operations
+        -- Identity arrow
+        id   : {A : obj} -> A ~> A
+        -- Composition of arrows
+        _∘_  : {A B C : obj} -> (B ~> C) -> (A ~> B) -> (A ~> C)
+        -- Equality of arrows (as we don't have function extensionality)
+        _≈_  : {A B : obj} -> (A ~> B) -> (A ~> B) -> Set
 
+        -- || Laws
+        -- Left identity
+        id-left  : {x y : obj} {f : x ~> y} -> id ∘ f ≈ f
+        -- Right identity
+        id-right : {x y : obj} {f : x ~> y} -> f ∘ id ≈ f
+        -- Associativity of composition
+        ∘-assoc  : {x y z w : obj} {f : z ~> w} {g : y ~> z} {h : x ~> y}
+                -> (f ∘ g) ∘ h ≈ f ∘ (g ∘ h)
+open Category
 
--- || Objects and arrows
+instance
+    𝕊et : Category
+    𝕊et = record
+        { obj      = Set
+        ; _~>_     = λ a b   -> (a -> b)
+        ; id       = λ a     -> a
+        ; _∘_      = λ g f a -> g (f a)
+        ; _≈_      = λ f g   -> ∀ {a} -> f a ≡ g a
+        ; id-left  = refl
+        ; id-right = refl
+        ; ∘-assoc  = refl
+        }
 
 -- Time-indexed types.
 τ : Set₁
 τ = ℕ -> Set
 
--- Arrows
+-- Time-indexed functions.
 _⇴_ : τ -> τ -> Set
-a ⇴ b = ∀(n : ℕ) -> a n -> b n
+A ⇴ B = ∀(n : ℕ) -> A n -> B n
 infixr 30 _⇴_
 
--- || Identity and composition
+-- Category of reactive types
+instance
+    ℝeactive : Category
+    ℝeactive = record
+             { obj      = τ
+             ; _~>_     = _⇴_
+             ; id       = λ n a -> a
+             ; _∘_      = λ g f -> λ n a -> g n (f n a)
+             ; _≈_      = eq
+             ; id-left  = refl
+             ; id-right = refl
+             ; ∘-assoc  = refl
+             }
+        where
+        eq : {A B : τ} -> (A ⇴ B) -> (A ⇴ B) -> Set
+        eq {A} {B} f g = ∀ {n : ℕ} {a : A n} -> f n a ≡ g n a
 
--- Identity arrow
-id : {A : τ} -> A ⇴ A
-id n = λ a -> a
 
--- Composition of arrows
-_∘_ : {A B C : τ} -> B ⇴ C -> A ⇴ B -> A ⇴ C
-(g ∘ f) n = λ a -> g n (f n a)
-infixl 55 _∘_
-
--- || Category laws
-
--- Left identity
-id-left : ∀{A B : τ} {f : A ⇴ B} -> id ∘ f ≡ f
-id-left = refl
-
--- Right identity
-id-right : ∀{A B : τ} {f : A ⇴ B} -> f ∘ id ≡ f
-id-right = refl
-
--- Associativity
-∘-assoc : {A B C D : τ} {f : A ⇴ B} {g : B ⇴ C} {h : C ⇴ D}
-       -> (h ∘ g) ∘ f ≡ h ∘ (g ∘ f)
-∘-assoc = refl
 
 -- || Cartesian, cocartesian, exponential structure
 
