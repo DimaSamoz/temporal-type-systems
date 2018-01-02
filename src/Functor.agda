@@ -8,29 +8,6 @@ open Categories.Category using (obj)
 open import TemporalOps
 open import Relation.Binary.PropositionalEquality
 
-
--- || Functoriality of delay
-
--- Delay of the iterated delay operator
-fmap-delay : {A B : τ} -> (n : ℕ) -> A ⇴ B -> delay A by n ⇴ delay B by n
-fmap-delay zero    f = f
-fmap-delay (suc k) f = fmap-▹ (fmap-delay k f)
-
--- Delay preserves identities
-fmap-delay-id : ∀{A : τ} {n k : ℕ}
-             -> fmap-delay k id at n ≡ id {delay A by k} at n
-fmap-delay-id {k = zero} = refl
-fmap-delay-id {A} {zero} {suc l} = refl
-fmap-delay-id {A} {suc n} {suc l} = fmap-delay-id {A} {n} {l}
-
--- Delay preserves composition
-fmap-delay-∘ : ∀{A B C : τ} {n k : ℕ} {g : B ⇴ C} {f : A ⇴ B}
-            -> fmap-delay k (g ∘ f) at n ≡ fmap-delay k g ∘ fmap-delay k f at n
-fmap-delay-∘ {k = zero} = refl
-fmap-delay-∘ {n = zero} {suc l} = refl
-fmap-delay-∘ {n = suc m} {suc l} = fmap-delay-∘ {n = m} {k = l}
-
-
 -- || Functoriality of ◇
 
 -- Lifting of ◇
@@ -105,7 +82,7 @@ instance
         { omap = ▹_
         ; fmap = fmap-▹
         ; fmap-id = λ {_ n a} -> fmap-▹-id {_} {n} {a}
-        ; fmap-∘ = λ {_ _ _ _ _ n a} -> fmap-▹-∘ {n = n} {a = a}
+        ; fmap-∘ = λ {_ _ _ _ _ n} -> fmap-▹-∘ {n = n}
         }
         where
         -- Lifting of ▹
@@ -126,5 +103,34 @@ instance
     EF-▹ : Endofunctor ℝeactive
     EF-▹ = record {}
 
+-- Delay instances
+instance
+    F-delay : ℕ -> Functor ℝeactive ℝeactive
+    F-delay k = record
+        { omap = delay_by k
+        ; fmap = fmap-delay k
+        ; fmap-id = λ {_ n a} -> fmap-delay-id k {_} {n} {a}
+        ; fmap-∘ = fmap-delay-∘ k
+        }
+        where
+        -- Lifting of delay
+        fmap-delay : {A B : τ} -> (k : ℕ) -> A ⇴ B -> delay A by k ⇴ delay B by k
+        fmap-delay zero    f = f
+        fmap-delay (suc k) f = Functor.fmap F-▹ (fmap-delay k f)
+        -- Delay preserves identities
+        fmap-delay-id : ∀ (k : ℕ) {A : τ} {n : ℕ} {a : (delay A by k) n}
+                 -> (fmap-delay k (id {A}) at n) a ≡ a
+        fmap-delay-id zero = refl
+        fmap-delay-id (suc k) {A} {zero} = refl
+        fmap-delay-id (suc k) {A} {suc n} = fmap-delay-id k {A} {n}
+        -- Delay preserves composition
+        fmap-delay-∘ : ∀ (k : ℕ) {A B C : τ} {g : B ⇴ C} {f : A ⇴ B} {n : ℕ} {a : (delay A by k) n}
+                -> (fmap-delay k (g ∘ f) at n) a ≡ (fmap-delay k g ∘ fmap-delay k f at n) a
+        fmap-delay-∘ zero = refl
+        fmap-delay-∘ (suc k) {n = zero} = refl
+        fmap-delay-∘ (suc k) {n = suc n} = fmap-delay-∘ k {n = n}
+
+    EF-delay : Endofunctor ℝeactive
+    EF-delay = record {}
 
 
