@@ -8,21 +8,6 @@ open Categories.Category using (obj)
 open import TemporalOps
 open import Relation.Binary.PropositionalEquality
 
--- || Functoriality of □
-
--- Lifting of □
-fmap-□ : {A B : τ} -> A ⇴ B -> □ A ⇴ □ B
-fmap-□ f n a = λ k → f k (a k)
-
--- □ preserves identities
-fmap-□-id : ∀{A : τ}
-         -> fmap-□ id ≡ id {□ A}
-fmap-□-id = refl
-
--- □ preserves composition
-fmap-□-∘ : ∀ {A B C : τ} {g : B ⇴ C} {f : A ⇴ B}
-        -> fmap-□ (g ∘ f) ≡ fmap-□ g ∘ fmap-□ f
-fmap-□-∘ = refl
 -- Functor between two categories
 record Functor (ℂ : Category) (𝔻 : Category) : Set₁ where
     private module ℂ = Category ℂ
@@ -145,3 +130,19 @@ instance
     EF-◇ : Endofunctor ℝeactive F-◇
     EF-◇ = record {}
 
+-- □ instances
+instance
+    F-□ : Functor ℝeactive ℝeactive
+    F-□ = record
+        { omap = □_
+        ; fmap = fmap-□
+        ; fmap-id = refl
+        ; fmap-∘ = refl
+        }
+        where
+        -- Lifting of □
+        fmap-□ : {A B : τ} -> A ⇴ B -> □ A ⇴ □ B
+        fmap-□ f n a = λ k → f k (a k)
+
+    EF-□ : Endofunctor ℝeactive F-□
+    EF-□ = record {}
