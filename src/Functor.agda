@@ -66,9 +66,9 @@ record Functor (ℂ : Category) (𝔻 : Category) : Set₁ where
               -> fmap (g ℂ.∘ f) 𝔻.≈ fmap g 𝔻.∘ fmap f
 
 -- Endofunctor on a category
-record Endofunctor (ℂ : Category) : Set₁ where
-    field
-        {{functor}} : Functor ℂ ℂ
+record Endofunctor (ℂ : Category) (f : Functor ℂ ℂ): Set₁ where
+    functor : Functor ℂ ℂ
+    functor = f
 
 open Categories.Category {{...}}
 
@@ -100,7 +100,7 @@ instance
         fmap-▹-∘ {n = zero} = refl
         fmap-▹-∘ {n = suc n} = refl
 
-    EF-▹ : Endofunctor ℝeactive
+    EF-▹ : Endofunctor ℝeactive F-▹
     EF-▹ = record {}
 
 -- Delay instances
@@ -130,7 +130,7 @@ instance
         fmap-delay-∘ (suc k) {n = zero} = refl
         fmap-delay-∘ (suc k) {n = suc n} = fmap-delay-∘ k {n = n}
 
-    EF-delay : Endofunctor ℝeactive
-    EF-delay = record {}
+    EF-delay : (k : ℕ) -> Endofunctor ℝeactive (F-delay k)
+    EF-delay = λ _ → record {}
 
 
