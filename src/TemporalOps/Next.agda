@@ -43,5 +43,5 @@ instance
         fmap-▹-∘ {n = zero} = refl
         fmap-▹-∘ {n = suc n} = refl
 
-    EF-▹ : Endofunctor ℝeactive F-▹
-    EF-▹ = record {}
+    EF-▹ : Endofunctor ℝeactive
+    EF-▹ = record { functor = F-▹ }

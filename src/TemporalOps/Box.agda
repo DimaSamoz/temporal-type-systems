@@ -25,5 +25,5 @@ instance
         fmap-□ : {A B : τ} -> A ⇴ B -> □ A ⇴ □ B
         fmap-□ f n a = λ k → f k (a k)
 
-    EF-□ : Endofunctor ℝeactive F-□
-    EF-□ = record {}
+    EF-□ : Endofunctor ℝeactive
+    EF-□ = record { functor = F-□ }

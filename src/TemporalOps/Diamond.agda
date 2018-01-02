@@ -46,5 +46,5 @@ instance
                   | Functor.fmap-∘ (F-delay (suc k)) {A} {B} {C} {g} {f} {suc n} {v}
             = refl
 
-    EF-◇ : Endofunctor ℝeactive F-◇
-    EF-◇ = record {}
+    EF-◇ : Endofunctor ℝeactive
+    EF-◇ = record { functor = F-◇ }

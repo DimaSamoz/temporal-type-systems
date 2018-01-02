@@ -25,6 +25,6 @@ record Functor (ℂ : Category) (𝔻 : Category) : Set₁ where
               -> fmap (g ℂ.∘ f) 𝔻.≈ fmap g 𝔻.∘ fmap f
 
 -- Endofunctor on a category
-record Endofunctor (ℂ : Category) (f : Functor ℂ ℂ): Set₁ where
-    functor : Functor ℂ ℂ
-    functor = f
+record Endofunctor (ℂ : Category) : Set₁ where
+    field
+        functor : Functor ℂ ℂ

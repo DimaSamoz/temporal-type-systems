@@ -70,5 +70,5 @@ instance
         fmap-delay-∘ (suc k) {n = zero} = refl
         fmap-delay-∘ (suc k) {n = suc n} = fmap-delay-∘ k {n = n}
 
-    EF-delay : (k : ℕ) -> Endofunctor ℝeactive (F-delay k)
-    EF-delay = λ _ → record {}
+    EF-delay : (k : ℕ) -> Endofunctor ℝeactive
+    EF-delay k = record { functor = F-delay k }
