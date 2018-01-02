@@ -1,9 +1,6 @@
 
-{- Category of temporal types.
-    Objects: types indexed by time (natural numbers)
-    Arrows: functions indexed by time
--}
-module Categories where
+{- Type classes and instances for categories. -}
+module CategoryTheory.Categories where
 
 open import Data.Nat public
 open import Relation.Binary.PropositionalEquality public
