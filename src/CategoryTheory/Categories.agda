@@ -8,6 +8,7 @@ open import Data.Unit using () renaming (⊤ to top) public
 open import Data.Empty using () renaming (⊥ to bot) public
 open import Data.Product public
 open import Data.Sum renaming (_⊎_ to _∨_)
+open import Relation.Binary using (IsEquivalence ; Reflexive ; Symmetric ; Transitive)
 
 -- Type class for categories.
 -- Based on https://github.com/UlfNorell/category-theory-experiments
@@ -38,8 +39,10 @@ record Category : Set₂ where
         -- Associativity of composition
         ∘-assoc  : {x y z w : obj} {f : z ~> w} {g : y ~> z} {h : x ~> y}
                 -> (f ∘ g) ∘ h ≈ f ∘ (g ∘ h)
+        ≈-equiv  : ∀{A B : obj} -> IsEquivalence (_≈_ {A} {B})
 open Category
 
+-- Category of sets.
 instance
     𝕊et : Category
     𝕊et = record
@@ -51,7 +54,12 @@ instance
         ; id-left  = refl
         ; id-right = refl
         ; ∘-assoc  = refl
+        ; ≈-equiv  = record { refl = refl
+                            ; sym = λ p → sym p
+                            ; trans = λ p q → trans p q }
         }
+
+-- || Reactive types
 
 -- Time-indexed types.
 τ : Set₁
@@ -70,14 +78,14 @@ instance
              ; _~>_     = _⇴_
              ; id       = λ n a -> a
              ; _∘_      = λ g f -> λ n a -> g n (f n a)
-             ; _≈_      = eq
+             ; _≈_      = λ f g -> ∀ {n : ℕ} {a} -> f n a ≡ g n a
              ; id-left  = refl
              ; id-right = refl
              ; ∘-assoc  = refl
+             ; ≈-equiv  = record { refl = refl
+                                 ; sym = λ x → sym x
+                                 ; trans = λ p q → trans p q }
              }
-        where
-        eq : {A B : τ} -> (A ⇴ B) -> (A ⇴ B) -> Set
-        eq {A} {B} f g = ∀ {n : ℕ} {a : A n} -> f n a ≡ g n a
 
 
 
