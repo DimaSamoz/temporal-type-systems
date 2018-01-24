@@ -22,8 +22,8 @@ record Monad (ℂ : Category) : Set₁ where
         -- Multiplication / join
         μ : (T ²) ⟹ T
 
-    private module η = NatTrans η
-    private module μ = NatTrans μ
+    private module η = _⟹_ η
+    private module μ = _⟹_ μ
     field
         -- || Laws
         -- Unit on both sides is cancelled by multiplication (unit)

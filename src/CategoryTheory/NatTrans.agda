@@ -7,8 +7,10 @@ open import CategoryTheory.Functor
 open CategoryTheory.Categories.Category using (obj)
 open import Relation.Binary.PropositionalEquality
 
+infixr 25 _⟹_
+
 -- Natural transformation between two functors
-record NatTrans {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor ℂ 𝔻) : Set₁ where
+record _⟹_ {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor ℂ 𝔻) : Set₁ where
     private module ℂ = Category ℂ
     private module 𝔻 = Category 𝔻
     private module F = Functor F
@@ -22,8 +24,4 @@ record NatTrans {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor ℂ �
         -- Naturality condition
         nat-cond : ∀{A B : obj ℂ} {f : A ℂ.~> B}
                 -> (G.fmap f 𝔻.∘ at A) 𝔻.≈ (at B 𝔻.∘ F.fmap f)
-
--- Shorthand for natural transformation
-infixr 25 _⟹_
-_⟹_ : {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor ℂ 𝔻) -> Set₁
-F ⟹ G = NatTrans F G
+                
