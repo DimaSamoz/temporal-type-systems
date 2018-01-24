@@ -24,5 +24,6 @@ record NatTrans {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor ℂ �
                 -> (G.fmap f 𝔻.∘ at A) 𝔻.≈ (at B 𝔻.∘ F.fmap f)
 
 -- Shorthand for natural transformation
+infixr 25 _⟹_
 _⟹_ : {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor ℂ 𝔻) -> Set₁
 F ⟹ G = NatTrans F G
