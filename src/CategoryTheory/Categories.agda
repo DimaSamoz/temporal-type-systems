@@ -39,7 +39,28 @@ record Category : Set₂ where
         -- Associativity of composition
         ∘-assoc  : {x y z w : obj} {f : z ~> w} {g : y ~> z} {h : x ~> y}
                 -> (f ∘ g) ∘ h ≈ f ∘ (g ∘ h)
+        -- Arrow equality is an equivalence relation
         ≈-equiv  : ∀{A B : obj} -> IsEquivalence (_≈_ {A} {B})
+        -- Congruence of equality and composition
+        ≈-cong   : ∀{A B C : obj} {f f′ : A ~> B} {g g′ : B ~> C}
+                -> f ≈ f′ -> g ≈ g′ -> g ∘ f ≈ g′ ∘ f′
+
+    -- Equational reasoning for ≈ (based on the standard library definitions)
+    infix  3 _∎
+    infixr 2 _≈⟨⟩_ _≈⟨_⟩_
+    infix  1 begin_
+
+    begin_ : ∀{A B : obj} {x y : A ~> B} → x ≈ y → x ≈ y
+    begin_ x≈y = x≈y
+
+    _≈⟨⟩_ : ∀{A B : obj} (x {y} : A ~> B) → x ≈ y → x ≈ y
+    _ ≈⟨⟩ x≈y = x≈y
+
+    _≈⟨_⟩_ : ∀{A B : obj} (x {y z} : A ~> B) → x ≈ y → y ≈ z → x ≈ z
+    _ ≈⟨ x≈y ⟩ y≈z = IsEquivalence.trans ≈-equiv x≈y y≈z
+
+    _∎ : ∀{A B : obj} (x : A ~> B) → x ≈ x
+    _∎ _ = IsEquivalence.refl ≈-equiv
 open Category
 
 -- Category of sets.
@@ -57,7 +78,14 @@ instance
         ; ≈-equiv  = record { refl = refl
                             ; sym = λ p → sym p
                             ; trans = λ p q → trans p q }
+        ; ≈-cong   = ≈-cong-𝕊
         }
+        where
+        ≈-cong-𝕊 : ∀{A B C : Set} {f f′ : A -> B} {g g′ : B -> C}
+                -> (∀ {a} -> f a ≡ f′ a)
+                -> (∀ {b} -> g b ≡ g′ b)
+                -> (∀ {a} -> g (f a) ≡ g′ (f′ a))
+        ≈-cong-𝕊 {f′ = f′} fe ge {a′} rewrite fe {a′} | ge {f′ a′} = refl
 
 -- || Reactive types
 
@@ -85,8 +113,16 @@ instance
              ; ≈-equiv  = record { refl = refl
                                  ; sym = λ x → sym x
                                  ; trans = λ p q → trans p q }
+             ; ≈-cong   = ≈-cong-ℝ
              }
-
+             where
+             ≈-cong-ℝ : ∀{A B C : τ} {f f′ : A ⇴ B} {g g′ : B ⇴ C}
+                     -> (∀ {n a} -> f n a ≡ f′ n a)
+                     -> (∀ {n b} -> g n b ≡ g′ n b)
+                     -> (∀ {n a} -> g n (f n a) ≡ g′ n (f′ n a))
+             ≈-cong-ℝ {f′ = f′} fe ge {n} {a′}
+                    rewrite fe {n} {a′}
+                          | ge {n} {f′ n a′} = refl
 
 
 -- || Cartesian, cocartesian, exponential structure
