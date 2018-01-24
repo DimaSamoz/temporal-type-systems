@@ -28,10 +28,9 @@ record Functor (ℂ : Category) (𝔻 : Category) : Set₁ where
         fmap-cong : ∀{A B : obj ℂ} {f f′ : A ℂ.~> B}
                 -> f ℂ.≈ f′ -> fmap f 𝔻.≈ fmap f′
 
--- Endofunctor on a category
-record Endofunctor (ℂ : Category) : Set₁ where
-    field
-        functor : Functor ℂ ℂ
+-- Type synonym for endofunctors
+Endofunctor : Category -> Set₁
+Endofunctor ℂ = Functor ℂ ℂ
 
 open Functor {{...}}
 
@@ -41,13 +40,12 @@ open CategoryTheory.Categories.Category {{...}}
 -- Identity functor
 instance
     I : ∀{ℂ} -> Endofunctor ℂ
-    I {ℂ} = record { functor =
-            record { omap = λ a → a
+    I {ℂ} = record { omap = λ a → a
                    ; fmap = λ a → a
                    ; fmap-id = IsEquivalence.refl (Category.≈-equiv ℂ)
                    ; fmap-∘ =  IsEquivalence.refl (Category.≈-equiv ℂ)
                    ; fmap-cong = λ p → p }
-        }
+
 
 -- Functors are closed under composition.
 instance
@@ -89,7 +87,7 @@ instance
 instance
     infixl 40 _⨂_
     _⨂_ : ∀{ℂ} -> Endofunctor ℂ -> Endofunctor ℂ -> Endofunctor ℂ
-    (T ⨂ S) = record { functor = Endofunctor.functor T ◯ Endofunctor.functor S }
+    (T ⨂ S) = T ◯ S
 
 -- Square and cube of an endofunctor
 instance
