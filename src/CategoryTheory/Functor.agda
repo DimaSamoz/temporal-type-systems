@@ -48,3 +48,40 @@ instance
                    ; fmap-∘ =  IsEquivalence.refl (Category.≈-equiv ℂ)
                    ; fmap-cong = λ p → p }
         }
+
+-- Functors are closed under composition.
+instance
+    _◯_ : ∀{𝔸 𝔹 ℂ} -> Functor 𝔹 ℂ -> Functor 𝔸 𝔹 -> Functor 𝔸 ℂ
+    _◯_ {𝔸} {𝔹} {ℂ} G F =
+        record { omap = λ a → G.omap (F.omap a)
+               ; fmap = λ f → G.fmap (F.fmap f)
+               ; fmap-id = fmap-◯-id
+               ; fmap-∘ = fmap-◯-∘
+               ; fmap-cong = λ p → G.fmap-cong (F.fmap-cong p)}
+        where private module F = Functor F
+              private module G = Functor G
+              private module 𝔸 = Category 𝔸
+              private module 𝔹 = Category 𝔹
+              private module ℂ = Category ℂ
+
+              fmap-◯-id : ∀{A : obj 𝔸} -> G.fmap (F.fmap (𝔸.id {A})) ℂ.≈ ℂ.id
+              fmap-◯-id {A} =
+                    ℂ.begin
+                        G.fmap (F.fmap (𝔸.id))
+                    ℂ.≈⟨ G.fmap-cong (F.fmap-id) ⟩
+                        G.fmap (𝔹.id)
+                    ℂ.≈⟨ G.fmap-id ⟩
+                        ℂ.id
+                    ℂ.∎
+              fmap-◯-∘ : ∀{A B C : obj 𝔸} {g : B 𝔸.~> C} {f : A 𝔸.~> B}
+                       -> G.fmap (F.fmap (g 𝔸.∘ f)) ℂ.≈
+                          G.fmap (F.fmap g) ℂ.∘ G.fmap (F.fmap f)
+              fmap-◯-∘ {A} {g = g} {f = f} =
+                    ℂ.begin
+                        G.fmap (F.fmap (g 𝔸.∘ f))
+                    ℂ.≈⟨ G.fmap-cong (F.fmap-∘) ⟩
+                        G.fmap ((F.fmap g) 𝔹.∘ (F.fmap f))
+                    ℂ.≈⟨ G.fmap-∘ ⟩
+                        G.fmap (F.fmap g) ℂ.∘ G.fmap (F.fmap f)
+                    ℂ.∎
+
