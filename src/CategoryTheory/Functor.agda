@@ -32,3 +32,19 @@ record Functor (ℂ : Category) (𝔻 : Category) : Set₁ where
 record Endofunctor (ℂ : Category) : Set₁ where
     field
         functor : Functor ℂ ℂ
+
+open Functor {{...}}
+
+open CategoryTheory.Categories.Category {{...}}
+
+
+-- Identity functor
+instance
+    I : ∀{ℂ} -> Endofunctor ℂ
+    I {ℂ} = record { functor =
+            record { omap = λ a → a
+                   ; fmap = λ a → a
+                   ; fmap-id = IsEquivalence.refl (Category.≈-equiv ℂ)
+                   ; fmap-∘ =  IsEquivalence.refl (Category.≈-equiv ℂ)
+                   ; fmap-cong = λ p → p }
+        }
