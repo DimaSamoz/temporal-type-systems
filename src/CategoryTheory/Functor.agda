@@ -49,6 +49,7 @@ instance
 
 -- Functors are closed under composition.
 instance
+    infixl 40 _◯_
     _◯_ : ∀{𝔸 𝔹 ℂ} -> Functor 𝔹 ℂ -> Functor 𝔸 𝔹 -> Functor 𝔸 ℂ
     _◯_ {𝔸} {𝔹} {ℂ} G F =
         record { omap = λ a → G.omap (F.omap a)
