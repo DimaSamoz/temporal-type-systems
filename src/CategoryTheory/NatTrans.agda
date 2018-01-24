@@ -16,12 +16,12 @@ record NatTrans {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor ℂ �
     field
         -- || Definitions
         -- One component of the natural transformations.
-        φ : ∀(A : obj ℂ) -> (F.omap A) 𝔻.~> (G.omap A)
+        at : ∀(A : obj ℂ) -> (F.omap A) 𝔻.~> (G.omap A)
 
         -- || Laws
         -- Naturality condition
         nat-cond : ∀{A B : obj ℂ} {f : A ℂ.~> B}
-                -> (G.fmap f 𝔻.∘ φ A) 𝔻.≈ (φ B 𝔻.∘ F.fmap f)
+                -> (G.fmap f 𝔻.∘ at A) 𝔻.≈ (at B 𝔻.∘ F.fmap f)
 
 -- Shorthand for natural transformation
 _⟹_ : {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor ℂ 𝔻) -> Set₁
