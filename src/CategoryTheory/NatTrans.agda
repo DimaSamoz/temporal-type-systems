@@ -22,3 +22,7 @@ record NatTrans {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor ℂ �
         -- Naturality condition
         nat-cond : ∀{A B : obj ℂ} {f : A ℂ.~> B}
                 -> (G.fmap f 𝔻.∘ φ A) 𝔻.≈ (φ B 𝔻.∘ F.fmap f)
+
+-- Shorthand for natural transformation
+_⟹_ : {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor ℂ 𝔻) -> Set₁
+F ⟹ G = NatTrans F G
