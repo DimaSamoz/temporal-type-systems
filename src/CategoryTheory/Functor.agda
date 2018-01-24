@@ -85,3 +85,16 @@ instance
                         G.fmap (F.fmap g) ℂ.∘ G.fmap (F.fmap f)
                     ℂ.∎
 
+-- Endofunctor tensor product
+instance
+    infixl 40 _⨂_
+    _⨂_ : ∀{ℂ} -> Endofunctor ℂ -> Endofunctor ℂ -> Endofunctor ℂ
+    (T ⨂ S) = record { functor = Endofunctor.functor T ◯ Endofunctor.functor S }
+
+-- Square and cube of an endofunctor
+instance
+    _² : ∀{ℂ} -> Endofunctor ℂ -> Endofunctor ℂ
+    F ² = F ⨂ F
+
+    _³ : ∀{ℂ} -> Endofunctor ℂ -> Endofunctor ℂ
+    F ³ = F ⨂ F ⨂ F
