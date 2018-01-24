@@ -20,12 +20,13 @@ open CategoryTheory.Categories.Category {{...}}
 
 -- ▹ instances
 instance
-    F-▹ : Functor ℝeactive ℝeactive
+    F-▹ : Endofunctor ℝeactive
     F-▹ = record
-        { omap = ▹_
-        ; fmap = fmap-▹
-        ; fmap-id = λ {_ n} -> fmap-▹-id {n = n}
-        ; fmap-∘ = λ {_ _ _ _ _ n} -> fmap-▹-∘ {n = n}
+        { omap      = ▹_
+        ; fmap      = fmap-▹
+        ; fmap-id   = λ {_ n} -> fmap-▹-id {n = n}
+        ; fmap-∘    = λ {_ _ _ _ _ n} -> fmap-▹-∘ {n = n}
+        ; fmap-cong = fmap-▹-cong
         }
         where
         -- Lifting of ▹
@@ -42,6 +43,10 @@ instance
                 -> (fmap-▹ (g ∘ f) at n) a ≡ (fmap-▹ g ∘ fmap-▹ f at n) a
         fmap-▹-∘ {n = zero} = refl
         fmap-▹-∘ {n = suc n} = refl
-
-    EF-▹ : Endofunctor ℝeactive
-    EF-▹ = record { functor = F-▹ }
+        -- ▹ is congruent
+        fmap-▹-cong : ∀{A B : τ} {f f′ : A ⇴ B}
+                -> ({n : ℕ} {a : A at n}     -> f n a ≡ f′ n a)
+                -> ({n : ℕ} {a : ▹ A at n} -> (fmap-▹ f at n) a
+                                          ≡ (fmap-▹ f′ at n) a)
+        fmap-▹-cong e {zero} = refl
+        fmap-▹-cong e {suc n} = e
