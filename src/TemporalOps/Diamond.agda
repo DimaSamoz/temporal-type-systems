@@ -16,12 +16,13 @@ infixr 65 ◇_
 
 -- ◇ instances
 instance
-    F-◇ : Functor ℝeactive ℝeactive
+    F-◇ : Endofunctor ℝeactive
     F-◇ = record
         { omap = ◇_
         ; fmap = fmap-◇
         ; fmap-id = fmap-◇-id
         ; fmap-∘ = fmap-◇-∘
+        ; fmap-cong = fmap-◇-cong
         }
         where
         -- Lifting of ◇
@@ -45,6 +46,16 @@ instance
             rewrite delay-plus {A} 1 k n
                   | Functor.fmap-∘ (F-delay (suc k)) {A} {B} {C} {g} {f} {suc n} {v}
             = refl
-
-    EF-◇ : Endofunctor ℝeactive
-    EF-◇ = record { functor = F-◇ }
+        -- ▹ is congruent
+        fmap-◇-cong : ∀{A B : τ} {f f′ : A ⇴ B}
+                -> ({n : ℕ} {a : A at n}   -> f n a ≡ f′ n a)
+                -> ({n : ℕ} {a : ◇ A at n} -> (fmap-◇ f at n) a
+                                            ≡ (fmap-◇ f′ at n) a)
+        fmap-◇-cong {A} e {n} {zero , a}
+            rewrite delay-plus-left0 {A} 0 n
+                  | e {n} {a} = refl
+        fmap-◇-cong e {zero} {suc k , a} = refl
+        fmap-◇-cong {A} {B} {f} {f′} e {suc n} {suc k , a}
+            rewrite delay-plus {A} 1 k n
+                  | Functor.fmap-cong (F-delay (suc k)) {A} {B} {f} {f′} e {suc n} {a}
+                  = refl
