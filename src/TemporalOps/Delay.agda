@@ -45,12 +45,13 @@ delay-plus-right0 (suc n) l = delay-plus-right0 n l
 
 -- Delay instances
 instance
-    F-delay : ℕ -> Functor ℝeactive ℝeactive
+    F-delay : ℕ -> Endofunctor ℝeactive
     F-delay k = record
         { omap = delay_by k
         ; fmap = fmap-delay k
         ; fmap-id = λ {_ n a} -> fmap-delay-id k {_} {n} {a}
         ; fmap-∘ = fmap-delay-∘ k
+        ; fmap-cong = fmap-delay-cong k
         }
         where
         -- Lifting of delay
@@ -69,6 +70,12 @@ instance
         fmap-delay-∘ zero = refl
         fmap-delay-∘ (suc k) {n = zero} = refl
         fmap-delay-∘ (suc k) {n = suc n} = fmap-delay-∘ k {n = n}
-
-    EF-delay : (k : ℕ) -> Endofunctor ℝeactive
-    EF-delay k = record { functor = F-delay k }
+        -- Delay is congruent
+        fmap-delay-cong : ∀ (k : ℕ) {A B : τ} {f f′ : A ⇴ B}
+                -> ({n : ℕ} {a : A at n}     -> f n a ≡ f′ n a)
+                -> ({n : ℕ} {a : delay A by k at n}
+                    -> (fmap-delay k f at n) a
+                     ≡ (fmap-delay k f′ at n) a)
+        fmap-delay-cong zero e = e
+        fmap-delay-cong (suc k) e {zero} = refl
+        fmap-delay-cong (suc k) e {suc n} = fmap-delay-cong k e
