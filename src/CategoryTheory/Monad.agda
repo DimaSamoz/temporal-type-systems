@@ -8,7 +8,7 @@ open import CategoryTheory.NatTrans
 open CategoryTheory.Categories.Category using (obj)
 
 -- A monad on a category
-record Monad (ℂ : Category) : Set₁ where
+record Monad {n} (ℂ : Category n) : Set (lsuc n) where
     private module ℂ = Category ℂ
     field
         -- Underlying endofunctor

@@ -8,7 +8,7 @@ open import CategoryTheory.NatTrans
 open CategoryTheory.Categories.Category using (obj)
 
 -- A comonad on a category
-record Comonad (ℂ : Category) : Set₁ where
+record Comonad {n} (ℂ : Category n) : Set (lsuc n) where
     private module ℂ = Category ℂ
     field
         -- Underlying endofunctor

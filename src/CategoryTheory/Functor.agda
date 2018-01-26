@@ -8,7 +8,7 @@ import Relation.Binary.PropositionalEquality as R
 open import Relation.Binary
 
 -- Functor between two categories
-record Functor (ℂ : Category) (𝔻 : Category) : Set₁ where
+record Functor {n} (ℂ : Category n) (𝔻 : Category n) : Set (lsuc n) where
     private module ℂ = Category ℂ
     private module 𝔻 = Category 𝔻
     field
@@ -29,7 +29,7 @@ record Functor (ℂ : Category) (𝔻 : Category) : Set₁ where
                 -> f ℂ.≈ f′ -> fmap f 𝔻.≈ fmap f′
 
 -- Type synonym for endofunctors
-Endofunctor : Category -> Set₁
+Endofunctor : ∀{n} -> Category n -> Set (lsuc n)
 Endofunctor ℂ = Functor ℂ ℂ
 
 open Functor {{...}}
@@ -39,8 +39,8 @@ open CategoryTheory.Categories.Category {{...}}
 
 -- Identity functor
 instance
-    I : ∀{ℂ} -> Endofunctor ℂ
-    I {ℂ} = record { omap = λ a → a
+    I : ∀ {n} {ℂ : Category n} -> Endofunctor {n} ℂ
+    I {n} {ℂ} = record { omap = λ a → a
                    ; fmap = λ a → a
                    ; fmap-id = IsEquivalence.refl (Category.≈-equiv ℂ)
                    ; fmap-∘ =  IsEquivalence.refl (Category.≈-equiv ℂ)
@@ -50,8 +50,8 @@ instance
 -- Functors are closed under composition.
 instance
     infixl 40 _◯_
-    _◯_ : ∀{𝔸 𝔹 ℂ} -> Functor 𝔹 ℂ -> Functor 𝔸 𝔹 -> Functor 𝔸 ℂ
-    _◯_ {𝔸} {𝔹} {ℂ} G F =
+    _◯_ : ∀ {n} {𝔸 𝔹 ℂ : Category n} -> Functor 𝔹 ℂ -> Functor 𝔸 𝔹 -> Functor 𝔸 ℂ
+    _◯_ {n} {𝔸} {𝔹} {ℂ} G F =
         record { omap = λ a → G.omap (F.omap a)
                ; fmap = λ f → G.fmap (F.fmap f)
                ; fmap-id = fmap-◯-id
@@ -87,13 +87,13 @@ instance
 -- Endofunctor tensor product
 instance
     infixl 40 _⨂_
-    _⨂_ : ∀{ℂ} -> Endofunctor ℂ -> Endofunctor ℂ -> Endofunctor ℂ
+    _⨂_ : ∀ {n} {ℂ : Category n} -> Endofunctor ℂ -> Endofunctor ℂ -> Endofunctor ℂ
     (T ⨂ S) = T ◯ S
 
 -- Square and cube of an endofunctor
 instance
-    _² : ∀{ℂ} -> Endofunctor ℂ -> Endofunctor ℂ
+    _² : ∀ {n} {ℂ : Category n} -> Endofunctor ℂ -> Endofunctor ℂ
     F ² = F ⨂ F
 
-    _³ : ∀{ℂ} -> Endofunctor ℂ -> Endofunctor ℂ
+    _³ : ∀ {n} {ℂ : Category n} -> Endofunctor ℂ -> Endofunctor ℂ
     F ³ = F ⨂ F ⨂ F

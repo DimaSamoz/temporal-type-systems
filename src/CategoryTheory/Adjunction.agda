@@ -8,7 +8,7 @@ open import CategoryTheory.NatTrans
 open CategoryTheory.Categories.Category using (obj)
 
 -- Adjunction between two functors
-record _⊣_ {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor 𝔻 ℂ) : Set₁ where
+record _⊣_ {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor 𝔻 ℂ) : Set (lsuc n) where
     private module ℂ = Category ℂ
     private module 𝔻 = Category 𝔻
     private module F = Functor F

@@ -2,26 +2,27 @@
 {- Type classes and instances for categories. -}
 module CategoryTheory.Categories where
 
-open import Data.Nat public
+open import Data.Nat using (ℕ) public
 open import Relation.Binary.PropositionalEquality public
 open import Data.Unit using () renaming (⊤ to top) public
 open import Data.Empty using () renaming (⊥ to bot) public
 open import Data.Product public
 open import Data.Sum renaming (_⊎_ to _∨_)
 open import Relation.Binary using (IsEquivalence ; Reflexive ; Symmetric ; Transitive)
+open import Agda.Primitive using (Level ; _⊔_ ; lzero ; lsuc) public
 
 -- Type class for categories.
 -- Based on https://github.com/UlfNorell/category-theory-experiments
-record Category : Set₂ where
+record Category (n : Level) : Set (lsuc (lsuc n)) where
     infixr 50 _~>_
     infixl 40 _≈_
     infix 60 _∘_
     field
         -- || Data
         -- Objects
-        obj  : Set₁
+        obj  : Set (lsuc n)
         -- Arrows
-        _~>_ : obj -> obj -> Set
+        _~>_ : obj -> obj -> Set n
 
         -- || Operations
         -- Identity arrow
@@ -29,7 +30,7 @@ record Category : Set₂ where
         -- Composition of arrows
         _∘_  : {A B C : obj} -> (B ~> C) -> (A ~> B) -> (A ~> C)
         -- Equality of arrows (as we don't have function extensionality)
-        _≈_  : {A B : obj} -> (A ~> B) -> (A ~> B) -> Set
+        _≈_  : {A B : obj} -> (A ~> B) -> (A ~> B) -> Set n
 
         -- || Laws
         -- Left identity
@@ -65,7 +66,7 @@ open Category
 
 -- Category of sets.
 instance
-    𝕊et : Category
+    𝕊et : Category lzero
     𝕊et = record
         { obj      = Set
         ; _~>_     = λ a b   -> (a -> b)
@@ -100,7 +101,7 @@ infixr 30 _⇴_
 
 -- Category of reactive types
 instance
-    ℝeactive : Category
+    ℝeactive : Category lzero
     ℝeactive = record
              { obj      = τ
              ; _~>_     = _⇴_

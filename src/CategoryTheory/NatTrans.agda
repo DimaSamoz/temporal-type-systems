@@ -10,7 +10,7 @@ open import Relation.Binary.PropositionalEquality
 infixr 25 _⟹_
 
 -- Natural transformation between two functors
-record _⟹_ {ℂ 𝔻 : Category} (F : Functor ℂ 𝔻) (G : Functor ℂ 𝔻) : Set₁ where
+record _⟹_ {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor ℂ 𝔻) : Set (lsuc n) where
     private module ℂ = Category ℂ
     private module 𝔻 = Category 𝔻
     private module F = Functor F
