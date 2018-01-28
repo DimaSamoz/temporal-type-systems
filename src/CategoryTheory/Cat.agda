@@ -294,10 +294,6 @@ instance
                         ℂ.id
                     ℂ.∎
                 }
-
--- (at G⟺G′.to (F′.omap A) ℂ.∘ G.fmap (at F⟺F′.to A)) ℂ.∘
---       (at G⟺G′.from (F.omap A) ℂ.∘ G′.fmap (at F⟺F′.from A))
---       ℂ.≈ ℂ.id
                 where
                 private module F = Functor F
                 private module F′ = Functor F′
