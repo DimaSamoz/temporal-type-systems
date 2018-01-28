@@ -5,7 +5,6 @@ module CategoryTheory.Adjunction where
 open import CategoryTheory.Categories
 open import CategoryTheory.Functor
 open import CategoryTheory.NatTrans
-open CategoryTheory.Categories.Category using (obj)
 
 -- Adjunction between two functors
 record _⊣_ {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor 𝔻 ℂ) : Set (lsuc n) where
@@ -26,6 +25,6 @@ record _⊣_ {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor �
     field
         -- || Laws
         -- First triangle identity: εF ∘ Fη = ιd
-        tri1 : ∀ {A : obj ℂ} -> ε.at (F.omap A) 𝔻.∘ F.fmap (η.at A) 𝔻.≈ 𝔻.id
+        tri1 : ∀ {A : ℂ.obj} -> ε.at (F.omap A) 𝔻.∘ F.fmap (η.at A) 𝔻.≈ 𝔻.id
         -- Second triangle inequality: Gε ∘ ηG = ιd
-        tri2 : ∀ {B : obj 𝔻} -> G.fmap (ε.at B) ℂ.∘ η.at (G.omap B) ℂ.≈ ℂ.id
+        tri2 : ∀ {B : 𝔻.obj} -> G.fmap (ε.at B) ℂ.∘ η.at (G.omap B) ℂ.≈ ℂ.id

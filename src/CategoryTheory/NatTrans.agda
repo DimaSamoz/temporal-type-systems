@@ -4,7 +4,6 @@ module CategoryTheory.NatTrans where
 
 open import CategoryTheory.Categories
 open import CategoryTheory.Functor
-open CategoryTheory.Categories.Category using (obj)
 open import Relation.Binary using (IsEquivalence)
 
 infixr 25 _⟹_
@@ -18,11 +17,11 @@ record _⟹_ {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor ℂ
     field
         -- || Definitions
         -- One component of the natural transformations.
-        at : ∀(A : obj ℂ) -> (F.omap A) 𝔻.~> (G.omap A)
+        at : ∀(A : ℂ.obj) -> (F.omap A) 𝔻.~> (G.omap A)
 
         -- || Laws
         -- Naturality condition
-        nat-cond : ∀{A B : obj ℂ} {f : A ℂ.~> B}
+        nat-cond : ∀{A B : ℂ.obj} {f : A ℂ.~> B}
                 -> (G.fmap f 𝔻.∘ at A) 𝔻.≈ (at B 𝔻.∘ F.fmap f)
 
 -- Identity natural transformation
@@ -98,8 +97,8 @@ record _⟺_  {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor �
 
     field
         -- || Isomorphism laws
-        iso1 : ∀{A : obj ℂ} -> (from.at A) 𝔻.∘ (to.at A)   𝔻.≈ 𝔻.id
-        iso2 : ∀{A : obj ℂ} -> (to.at A)   𝔻.∘ (from.at A) 𝔻.≈ 𝔻.id
+        iso1 : ∀{A : ℂ.obj} -> (from.at A) 𝔻.∘ (to.at A)   𝔻.≈ 𝔻.id
+        iso2 : ∀{A : ℂ.obj} -> (to.at A)   𝔻.∘ (from.at A) 𝔻.≈ 𝔻.id
 
 -- Natural isomorphism is an equivalence
 ⟺-equiv : ∀ {n} {ℂ 𝔻 : Category n} -> IsEquivalence (_⟺_ {n} {ℂ} {𝔻})
