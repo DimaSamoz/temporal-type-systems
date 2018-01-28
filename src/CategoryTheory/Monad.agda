@@ -5,7 +5,6 @@ module CategoryTheory.Monad where
 open import CategoryTheory.Categories
 open import CategoryTheory.Functor
 open import CategoryTheory.NatTrans
-open CategoryTheory.Categories.Category using (obj)
 
 -- A monad on a category
 record Monad {n} (ℂ : Category n) : Set (lsuc n) where
@@ -27,9 +26,9 @@ record Monad {n} (ℂ : Category n) : Set (lsuc n) where
     field
         -- || Laws
         -- Unit on both sides is cancelled by multiplication (unit)
-        η-unit1 : ∀ {A : obj ℂ} -> (μ.at A) ℂ.∘ (η.at (T.omap A)) ℂ.≈ ℂ.id
-        η-unit2 : ∀ {A : obj ℂ} -> (μ.at A) ℂ.∘ (T.fmap (η.at A)) ℂ.≈ ℂ.id
+        η-unit1 : ∀ {A : ℂ.obj} -> (μ.at A) ℂ.∘ (η.at (T.omap A)) ℂ.≈ ℂ.id
+        η-unit2 : ∀ {A : ℂ.obj} -> (μ.at A) ℂ.∘ (T.fmap (η.at A)) ℂ.≈ ℂ.id
 
         -- Multiplication can be performed on both sides (associativity)
-        μ-assoc : ∀ {A : obj ℂ} -> (μ.at A) ℂ.∘ (μ.at (T.omap A))
+        μ-assoc : ∀ {A : ℂ.obj} -> (μ.at A) ℂ.∘ (μ.at (T.omap A))
                                ℂ.≈ (μ.at A) ℂ.∘ (T.fmap (μ.at A))

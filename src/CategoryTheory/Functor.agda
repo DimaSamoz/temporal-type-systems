@@ -3,8 +3,6 @@
 module CategoryTheory.Functor where
 
 open import CategoryTheory.Categories
-open CategoryTheory.Categories.Category using (obj)
-import Relation.Binary.PropositionalEquality as R
 open import Relation.Binary
 
 -- Functor between two categories
@@ -14,18 +12,18 @@ record Functor {n} (ℂ : Category n) (𝔻 : Category n) : Set (lsuc n) where
     field
         -- || Definitions
         -- Object map
-        omap : obj ℂ -> obj 𝔻
+        omap : ℂ.obj -> 𝔻.obj
         -- Arrow map
-        fmap : ∀{A B : obj ℂ} -> (A ℂ.~> B) -> (omap A 𝔻.~> omap B)
+        fmap : ∀{A B : ℂ.obj} -> (A ℂ.~> B) -> (omap A 𝔻.~> omap B)
 
         -- || Laws
         -- Functor preseres identities
-        fmap-id   : ∀{A : obj ℂ} -> fmap (ℂ.id {A}) 𝔻.≈ 𝔻.id
+        fmap-id   : ∀{A : ℂ.obj} -> fmap (ℂ.id {A}) 𝔻.≈ 𝔻.id
         -- Functor preserves composition
-        fmap-∘    : ∀{A B C : obj ℂ} {g : B ℂ.~> C} {f : A ℂ.~> B}
+        fmap-∘    : ∀{A B C : ℂ.obj} {g : B ℂ.~> C} {f : A ℂ.~> B}
                  -> fmap (g ℂ.∘ f) 𝔻.≈ fmap g 𝔻.∘ fmap f
         -- Congruence of equality and fmap
-        fmap-cong : ∀{A B : obj ℂ} {f f′ : A ℂ.~> B}
+        fmap-cong : ∀{A B : ℂ.obj} {f f′ : A ℂ.~> B}
                 -> f ℂ.≈ f′ -> fmap f 𝔻.≈ fmap f′
 
 -- Type synonym for endofunctors
@@ -39,7 +37,7 @@ open CategoryTheory.Categories.Category {{...}}
 
 -- Identity functor
 instance
-    I : ∀ {n} {ℂ : Category n} -> Endofunctor {n} ℂ
+    I : ∀ {n} {ℂ : Category n} -> Endofunctor ℂ
     I {n} {ℂ} = record { omap = λ a → a
                    ; fmap = λ a → a
                    ; fmap-id = IsEquivalence.refl (Category.≈-equiv ℂ)
@@ -63,7 +61,7 @@ instance
               private module 𝔹 = Category 𝔹
               private module ℂ = Category ℂ
 
-              fmap-◯-id : ∀{A : obj 𝔸} -> G.fmap (F.fmap (𝔸.id {A})) ℂ.≈ ℂ.id
+              fmap-◯-id : ∀{A : 𝔸.obj} -> G.fmap (F.fmap (𝔸.id {A})) ℂ.≈ ℂ.id
               fmap-◯-id {A} =
                     ℂ.begin
                         G.fmap (F.fmap (𝔸.id))
@@ -72,7 +70,7 @@ instance
                     ℂ.≈⟨ G.fmap-id ⟩
                         ℂ.id
                     ℂ.∎
-              fmap-◯-∘ : ∀{A B C : obj 𝔸} {g : B 𝔸.~> C} {f : A 𝔸.~> B}
+              fmap-◯-∘ : ∀{A B C : 𝔸.obj} {g : B 𝔸.~> C} {f : A 𝔸.~> B}
                        -> G.fmap (F.fmap (g 𝔸.∘ f)) ℂ.≈
                           G.fmap (F.fmap g) ℂ.∘ G.fmap (F.fmap f)
               fmap-◯-∘ {A} {g = g} {f = f} =

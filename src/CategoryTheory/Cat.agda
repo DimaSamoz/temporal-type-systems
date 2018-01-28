@@ -5,7 +5,6 @@ module CategoryTheory.Cat where
 open import CategoryTheory.Categories
 open import CategoryTheory.Functor
 open import CategoryTheory.NatTrans
-open CategoryTheory.Categories.Category using (obj)
 
 -- Category of categories
 instance
@@ -64,7 +63,7 @@ instance
                 private module ℂ = Category ℂ
                 private module 𝔻 = Category 𝔻
 
-                iso-proof : ∀{A : obj ℂ} -> F.fmap (ℂ.id {A}) 𝔻.∘ F.fmap ℂ.id 𝔻.≈ 𝔻.id
+                iso-proof : ∀{A : ℂ.obj} -> F.fmap (ℂ.id {A}) 𝔻.∘ F.fmap ℂ.id 𝔻.≈ 𝔻.id
                 iso-proof =
                     𝔻.begin
                         F.fmap ℂ.id 𝔻.∘ F.fmap ℂ.id
@@ -118,7 +117,7 @@ instance
                 private module ℂ = Category ℂ
                 private module 𝔻 = Category 𝔻
 
-                iso-proof : ∀{A : obj ℂ} -> F.fmap (ℂ.id {A}) 𝔻.∘ F.fmap ℂ.id 𝔻.≈ 𝔻.id
+                iso-proof : ∀{A : ℂ.obj} -> F.fmap (ℂ.id {A}) 𝔻.∘ F.fmap ℂ.id 𝔻.≈ 𝔻.id
                 iso-proof =
                     𝔻.begin
                         F.fmap ℂ.id 𝔻.∘ F.fmap ℂ.id
@@ -178,7 +177,7 @@ instance
                 private module ℂ = Category ℂ
                 private module 𝔻 = Category 𝔻
 
-                iso-proof : ∀{A : obj 𝔸}
+                iso-proof : ∀{A : 𝔸.obj}
                          ->  Functor.fmap ((H ◯ G) ◯ F) (𝔸.id {A}) 𝔻.∘ Functor.fmap (H ◯ (G ◯ F)) 𝔸.id
                          𝔻.≈ 𝔻.id
                 iso-proof =

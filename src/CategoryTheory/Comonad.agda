@@ -5,7 +5,6 @@ module CategoryTheory.Comonad where
 open import CategoryTheory.Categories
 open import CategoryTheory.Functor
 open import CategoryTheory.NatTrans
-open CategoryTheory.Categories.Category using (obj)
 
 -- A comonad on a category
 record Comonad {n} (ℂ : Category n) : Set (lsuc n) where
@@ -27,9 +26,9 @@ record Comonad {n} (ℂ : Category n) : Set (lsuc n) where
     field
         -- || Laws
         -- Duplication is cancelled by extraction on both sides (counit)
-        ε-unit1 : ∀ {A : obj ℂ} -> (ε.at (W.omap A)) ℂ.∘ (δ.at A) ℂ.≈ ℂ.id
-        ε-unit2 : ∀ {A : obj ℂ} -> (W.fmap (ε.at A)) ℂ.∘ (δ.at A) ℂ.≈ ℂ.id
+        ε-unit1 : ∀ {A : ℂ.obj} -> (ε.at (W.omap A)) ℂ.∘ (δ.at A) ℂ.≈ ℂ.id
+        ε-unit2 : ∀ {A : ℂ.obj} -> (W.fmap (ε.at A)) ℂ.∘ (δ.at A) ℂ.≈ ℂ.id
 
         -- Duplication can be performed on both sides (coassociativity)
-        δ-assoc : ∀ {A : obj ℂ} -> (δ.at (W.omap A)) ℂ.∘ (δ.at A)
+        δ-assoc : ∀ {A : ℂ.obj} -> (δ.at (W.omap A)) ℂ.∘ (δ.at A)
                                ℂ.≈ (W.fmap (δ.at A)) ℂ.∘ (δ.at A)
