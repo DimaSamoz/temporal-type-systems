@@ -8,7 +8,7 @@ open import Data.Unit using () renaming (⊤ to top) public
 open import Data.Empty using () renaming (⊥ to bot) public
 open import Data.Product public
 open import Data.Sum renaming (_⊎_ to _∨_)
-open import Relation.Binary using (IsEquivalence ; Reflexive ; Symmetric ; Transitive)
+open import Relation.Binary using (IsEquivalence)
 open import Agda.Primitive using (Level ; _⊔_ ; lzero ; lsuc) public
 
 -- Type class for categories.
@@ -62,6 +62,14 @@ record Category (n : Level) : Set (lsuc (lsuc n)) where
 
     _∎ : ∀{A B : obj} (x : A ~> B) → x ≈ x
     _∎ _ = IsEquivalence.refl ≈-equiv
+
+    -- Derived congruence properties
+    ≈-cong-left : ∀{A B C : obj} {f : A ~> B} {g g′ : B ~> C}
+            -> g ≈ g′ -> g ∘ f ≈ g′ ∘ f
+    ≈-cong-left e = ≈-cong (IsEquivalence.refl ≈-equiv) e
+    ≈-cong-right : ∀{A B C : obj} {g : B ~> C} {f f′ : A ~> B}
+            -> f ≈ f′ -> g ∘ f ≈ g ∘ f′
+    ≈-cong-right e = ≈-cong e (IsEquivalence.refl ≈-equiv)
 open Category
 
 -- Category of sets.
