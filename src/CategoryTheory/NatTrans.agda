@@ -5,6 +5,7 @@ module CategoryTheory.NatTrans where
 open import CategoryTheory.Categories
 open import CategoryTheory.Functor
 open CategoryTheory.Categories.Category using (obj)
+open import Relation.Binary using (IsEquivalence)
 
 infixr 25 _⟹_
 
@@ -99,3 +100,67 @@ record _⟺_  {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor �
         -- || Isomorphism laws
         iso1 : ∀{A : obj ℂ} -> (from.at A) 𝔻.∘ (to.at A)   𝔻.≈ 𝔻.id
         iso2 : ∀{A : obj ℂ} -> (to.at A)   𝔻.∘ (from.at A) 𝔻.≈ 𝔻.id
+
+-- Natural isomorphism is an equivalence
+⟺-equiv : ∀ {n} {ℂ 𝔻 : Category n} -> IsEquivalence (_⟺_ {n} {ℂ} {𝔻})
+⟺-equiv {n} {ℂ} {𝔻} = record
+         { refl = λ {F} -> record
+             { to = ιd F
+             ; from = ιd F
+             ; iso1 = λ {A} -> refl-iso-proof {A} {F}
+             ; iso2 = λ {A} -> refl-iso-proof {A} {F} }
+         ; sym = λ {F} {G} F⟺G -> record
+             { to = _⟺_.from F⟺G
+             ; from = _⟺_.to F⟺G
+             ; iso1 = _⟺_.iso2 F⟺G
+             ; iso2 = _⟺_.iso1 F⟺G }
+         ; trans = λ {F} {G} {H} F⟺G G⟺H -> record
+             { to = (_⟺_.to G⟺H) ⊚ (_⟺_.to F⟺G)
+             ; from = (_⟺_.from F⟺G) ⊚ (_⟺_.from G⟺H)
+             ; iso1 = λ {A} →
+                𝔻.begin
+                    at (from F⟺G ⊚ from G⟺H) A 𝔻.∘ at (to G⟺H ⊚ to F⟺G) A
+                𝔻.≈⟨ IsEquivalence.sym 𝔻.≈-equiv (𝔻.∘-assoc) ⟩
+                    ((at (from F⟺G) A 𝔻.∘ at (from G⟺H) A) 𝔻.∘ at (to G⟺H) A) 𝔻.∘ at (to F⟺G) A
+                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.∘-assoc) ⟩
+                    (at (from F⟺G) A 𝔻.∘ (at (from G⟺H) A 𝔻.∘ at (to G⟺H) A)) 𝔻.∘ at (to F⟺G) A
+                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.≈-cong-right (iso1 G⟺H)) ⟩
+                    (at (from F⟺G) A 𝔻.∘ 𝔻.id) 𝔻.∘ at (to F⟺G) A
+                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.id-right) ⟩
+                    at (from F⟺G) A 𝔻.∘ at (to F⟺G) A
+                𝔻.≈⟨ iso1 F⟺G ⟩
+                    𝔻.id
+                𝔻.∎
+             ; iso2 = λ {A} →
+                𝔻.begin
+                    at (to G⟺H ⊚ to F⟺G) A 𝔻.∘ at (from F⟺G ⊚ from G⟺H) A
+                𝔻.≈⟨ IsEquivalence.sym 𝔻.≈-equiv (𝔻.∘-assoc) ⟩
+                    ((at (to G⟺H) A 𝔻.∘ at (to F⟺G) A) 𝔻.∘ at (from F⟺G) A) 𝔻.∘ at (from G⟺H) A
+                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.∘-assoc) ⟩
+                    (at (to G⟺H) A 𝔻.∘ (at (to F⟺G) A 𝔻.∘ at (from F⟺G) A)) 𝔻.∘ at (from G⟺H) A
+                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.≈-cong-right (iso2 F⟺G)) ⟩
+                    (at (to G⟺H) A 𝔻.∘ 𝔻.id) 𝔻.∘ at (from G⟺H) A
+                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.id-right) ⟩
+                    at (to G⟺H) A 𝔻.∘ at (from G⟺H) A
+                𝔻.≈⟨ iso2 G⟺H ⟩
+                    𝔻.id
+                𝔻.∎
+             }
+         }
+    where
+    private module ℂ = Category ℂ
+    private module 𝔻 = Category 𝔻
+    open _⟹_
+    open _⟺_
+    refl-iso-proof : {A : ℂ.obj} {F : Functor ℂ 𝔻}
+             -> _⟹_.at (ιd F) A 𝔻.∘ _⟹_.at (ιd F) A 𝔻.≈ 𝔻.id
+    refl-iso-proof {A} {F} =
+        𝔻.begin
+            _⟹_.at (ιd F) A 𝔻.∘ _⟹_.at (ιd F) A
+        𝔻.≈⟨ 𝔻.≈-cong-left (Functor.fmap-id F) ⟩
+            𝔻.id 𝔻.∘ _⟹_.at (ιd F) A
+        𝔻.≈⟨ 𝔻.≈-cong-right (Functor.fmap-id F) ⟩
+            𝔻.id 𝔻.∘ 𝔻.id
+        𝔻.≈⟨ 𝔻.id-left ⟩
+            𝔻.id
+        𝔻.∎
