@@ -34,11 +34,11 @@ record Category (n : Level) : Set (lsuc (lsuc n)) where
 
         -- || Laws
         -- Left identity
-        id-left  : {x y : obj} {f : x ~> y} -> id ∘ f ≈ f
+        id-left  : {A B : obj} {f : A ~> B} -> id ∘ f ≈ f
         -- Right identity
-        id-right : {x y : obj} {f : x ~> y} -> f ∘ id ≈ f
+        id-right : {A B : obj} {f : A ~> B} -> f ∘ id ≈ f
         -- Associativity of composition
-        ∘-assoc  : {x y z w : obj} {f : z ~> w} {g : y ~> z} {h : x ~> y}
+        ∘-assoc  : {A B C D : obj} {f : C ~> D} {g : B ~> C} {h : A ~> B}
                 -> (f ∘ g) ∘ h ≈ f ∘ (g ∘ h)
         -- Arrow equality is an equivalence relation
         ≈-equiv  : ∀{A B : obj} -> IsEquivalence (_≈_ {A} {B})
