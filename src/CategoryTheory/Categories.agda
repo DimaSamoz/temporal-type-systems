@@ -50,6 +50,8 @@ record Category (n : Level) : Set (lsuc (lsuc n)) where
     infix  3 _∎
     infixr 2 _≈⟨⟩_ _≈⟨_⟩_
     infix  1 begin_
+    infixl 20 _[sym]
+    infixr 15 _≈>_
 
     begin_ : ∀{A B : obj} {x y : A ~> B} → x ≈ y → x ≈ y
     begin_ x≈y = x≈y
@@ -62,6 +64,15 @@ record Category (n : Level) : Set (lsuc (lsuc n)) where
 
     _∎ : ∀{A B : obj} (x : A ~> B) → x ≈ x
     _∎ _ = IsEquivalence.refl ≈-equiv
+
+    _[sym] : ∀{A B : obj} {x y : A ~> B} → x ≈ y → y ≈ x
+    p [sym] = IsEquivalence.sym ≈-equiv p
+
+    _≈>_ : ∀{A B : obj} {x y z : A ~> B} → x ≈ y → y ≈ z → x ≈ z
+    p1 ≈> p2 = IsEquivalence.trans ≈-equiv p1 p2
+
+    id-comm : {A B : obj} {f : A ~> B} -> f ∘ id ≈ id ∘ f
+    id-comm = id-right ≈> id-left [sym]
 
     -- Derived congruence properties
     ≈-cong-left : ∀{A B C : obj} {f : A ~> B} {g g′ : B ~> C}
