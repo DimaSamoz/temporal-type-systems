@@ -34,11 +34,9 @@ instance
                     F.fmap f 𝔻.∘ F.fmap ℂ.id
                 𝔻.≈⟨ 𝔻.≈-cong-right (F.fmap-id) ⟩
                     F.fmap f 𝔻.∘ 𝔻.id
-                𝔻.≈⟨ 𝔻.id-right ⟩
-                    F.fmap f
-                𝔻.≈⟨  IsEquivalence.sym 𝔻.≈-equiv (𝔻.id-left)  ⟩
+                𝔻.≈⟨ 𝔻.id-comm ⟩
                     𝔻.id 𝔻.∘ F.fmap f
-                𝔻.≈⟨ 𝔻.≈-cong-left (IsEquivalence.sym 𝔻.≈-equiv (F.fmap-id)) ⟩
+                𝔻.≈⟨ 𝔻.≈-cong-left (F.fmap-id 𝔻.[sym]) ⟩
                     F.fmap ℂ.id 𝔻.∘ F.fmap  f
                 𝔻.∎
             }
@@ -58,15 +56,11 @@ instance
         ; nat-cond =  λ {A} {B} {f} ->
             𝔻.begin
                 H.fmap f 𝔻.∘ (φ.at A 𝔻.∘ ψ.at A)
-            𝔻.≈⟨ IsEquivalence.sym 𝔻.≈-equiv 𝔻.∘-assoc ⟩
+            𝔻.≈⟨ 𝔻.∘-assoc 𝔻.[sym] ⟩
                 (H.fmap f 𝔻.∘ φ.at A) 𝔻.∘ ψ.at A
-            𝔻.≈⟨  𝔻.≈-cong-left (φ.nat-cond) ⟩
-                (φ.at B 𝔻.∘ G.fmap f) 𝔻.∘ ψ.at A
-            𝔻.≈⟨ 𝔻.∘-assoc ⟩
+            𝔻.≈⟨  𝔻.≈-cong-left (φ.nat-cond) 𝔻.≈> 𝔻.∘-assoc ⟩
                 φ.at B 𝔻.∘ (G.fmap f 𝔻.∘ ψ.at A)
-            𝔻.≈⟨ 𝔻.≈-cong-right (ψ.nat-cond) ⟩
-                φ.at B 𝔻.∘ (ψ.at B 𝔻.∘ F.fmap f)
-            𝔻.≈⟨ IsEquivalence.sym 𝔻.≈-equiv 𝔻.∘-assoc ⟩
+            𝔻.≈⟨ 𝔻.≈-cong-right (ψ.nat-cond) 𝔻.≈> (𝔻.∘-assoc 𝔻.[sym])⟩
                 (φ.at B 𝔻.∘ ψ.at B) 𝔻.∘ F.fmap f
             𝔻.∎
         }
@@ -119,9 +113,7 @@ record _⟺_  {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor �
              ; iso1 = λ {A} →
                 𝔻.begin
                     at (from F⟺G ⊚ from G⟺H) A 𝔻.∘ at (to G⟺H ⊚ to F⟺G) A
-                𝔻.≈⟨ IsEquivalence.sym 𝔻.≈-equiv (𝔻.∘-assoc) ⟩
-                    ((at (from F⟺G) A 𝔻.∘ at (from G⟺H) A) 𝔻.∘ at (to G⟺H) A) 𝔻.∘ at (to F⟺G) A
-                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.∘-assoc) ⟩
+                𝔻.≈⟨ 𝔻.∘-assoc 𝔻.[sym] 𝔻.≈> 𝔻.≈-cong-left (𝔻.∘-assoc) ⟩
                     (at (from F⟺G) A 𝔻.∘ (at (from G⟺H) A 𝔻.∘ at (to G⟺H) A)) 𝔻.∘ at (to F⟺G) A
                 𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.≈-cong-right (iso1 G⟺H)) ⟩
                     (at (from F⟺G) A 𝔻.∘ 𝔻.id) 𝔻.∘ at (to F⟺G) A
@@ -133,9 +125,7 @@ record _⟺_  {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor �
              ; iso2 = λ {A} →
                 𝔻.begin
                     at (to G⟺H ⊚ to F⟺G) A 𝔻.∘ at (from F⟺G ⊚ from G⟺H) A
-                𝔻.≈⟨ IsEquivalence.sym 𝔻.≈-equiv (𝔻.∘-assoc) ⟩
-                    ((at (to G⟺H) A 𝔻.∘ at (to F⟺G) A) 𝔻.∘ at (from F⟺G) A) 𝔻.∘ at (from G⟺H) A
-                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.∘-assoc) ⟩
+                𝔻.≈⟨ (𝔻.∘-assoc 𝔻.[sym]) 𝔻.≈> 𝔻.≈-cong-left (𝔻.∘-assoc) ⟩
                     (at (to G⟺H) A 𝔻.∘ (at (to F⟺G) A 𝔻.∘ at (from F⟺G) A)) 𝔻.∘ at (from G⟺H) A
                 𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.≈-cong-right (iso2 F⟺G)) ⟩
                     (at (to G⟺H) A 𝔻.∘ 𝔻.id) 𝔻.∘ at (from G⟺H) A
