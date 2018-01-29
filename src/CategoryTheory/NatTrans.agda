@@ -30,42 +30,41 @@ instance
     ιd {n} {ℂ} {𝔻} F = record
             { at = λ A -> F.fmap ℂ.id
             ; nat-cond =  λ {A} {B} {f} ->
-                𝔻.begin
-                    F.fmap f 𝔻.∘ F.fmap ℂ.id
-                𝔻.≈⟨ 𝔻.≈-cong-right (F.fmap-id) ⟩
-                    F.fmap f 𝔻.∘ 𝔻.id
-                𝔻.≈⟨ 𝔻.id-comm ⟩
-                    𝔻.id 𝔻.∘ F.fmap f
-                𝔻.≈⟨ 𝔻.≈-cong-left (F.fmap-id 𝔻.[sym]) ⟩
-                    F.fmap ℂ.id 𝔻.∘ F.fmap  f
-                𝔻.∎
+                begin
+                    F.fmap f ∘ F.fmap ℂ.id
+                ≈⟨ ≈-cong-right (F.fmap-id) ⟩
+                    F.fmap f ∘ id
+                ≈⟨ id-comm ⟩
+                    id ∘ F.fmap f
+                ≈⟨ ≈-cong-left (F.fmap-id [sym]) ⟩
+                    F.fmap ℂ.id ∘ F.fmap  f
+                ∎
             }
 
         where
-        open import Relation.Binary using (IsEquivalence)
         private module F = Functor F
         private module ℂ = Category ℂ
-        private module 𝔻 = Category 𝔻
+        open Category 𝔻
 
 -- Vertical composition of natural transformations
 instance
     _⊚_ : ∀ {n} {ℂ 𝔻 : Category n} -> {F G H : Functor ℂ 𝔻}
-       -> G ⟹ H -> F ⟹ G -> F ⟹ H
+       -> (G ⟹ H) -> (F ⟹ G) -> (F ⟹ H)
     _⊚_ {n} {ℂ} {𝔻} {F} {G} {H} φ ψ = record
-        { at = λ A -> (φ.at A) 𝔻.∘ (ψ.at A)
+        { at = λ A -> (φ.at A) ∘ (ψ.at A)
         ; nat-cond =  λ {A} {B} {f} ->
-            𝔻.begin
-                H.fmap f 𝔻.∘ (φ.at A 𝔻.∘ ψ.at A)
-            𝔻.≈⟨ 𝔻.∘-assoc 𝔻.[sym] ⟩
-                (H.fmap f 𝔻.∘ φ.at A) 𝔻.∘ ψ.at A
-            𝔻.≈⟨  𝔻.≈-cong-left (φ.nat-cond) 𝔻.≈> 𝔻.∘-assoc ⟩
-                φ.at B 𝔻.∘ (G.fmap f 𝔻.∘ ψ.at A)
-            𝔻.≈⟨ 𝔻.≈-cong-right (ψ.nat-cond) 𝔻.≈> (𝔻.∘-assoc 𝔻.[sym])⟩
-                (φ.at B 𝔻.∘ ψ.at B) 𝔻.∘ F.fmap f
-            𝔻.∎
+            begin
+                H.fmap f ∘ (φ.at A ∘ ψ.at A)
+            ≈⟨ ∘-assoc [sym] ⟩
+                (H.fmap f ∘ φ.at A) ∘ ψ.at A
+            ≈⟨ ≈-cong-left (φ.nat-cond) ≈> ∘-assoc ⟩
+                φ.at B ∘ (G.fmap f ∘ ψ.at A)
+            ≈⟨ ≈-cong-right (ψ.nat-cond) ≈> (∘-assoc [sym])⟩
+                (φ.at B ∘ ψ.at B) ∘ F.fmap f
+            ∎
         }
         where
-        private module 𝔻 = Category 𝔻
+        open Category 𝔻
         private module F = Functor F
         private module G = Functor G
         private module H = Functor H
@@ -111,45 +110,45 @@ record _⟺_  {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor �
              { to = (_⟺_.to G⟺H) ⊚ (_⟺_.to F⟺G)
              ; from = (_⟺_.from F⟺G) ⊚ (_⟺_.from G⟺H)
              ; iso1 = λ {A} →
-                𝔻.begin
-                    at (from F⟺G ⊚ from G⟺H) A 𝔻.∘ at (to G⟺H ⊚ to F⟺G) A
-                𝔻.≈⟨ 𝔻.∘-assoc 𝔻.[sym] 𝔻.≈> 𝔻.≈-cong-left (𝔻.∘-assoc) ⟩
-                    (at (from F⟺G) A 𝔻.∘ (at (from G⟺H) A 𝔻.∘ at (to G⟺H) A)) 𝔻.∘ at (to F⟺G) A
-                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.≈-cong-right (iso1 G⟺H)) ⟩
-                    (at (from F⟺G) A 𝔻.∘ 𝔻.id) 𝔻.∘ at (to F⟺G) A
-                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.id-right) ⟩
-                    at (from F⟺G) A 𝔻.∘ at (to F⟺G) A
-                𝔻.≈⟨ iso1 F⟺G ⟩
-                    𝔻.id
-                𝔻.∎
+                begin
+                    at (from F⟺G ⊚ from G⟺H) A ∘ at (to G⟺H ⊚ to F⟺G) A
+                ≈⟨ ∘-assoc [sym] ≈> ≈-cong-left (∘-assoc) ⟩
+                    (at (from F⟺G) A ∘ (at (from G⟺H) A ∘ at (to G⟺H) A)) ∘ at (to F⟺G) A
+                ≈⟨ ≈-cong-left (≈-cong-right (iso1 G⟺H)) ⟩
+                    (at (from F⟺G) A ∘ id) ∘ at (to F⟺G) A
+                ≈⟨ ≈-cong-left (id-right) ⟩
+                    at (from F⟺G) A ∘ at (to F⟺G) A
+                ≈⟨ iso1 F⟺G ⟩
+                    id
+                ∎
              ; iso2 = λ {A} →
-                𝔻.begin
-                    at (to G⟺H ⊚ to F⟺G) A 𝔻.∘ at (from F⟺G ⊚ from G⟺H) A
-                𝔻.≈⟨ (𝔻.∘-assoc 𝔻.[sym]) 𝔻.≈> 𝔻.≈-cong-left (𝔻.∘-assoc) ⟩
-                    (at (to G⟺H) A 𝔻.∘ (at (to F⟺G) A 𝔻.∘ at (from F⟺G) A)) 𝔻.∘ at (from G⟺H) A
-                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.≈-cong-right (iso2 F⟺G)) ⟩
-                    (at (to G⟺H) A 𝔻.∘ 𝔻.id) 𝔻.∘ at (from G⟺H) A
-                𝔻.≈⟨ 𝔻.≈-cong-left (𝔻.id-right) ⟩
-                    at (to G⟺H) A 𝔻.∘ at (from G⟺H) A
-                𝔻.≈⟨ iso2 G⟺H ⟩
-                    𝔻.id
-                𝔻.∎
+                begin
+                    at (to G⟺H ⊚ to F⟺G) A ∘ at (from F⟺G ⊚ from G⟺H) A
+                ≈⟨ (∘-assoc [sym]) ≈> ≈-cong-left (∘-assoc) ⟩
+                    (at (to G⟺H) A ∘ (at (to F⟺G) A ∘ at (from F⟺G) A)) ∘ at (from G⟺H) A
+                ≈⟨ ≈-cong-left (≈-cong-right (iso2 F⟺G)) ⟩
+                    (at (to G⟺H) A ∘ id) ∘ at (from G⟺H) A
+                ≈⟨ ≈-cong-left (id-right) ⟩
+                    at (to G⟺H) A ∘ at (from G⟺H) A
+                ≈⟨ iso2 G⟺H ⟩
+                    id
+                ∎
              }
          }
     where
     private module ℂ = Category ℂ
-    private module 𝔻 = Category 𝔻
+    open Category 𝔻
     open _⟹_
     open _⟺_
     refl-iso-proof : {A : ℂ.obj} {F : Functor ℂ 𝔻}
-             -> _⟹_.at (ιd F) A 𝔻.∘ _⟹_.at (ιd F) A 𝔻.≈ 𝔻.id
+             -> _⟹_.at (ιd F) A ∘ _⟹_.at (ιd F) A ≈ id
     refl-iso-proof {A} {F} =
-        𝔻.begin
-            _⟹_.at (ιd F) A 𝔻.∘ _⟹_.at (ιd F) A
-        𝔻.≈⟨ 𝔻.≈-cong-left (Functor.fmap-id F) ⟩
-            𝔻.id 𝔻.∘ _⟹_.at (ιd F) A
-        𝔻.≈⟨ 𝔻.≈-cong-right (Functor.fmap-id F) ⟩
-            𝔻.id 𝔻.∘ 𝔻.id
-        𝔻.≈⟨ 𝔻.id-left ⟩
-            𝔻.id
-        𝔻.∎
+        begin
+            _⟹_.at (ιd F) A ∘ _⟹_.at (ιd F) A
+        ≈⟨ ≈-cong-left (Functor.fmap-id F) ⟩
+            id ∘ _⟹_.at (ιd F) A
+        ≈⟨ ≈-cong-right (Functor.fmap-id F) ⟩
+            id ∘ id
+        ≈⟨ id-left ⟩
+            id
+        ∎

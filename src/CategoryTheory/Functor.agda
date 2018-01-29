@@ -30,10 +30,6 @@ record Functor {n} (ℂ : Category n) (𝔻 : Category n) : Set (lsuc n) where
 Endofunctor : ∀{n} -> Category n -> Set (lsuc n)
 Endofunctor ℂ = Functor ℂ ℂ
 
-open Functor {{...}}
-
-open CategoryTheory.Categories.Category {{...}}
-
 
 -- Identity functor
 instance
@@ -59,28 +55,28 @@ instance
               private module G = Functor G
               private module 𝔸 = Category 𝔸
               private module 𝔹 = Category 𝔹
-              private module ℂ = Category ℂ
+              open Category ℂ
 
-              fmap-◯-id : ∀{A : 𝔸.obj} -> G.fmap (F.fmap (𝔸.id {A})) ℂ.≈ ℂ.id
+              fmap-◯-id : ∀{A : 𝔸.obj} -> G.fmap (F.fmap (𝔸.id {A})) ≈ id
               fmap-◯-id {A} =
-                    ℂ.begin
+                    begin
                         G.fmap (F.fmap (𝔸.id))
-                    ℂ.≈⟨ G.fmap-cong (F.fmap-id) ⟩
+                    ≈⟨ G.fmap-cong (F.fmap-id) ⟩
                         G.fmap (𝔹.id)
-                    ℂ.≈⟨ G.fmap-id ⟩
-                        ℂ.id
-                    ℂ.∎
+                    ≈⟨ G.fmap-id ⟩
+                        id
+                    ∎
               fmap-◯-∘ : ∀{A B C : 𝔸.obj} {g : B 𝔸.~> C} {f : A 𝔸.~> B}
-                       -> G.fmap (F.fmap (g 𝔸.∘ f)) ℂ.≈
-                          G.fmap (F.fmap g) ℂ.∘ G.fmap (F.fmap f)
+                       -> G.fmap (F.fmap (g 𝔸.∘ f)) ≈
+                          G.fmap (F.fmap g) ∘ G.fmap (F.fmap f)
               fmap-◯-∘ {A} {g = g} {f = f} =
-                    ℂ.begin
+                    begin
                         G.fmap (F.fmap (g 𝔸.∘ f))
-                    ℂ.≈⟨ G.fmap-cong (F.fmap-∘) ⟩
+                    ≈⟨ G.fmap-cong (F.fmap-∘) ⟩
                         G.fmap ((F.fmap g) 𝔹.∘ (F.fmap f))
-                    ℂ.≈⟨ G.fmap-∘ ⟩
-                        G.fmap (F.fmap g) ℂ.∘ G.fmap (F.fmap f)
-                    ℂ.∎
+                    ≈⟨ G.fmap-∘ ⟩
+                        G.fmap (F.fmap g) ∘ G.fmap (F.fmap f)
+                    ∎
 
 -- Endofunctor tensor product
 instance
