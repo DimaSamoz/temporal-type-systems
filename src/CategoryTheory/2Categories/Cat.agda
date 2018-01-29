@@ -1,6 +1,6 @@
 
 {- Category of categories -}
-module CategoryTheory.Cat where
+module CategoryTheory.2Categories.Cat where
 
 open import CategoryTheory.Categories
 open import CategoryTheory.Functor
