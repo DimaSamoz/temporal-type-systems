@@ -4,14 +4,20 @@ module TemporalOps.Diamond where
 
 open import CategoryTheory.Categories
 open import CategoryTheory.Functor
+open import CategoryTheory.NatTrans
+open import CategoryTheory.Monad
 open import TemporalOps.Common
 open import TemporalOps.Next
 open import TemporalOps.Delay
+
+open import Relation.Binary.PropositionalEquality as ≡ using (_≡_)
+
+
 open CategoryTheory.Categories.Category {{...}}
 
 -- Arbitrary delay
 ◇_ : τ -> τ
-(◇_ A) n = Σ ℕ (λ k -> delay A by k at n)
+(◇ A) n = Σ ℕ (λ k -> delay A by k at n)
 infixr 65 ◇_
 
 -- ◇ instances
@@ -59,3 +65,49 @@ instance
             rewrite delay-plus {A} 1 k n
                   | Functor.fmap-cong (F-delay (suc k)) {A} {B} {f} {f′} e {suc n} {a}
                   = refl
+
+instance
+    M-◇ : Monad ℝeactive
+    M-◇ = record
+        { T = F-◇
+        ; η = η-◇
+        ; μ = {!   !}
+        ; η-unit1 = {!   !}
+        ; η-unit2 = {!   !}
+        ; μ-assoc = {!   !} }
+        where
+        η-◇ : I ⟹ F-◇
+        η-◇ = record
+            { at = λ A n x -> 0 , x
+            ; nat-cond = λ {A} {B} {f} {n} {a} → refl }
+
+        μ-◇ : (F-◇ ²) ⟹ F-◇
+        μ-◇ = record
+            { at = μ-◇-at
+            ; nat-cond = {!   !} }
+            where
+            μ-◇-at : (A : τ) -> ◇ ◇ A ⇴ ◇ A
+            μ-◇-at A n (k , v) with compareLeq k n
+            μ-◇-at A .(k + l) (k , v) | snd==[ .k + l ]
+                rewrite delay-plus-left0 {λ n → Σ ℕ (λ m → delay A by m at n)} k l
+                with v
+            ... |  j , y
+                rewrite sym (delay-plus {A} k j l)
+                = k + j , y
+            μ-◇-at A n (.(n + suc l) , v) | fst==suc[ .n + l ]
+                rewrite delay-plus-right0 {λ k → Σ ℕ (λ m → delay A by m at k)} n (suc l)
+                      | sym (delay-plus-right0 {A} n (suc l))
+                = n + suc l , v
+
+            μ-◇-nat-cond : ∀{A B : τ} {f : A ⇴ B} {n : ℕ} {a : ◇ ◇ A at n}
+                        -> Functor.fmap F-◇ f n (μ-◇-at A n a)
+                         ≡ μ-◇-at B n (Functor.fmap (F-◇ ²) f n a)
+            μ-◇-nat-cond {A} {B} {f} {n} {k , v} with compareLeq k n
+            μ-◇-nat-cond {A} {B} {f} {.(k + l)} {k , v} | snd==[ .k + l ]
+                = ≡.≡-Reasoning.begin
+                    {!   !}
+                ≡⟨ {!   !} ⟩
+                    {!   !}
+                ≡.≡-Reasoning.∎
+                where open ≡.≡-Reasoning
+            μ-◇-nat-cond {A} {B} {f} {.k} {.(k + suc l) , v} | fst==suc[ k + l ] = {!   !}
