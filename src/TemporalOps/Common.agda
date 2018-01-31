@@ -4,11 +4,17 @@ module TemporalOps.Common where
 
 open import CategoryTheory.Categories
 
+-- open import Relation.Binary.PropositionalEquality using (_≡_)
+
 -- Time indexing (for clarity, synonym of function appliation at any level)
 _at_ : ∀ {a b} {A : Set a} {B : A → Set b} →
       ((x : A) → B x) → ((x : A) → B x)
 f at n = f n
 infixl 45 _at_
+
+-- Substitution with identity predicate – explicit rewriting
+rew : ∀{x y : Set} -> x ≡ y -> x -> y
+rew p x = subst (λ a -> a) p x
 
 -- (Very verbose) comparison view
 -- Like 'compare', but only distinguishes ≤ or >.

@@ -85,18 +85,22 @@ instance
             { at = μ-◇-at
             ; nat-cond = {!   !} }
             where
+            μ-compare : (A : τ) -> (n : ℕ) -> (a : ◇ ◇ A at n) -> LeqOrdering (proj₁ a) n -> ◇ A at n
+            μ-compare A .(k + l) (k , v) snd==[ .k + l ] =
+                μ-split (rew (delay-plus-left0 k l) v)
+                where
+                μ-split : ◇ A at l ->  ◇ A at (k + l)
+                μ-split (j , y) = k + j , rew (sym (delay-plus k j l)) y
+            μ-compare A n (.(n + suc l) , v) fst==suc[ .n + l ] =
+                (n + suc l) , rew eq v
+                where
+                eq : delay ◇ A by (n + suc l) at n
+                   ≡ delay A by (n + suc l) at n
+                eq = trans (delay-plus-right0 n (suc l))
+                           (sym (delay-plus-right0 n (suc l)))
+
             μ-◇-at : (A : τ) -> ◇ ◇ A ⇴ ◇ A
-            μ-◇-at A n (k , v) with compareLeq k n
-            μ-◇-at A .(k + l) (k , v) | snd==[ .k + l ]
-                rewrite delay-plus-left0 {λ n → Σ ℕ (λ m → delay A by m at n)} k l
-                with v
-            ... |  j , y
-                rewrite sym (delay-plus {A} k j l)
-                = k + j , y
-            μ-◇-at A n (.(n + suc l) , v) | fst==suc[ .n + l ]
-                rewrite delay-plus-right0 {λ k → Σ ℕ (λ m → delay A by m at k)} n (suc l)
-                      | sym (delay-plus-right0 {A} n (suc l))
-                = n + suc l , v
+            μ-◇-at A n a@(k , v) = μ-compare A n a (compareLeq k n)
 
             μ-◇-nat-cond : ∀{A B : τ} {f : A ⇴ B} {n : ℕ} {a : ◇ ◇ A at n}
                         -> Functor.fmap F-◇ f n (μ-◇-at A n a)
