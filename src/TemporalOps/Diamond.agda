@@ -10,7 +10,7 @@ open import TemporalOps.Common
 open import TemporalOps.Next
 open import TemporalOps.Delay
 
-open import Relation.Binary.PropositionalEquality as ≡ using (_≡_)
+open import Relation.Binary.PropositionalEquality using (_≡_)
 
 open Category ℝeactive
 
@@ -70,7 +70,7 @@ instance
     M-◇ = record
         { T = F-◇
         ; η = η-◇
-        ; μ = {!   !}
+        ; μ = μ-◇
         ; η-unit1 = {!   !}
         ; η-unit2 = {!   !}
         ; μ-assoc = {!   !} }
@@ -83,15 +83,23 @@ instance
         μ-◇ : (F-◇ ²) ⟹ F-◇
         μ-◇ = record
             { at = μ-◇-at
-            ; nat-cond = {!   !} }
+            ; nat-cond = λ {A} {B} {f} {n} {a}
+                        -> μ-◇-nat-cond {A} {B} {f} {n} {a}
+            }
             where
-            μ-compare : (A : τ) -> (n : ℕ) -> (a : ◇ ◇ A at n) -> LeqOrdering (proj₁ a) n -> ◇ A at n
-            μ-compare A .(k + l) (k , v) snd==[ .k + l ] =
-                μ-split (rew (delay-plus-left0 k l) v)
-                where
-                μ-split : ◇ A at l ->  ◇ A at (k + l)
-                μ-split (j , y) = k + j , rew (sym (delay-plus k j l)) y
-            μ-compare A n (.(n + suc l) , v) fst==suc[ .n + l ] =
+            -- || Multiplication definition
+            -- Shifting an event by some interval
+            μ-shift : {A : τ}{k l : ℕ} -> ◇ A at l ->  ◇ A at (k + l)
+            μ-shift {A} {k} {l} (j , y) = k + j , rew (sym (delay-plus k j l)) y
+
+            -- Auxiliary function for μ, taking the comparison of the delay and
+            -- time index as an argument
+            μ-compare : (A : τ) -> (n k : ℕ) -> (v : delay ◇ A by k at n)
+                     -> LeqOrdering k n -> ◇ A at n
+            μ-compare A .(k + l) k  v snd==[ .k + l ] =
+                μ-shift {A} {k} {l} (rew (delay-plus-left0 k l) v)
+
+            μ-compare A n .(n + suc l) v fst==suc[ .n + l ] =
                 (n + suc l) , rew eq v
                 where
                 eq : delay ◇ A by (n + suc l) at n
@@ -99,8 +107,9 @@ instance
                 eq = trans (delay-plus-right0 n (suc l))
                            (sym (delay-plus-right0 n (suc l)))
 
+            -- Join for ◇
             μ-◇-at : (A : τ) -> ◇ ◇ A ⇴ ◇ A
-            μ-◇-at A n a@(k , v) = μ-compare A n a (compareLeq k n)
+            μ-◇-at A n (k , v) = μ-compare A n k v (compareLeq k n)
 
             μ-◇-nat-cond : ∀{A B : τ} {f : A ⇴ B} {n : ℕ} {a : ◇ ◇ A at n}
                         -> Functor.fmap F-◇ f n (μ-◇-at A n a)
