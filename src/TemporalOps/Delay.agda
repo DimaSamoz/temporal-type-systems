@@ -6,7 +6,8 @@ open import CategoryTheory.Categories
 open import CategoryTheory.Functor
 open import TemporalOps.Common
 open import TemporalOps.Next
-open CategoryTheory.Categories.Category {{...}}
+
+open Category ℝeactive
 
 -- General iteration
 -- iter f n v = fⁿ(v)
@@ -60,7 +61,7 @@ instance
         fmap-delay (suc k) f = Functor.fmap F-▹ (fmap-delay k f)
         -- Delay preserves identities
         fmap-delay-id : ∀ (k : ℕ) {A : τ} {n : ℕ} {a : (delay A by k) n}
-                 -> (fmap-delay k (id {A}) at n) a ≡ a
+                 -> (fmap-delay k id at n) a ≡ a
         fmap-delay-id zero = refl
         fmap-delay-id (suc k) {A} {zero} = refl
         fmap-delay-id (suc k) {A} {suc n} = fmap-delay-id k {A} {n}
@@ -72,7 +73,7 @@ instance
         fmap-delay-∘ (suc k) {n = suc n} = fmap-delay-∘ k {n = n}
         -- Delay is congruent
         fmap-delay-cong : ∀ (k : ℕ) {A B : τ} {f f′ : A ⇴ B}
-                -> ({n : ℕ} {a : A at n}     -> f n a ≡ f′ n a)
+                -> ({n : ℕ} {a : A at n} -> f n a ≡ f′ n a)
                 -> ({n : ℕ} {a : delay A by k at n}
                     -> (fmap-delay k f at n) a
                      ≡ (fmap-delay k f′ at n) a)

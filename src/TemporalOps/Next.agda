@@ -6,19 +6,16 @@ open import CategoryTheory.Categories
 open import CategoryTheory.Functor
 open import TemporalOps.Common
 
+open Category ℝeactive
+
 -- One-step delay operator.
 ▹_ : τ -> τ
-▹_ A zero    = ⊤ zero
-▹_ A (suc n) = A n
+(▹ A) zero    = ⊤ zero
+(▹ A) (suc n) = A n
 infixr 70 ▹_
 
 
-open CategoryTheory.Categories.Category {{...}}
-
-
--- || Functor and endofunctor instances
-
--- ▹ instances
+-- Functor instance for ▹
 instance
     F-▹ : Endofunctor ℝeactive
     F-▹ = record
@@ -34,19 +31,19 @@ instance
         fmap-▹ f zero =  λ _ → top.tt
         fmap-▹ f (suc n) = f n
         -- ▹ preserves identities
-        fmap-▹-id : ∀ {A : τ} {n : ℕ} {a : (▹ A) n}
-                 -> (fmap-▹ (id {A}) at n) a ≡ a
+        fmap-▹-id : ∀ {A : τ} {n : ℕ} {a : ▹ A at n}
+                 -> (fmap-▹ id at n) a ≡ a
         fmap-▹-id {n = zero} = refl
         fmap-▹-id {n = suc n} = refl
         -- ▹ preserves composition
-        fmap-▹-∘ : ∀ {A B C : τ} {g : B ⇴ C} {f : A ⇴ B} {n : ℕ} {a : (▹ A) n}
+        fmap-▹-∘ : ∀ {A B C : τ} {g : B ⇴ C} {f : A ⇴ B} {n : ℕ} {a : ▹ A at n}
                 -> (fmap-▹ (g ∘ f) at n) a ≡ (fmap-▹ g ∘ fmap-▹ f at n) a
-        fmap-▹-∘ {n = zero} = refl
+        fmap-▹-∘ {n = zero}  = refl
         fmap-▹-∘ {n = suc n} = refl
         -- ▹ is congruent
         fmap-▹-cong : ∀{A B : τ} {f f′ : A ⇴ B}
-                -> ({n : ℕ} {a : A at n}     -> f n a ≡ f′ n a)
+                -> ({n : ℕ} {a : A at n}   -> f n a ≡ f′ n a)
                 -> ({n : ℕ} {a : ▹ A at n} -> (fmap-▹ f at n) a
-                                          ≡ (fmap-▹ f′ at n) a)
+                                            ≡ (fmap-▹ f′ at n) a)
         fmap-▹-cong e {zero} = refl
         fmap-▹-cong e {suc n} = e

@@ -12,8 +12,7 @@ open import TemporalOps.Delay
 
 open import Relation.Binary.PropositionalEquality as ≡ using (_≡_)
 
-
-open CategoryTheory.Categories.Category {{...}}
+open Category ℝeactive
 
 -- Arbitrary delay
 ◇_ : τ -> τ
