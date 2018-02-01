@@ -53,3 +53,25 @@ instance
         private module F = Functor F
         private module G = Functor G
         open _⟹_
+
+instance
+    AdjC : ∀ {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor 𝔻 ℂ)
+        -> F ⊣ G -> Comonad 𝔻
+    AdjC {n} {ℂ} {𝔻} F G adj = record
+        { W = F ◯ G
+        ; ε = F⊣G.ε
+        ; δ = record
+            { at = λ A → F.fmap (at F⊣G.η (G.omap A))
+            ; nat-cond = F.fmap-∘ [sym] ≈> F.fmap-cong (nat-cond F⊣G.η) ≈> F.fmap-∘
+            }
+        ; ε-unit1 = F⊣G.tri1
+        ; ε-unit2 = F.fmap-∘ [sym] ≈> F.fmap-cong (F⊣G.tri2) ≈> F.fmap-id
+        ; δ-assoc = F.fmap-∘ [sym] ≈> F.fmap-cong ((nat-cond F⊣G.η) ℂ.[sym]) ≈> F.fmap-∘
+        }
+        where
+        private module F⊣G = _⊣_ adj
+        open Category 𝔻
+        private module ℂ = Category ℂ
+        private module F = Functor F
+        private module G = Functor G
+        open _⟹_
