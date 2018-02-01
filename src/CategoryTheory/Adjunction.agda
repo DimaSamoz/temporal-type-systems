@@ -40,47 +40,11 @@ instance
         ; η = F⊣G.η
         ; μ = record
             { at = λ A → G.fmap (at F⊣G.ε (F.omap A))
-            ; nat-cond = λ {A} {B} {f} ->
-                begin
-                    Functor.fmap (G ◯ F) f ∘ G.fmap (at F⊣G.ε (F.omap A))
-                ≈⟨ G.fmap-∘ [sym] ⟩
-                    G.fmap (F.fmap f 𝔻.∘ at F⊣G.ε (F.omap A))
-                ≈⟨ G.fmap-cong (nat-cond F⊣G.ε) ⟩
-                    G.fmap (at F⊣G.ε (F.omap B) 𝔻.∘ Functor.fmap (F ◯ G ◯ F) f)
-                ≈⟨ G.fmap-∘ ⟩
-                    G.fmap (at F⊣G.ε (F.omap B)) ∘ Functor.fmap ((G ◯ F) ²) f
-                ∎
+            ; nat-cond = G.fmap-∘ [sym] ≈> G.fmap-cong (nat-cond F⊣G.ε) ≈> G.fmap-∘
             }
-            ; η-unit1 = λ {A} →
-                begin
-                    G.fmap (at F⊣G.ε (F.omap A)) ∘ at F⊣G.η (Functor.omap (G ◯ F) A)
-                ≈⟨ F⊣G.tri2 ⟩
-                    id
-                ∎
-            ; η-unit2 = λ {A} →
-                begin
-                    G.fmap (at F⊣G.ε (F.omap A)) ∘ Functor.fmap (G ◯ F) (at F⊣G.η A)
-                ≈⟨ G.fmap-∘ [sym] ⟩
-                    G.fmap (at F⊣G.ε (F.omap A) 𝔻.∘ F.fmap (at F⊣G.η A))
-                ≈⟨ G.fmap-cong (F⊣G.tri1) ⟩
-                    G.fmap 𝔻.id
-                ≈⟨ G.fmap-id ⟩
-                    id
-                ∎
-            ; μ-assoc = λ {A} →
-                begin
-                    G.fmap (at F⊣G.ε (F.omap A)) ∘
-                    G.fmap (at F⊣G.ε (Functor.omap (F ◯ G ◯ F) A))
-                ≈⟨ G.fmap-∘ [sym] ⟩
-                    G.fmap (at F⊣G.ε (F.omap A) 𝔻.∘
-                            at F⊣G.ε (Functor.omap (F ◯ G ◯ F) A))
-                ≈⟨ G.fmap-cong (nat-cond F⊣G.ε) ⟩
-                    G.fmap (at F⊣G.ε (F.omap A) 𝔻.∘
-                            F.fmap (G.fmap (at F⊣G.ε (F.omap A))))
-                ≈⟨ G.fmap-∘ ⟩
-                    G.fmap (at F⊣G.ε (F.omap A)) ∘
-                    Functor.fmap (G ◯ F) (G.fmap (at F⊣G.ε (F.omap A)))
-                ∎
+        ; η-unit1 = F⊣G.tri2
+        ; η-unit2 = G.fmap-∘ [sym] ≈> G.fmap-cong (F⊣G.tri1) ≈> G.fmap-id
+        ; μ-assoc = G.fmap-∘ [sym] ≈> G.fmap-cong (nat-cond F⊣G.ε) ≈> G.fmap-∘
         }
         where
         private module F⊣G = _⊣_ adj
