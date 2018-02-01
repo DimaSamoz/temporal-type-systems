@@ -24,6 +24,13 @@ record _⊣_ {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor �
     private module η = _⟹_ η
     private module ε = _⟹_ ε
 
+    -- | Isomorphism of homsets
+    ϕ : ∀{A : ℂ.obj} {B : 𝔻.obj} -> (F.omap A 𝔻.~> B) -> (A ℂ.~> G.omap B)
+    ϕ {A} f = G.fmap f ℂ.∘ η.at A
+
+    ϕ⁻ : ∀{B : 𝔻.obj} {A : ℂ.obj} -> (A ℂ.~> G.omap B) -> (F.omap A 𝔻.~> B)
+    ϕ⁻ {B} f = ε.at B 𝔻.∘ F.fmap f
+
     field
         -- || Laws
         -- First triangle identity: εF ∘ Fη = ιd
