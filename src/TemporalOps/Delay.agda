@@ -63,7 +63,7 @@ delay-plus-zero : ∀{A} -> (n k : ℕ)
               -> delay A by n at k ≡ delay A by (n + 0) at k
 delay-plus-zero {A} n k rewrite +-identityʳ n = refl
 
--- Delay instances
+-- Functor instance for delay
 instance
     F-delay : ℕ -> Endofunctor ℝeactive
     F-delay k = record
@@ -99,3 +99,44 @@ instance
         fmap-delay-cong zero e = e
         fmap-delay-cong (suc k) e {zero} = refl
         fmap-delay-cong (suc k) e {suc n} = fmap-delay-cong k e
+
+-- || Lemmas for the interaction of fmap and delay-plus
+
+-- Lifted version of the delay-plus lemma
+-- Arguments have different types, so we need heterogeneous equality
+fmap-delay-plus : ∀ {A B : τ} {f : A ⇴ B} (n k l : ℕ)
+               -> (v : delay A by (n + k) at (n + l)) (v′ : delay A by k at l)
+               -> v ≅ v′
+               -> (Functor.fmap (F-delay (n + k)) f at (n + l)) v
+                ≅ (Functor.fmap (F-delay      k)  f at      l)  v′
+fmap-delay-plus zero    k l v .v _≅_.refl = _≅_.refl
+fmap-delay-plus (suc n) k l v  v′ pf       = fmap-delay-plus n k l v v′ pf
+
+
+-- Specialised version with v of type delay A by (n + k) at (n + l)
+-- Uses explicit rewrites and homogeneous equality
+fmap-delay-plus-n+k : ∀ {A B : τ} {f : A ⇴ B} (n k l : ℕ)
+               -> (v : delay A by (n + k) at (n + l))
+               -> rew (delay-plus n k l) ((Functor.fmap (F-delay (n + k)) f at (n + l)) v)
+                ≡ (Functor.fmap (F-delay k) f at l) (rew (delay-plus n k l) v)
+fmap-delay-plus-n+k {A} n k l v =
+    ≅-to-rew-≡ (fmap-delay-plus n k l v v′ v≅v′) (delay-plus n k l)
+    where
+    v′ : delay A by k at l
+    v′ = rew (delay-plus n k l) v
+    v≅v′ : v ≅ v′
+    v≅v′ = rew-to-≅ (delay-plus n k l)
+
+-- Specialised version with v of type delay A by k at l
+-- Uses explicit rewrites and homogeneous equality
+fmap-delay-plus-k : ∀ {A B : τ} {f : A ⇴ B} (n k l : ℕ) (v : delay A by k at l)
+               -> Functor.fmap (F-delay (n + k)) f (n + l) (rew (sym (delay-plus n k l)) v)
+                ≡ rew (sym (delay-plus n k l)) (Functor.fmap (F-delay k) f l v)
+fmap-delay-plus-k {A} {B} {f} n k l v =
+    sym (≅-to-rew-≡ (≅.sym (fmap-delay-plus n k l v′ v v≅v′)) (sym (delay-plus n k l)))
+    where
+    private module ≅ = Relation.Binary.HeterogeneousEquality
+    v′ : delay A by (n + k) at (n + l)
+    v′ = rew (sym (delay-plus n k l)) v
+    v≅v′ : v′ ≅ v
+    v≅v′ = ≅.sym (rew-to-≅ (sym (delay-plus n k l)))
