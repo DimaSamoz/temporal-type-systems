@@ -97,6 +97,7 @@ M-◇ = record
         μ-shift : {A : τ} -> (k l : ℕ) -> ◇ A at l -> ◇ A at (k + l)
         μ-shift {A} k l (j , y) = k + j , rew (sym (delay-+ k j l)) y
 
+        -- The order of mapping and shifting of events can be interchanged
         μ-shift-fmap : {A B : τ} {f : A ~> B} {k l : ℕ} {a : ◇ A at l}
                     -> F-◇.fmap f (k + l) (μ-shift {A} k l a)
                      ≡ μ-shift {B} k l (F-◇.fmap f l a)
@@ -125,14 +126,11 @@ M-◇ = record
 
         -- Naturality proof
 
-        foo : ∀(k n : ℕ) -> Σ (LeqOrdering k n) (λ y -> y ≡ compareLeq k n)
-        foo k n = compareLeq k n , refl
-
         μ-◇-nat-cond : ∀{A B : τ} {f : A ⇴ B} {n : ℕ} {a : ◇ ◇ A at n}
-                    -> Functor.fmap F-◇ f n (μ-◇-at A n a)
+                    -> F-◇.fmap f n (μ-◇-at A n a)
                      ≡ μ-◇-at B n (Functor.fmap (F-◇ ²) f n a)
-        -- μ-◇-nat-cond {A} {B} {f} {n} {k , v} = {!   !}
-        μ-◇-nat-cond {A} {B} {f} {n} {k , v}  with inspect (compareLeq k n)
+        μ-◇-nat-cond {A} {B} {f} {n} {k , v} with inspect (compareLeq k n)
+        -- n = k + l
         μ-◇-nat-cond {A} {B} {f} {.(k + l)} {k , v} | snd==[ .k + l ] with≡ pf =
             ≡.≡-Reasoning.begin
                 F-◇.fmap f (k + l) (μ-◇-at A (k + l) (k , v))
@@ -150,7 +148,8 @@ M-◇ = record
                 μ-shift k l (rew (delay-+ k 0 l) ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′))
             ≡⟨ cong (λ x → μ-shift k l x)
                 (sym (≅-to-≡ (delay-+-left0-eq k l ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v)
-                                                      ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′) pr))) ⟩
+                                                   ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′) pr)))
+             ⟩
                 μ-shift k l (rew (delay-+-left0 k l) ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v))
             ≡⟨⟩ -- Def. of μ-compare
                 μ-compare B (k + l) k ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v) (snd==[ k + l ])
