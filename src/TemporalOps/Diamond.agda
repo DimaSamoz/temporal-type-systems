@@ -162,9 +162,9 @@ M-◇ = record
             where
             private module ≅ = Relation.Binary.HeterogeneousEquality
             v′ : delay (◇ A) by (k + 0) at (k + l)
-            v′ = rew (delay-+-zero k (k + l)) v
+            v′ = rew (delay-+0-left k (k + l)) v
             v≅v′ : v ≅ v′
-            v≅v′ = rew-to-≅ (delay-+-zero k (k + l))
+            v≅v′ = rew-to-≅ (delay-+0-left k (k + l))
             pr : (Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v
               ≅ (Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′
             pr = ≅.cong₂ (λ x y → (Functor.fmap (F-delay x) (F-◇.fmap f) at (k + l)) y) (≡-to-≅ (sym (+-identityʳ k))) v≅v′

@@ -59,9 +59,9 @@ delay-+-right0 zero l = refl
 delay-+-right0 (suc n) l = delay-+-right0 n l
 
 -- Delaying by n is the same as delaying by (n + 0)
-delay-+-zero : ∀{A} -> (n k : ℕ)
-              -> delay A by n at k ≡ delay A by (n + 0) at k
-delay-+-zero {A} n k rewrite +-identityʳ n = refl
+delay-+0-left : ∀{A} -> (k n : ℕ)
+             -> delay A by k at n ≡ delay A by (k + 0) at n
+delay-+0-left {A} k n rewrite +-identityʳ k = refl
 
 -- Functor instance for delay
 F-delay : ℕ -> Endofunctor ℝeactive
