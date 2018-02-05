@@ -3,7 +3,7 @@
 module CategoryTheory.Categories where
 
 open import Data.Nat using (ℕ ; zero ; suc ; _+_) public
-open import Relation.Binary.PropositionalEquality public
+open import Relation.Binary.PropositionalEquality using (_≡_ ; refl ; sym ; trans ; subst ; cong) public
 open import Data.Unit using () renaming (⊤ to top) public
 open import Data.Empty using () renaming (⊥ to bot) public
 open import Data.Product public
