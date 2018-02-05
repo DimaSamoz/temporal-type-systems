@@ -63,6 +63,11 @@ delay-+0-left : ∀{A} -> (k n : ℕ)
              -> delay A by k at n ≡ delay A by (k + 0) at n
 delay-+0-left {A} k n rewrite +-identityʳ k = refl
 
+-- If the delay is greater than the wait amount, we get unit
+delay-⊤ : ∀{A} -> (n k : ℕ)
+       -> ⊤ at n ≡ delay A by (n + suc k) at n
+delay-⊤ {A} n k = sym (delay-+-right0 n (suc k))
+
 -- Functor instance for delay
 F-delay : ℕ -> Endofunctor ℝeactive
 F-delay k = record

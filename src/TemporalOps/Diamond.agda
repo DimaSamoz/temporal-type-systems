@@ -114,11 +114,7 @@ M-◇ = record
             μ-shift k l (rew (delay-+-left0 k l) v)
 
         μ-compare A n .(n + suc l) v fst==suc[ .n + l ] =
-            let eq : delay ◇ A by (n + suc l) at n
-                   ≡ delay A by (n + suc l) at n
-                eq = trans (delay-+-right0 n (suc l))
-                           (sym (delay-+-right0 n (suc l)))
-            in (n + suc l) , rew eq v
+            n + suc l , rew (delay-⊤ n l) top.tt
 
         -- Join for ◇
         μ-◇-at : (A : τ) -> ◇ ◇ A ⇴ ◇ A
