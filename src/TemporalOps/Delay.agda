@@ -17,7 +17,8 @@ iter F (suc n) A = F (iter F n A)
 
 -- Multi-step delay
 delay_by_ : τ -> ℕ -> τ
-delay A by n = iter ▹_ n A
+delay A by zero = A
+delay A by suc n = ▹ (delay A by n)
 infix 67 delay_by_
 
 -- || Lemmas for the delay operator
