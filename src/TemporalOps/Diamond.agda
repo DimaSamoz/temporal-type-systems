@@ -164,4 +164,28 @@ M-◇ = record
               ≅ (Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′
             pr = ≅.cong₂ (λ x y → (Functor.fmap (F-delay x) (F-◇.fmap f) at (k + l)) y) (≡-to-≅ (sym (+-identityʳ k))) v≅v′
 
-        μ-◇-nat-cond {A} {B} {f} {.k} {.(k + suc l) , v} | fst==suc[ k + l ] with≡ x = {!   !}
+        -- k = suc n + l
+        μ-◇-nat-cond {A} {B} {f} {.n} {.(n + suc l) , v} | fst==suc[ n + l ] with≡ pf =
+            ≡.≡-Reasoning.begin
+                F-◇.fmap f n (μ-◇-at A n (n + suc l , v))
+            ≡⟨⟩ -- Def. of μ-◇-at
+                F-◇.fmap f n (μ-compare A n (n + suc l) v (compareLeq (n + suc l) n))
+            ≡⟨ cong (λ x → F-◇.fmap f n (μ-compare A n (n + suc l) v x)) pf ⟩
+                F-◇.fmap f n (n + suc l , rew (delay-⊤ n l) top.tt)
+            ≡⟨⟩ -- Def. of F-◇.fmap
+                n + suc l , (Functor.fmap (F-delay (n + suc l)) f at n) (rew (delay-⊤ n l) top.tt)
+            ≡⟨ cong (λ x → n + suc l , x) (eq n l) ⟩
+                n + suc l , rew (delay-⊤ n l) top.tt
+            ≡⟨⟩ -- Def. of μ-compare
+                μ-compare B n (n + suc l) ((Functor.fmap (F-delay ((n + suc l))) (F-◇.fmap f) at n) v) (fst==suc[ n + l ])
+            ≡⟨ cong (λ x → μ-compare B n (n + suc l) ((Functor.fmap (F-delay (n + suc l)) (F-◇.fmap f) at n) v) x) (sym pf) ⟩
+                μ-compare B n (n + suc l) ((Functor.fmap (F-delay (n + suc l)) (F-◇.fmap f) at n) v) (compareLeq (n + suc l) n)
+            ≡⟨⟩ -- Def. of μ-◇-at
+                μ-◇-at B n (Functor.fmap (F-◇ ²) f n (n + suc l , v))
+            ≡.≡-Reasoning.∎
+            where
+            eq : ∀ (n l : ℕ)
+              -> (Functor.fmap (F-delay (n + suc l)) f at n) (rew (delay-⊤ n l) top.tt)
+               ≡ rew (delay-⊤ n l) top.tt
+            eq zero l = refl
+            eq (suc n) l = eq n l
