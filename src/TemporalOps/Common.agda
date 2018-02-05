@@ -30,3 +30,10 @@ compareLeq (suc n)            (suc .(n + l)) | snd==[ .n + l ] =
     snd==[ suc n + l ]
 compareLeq (suc .(k + suc l)) (suc k)        | fst==suc[ .k + l ] =
     fst==suc[ suc k + l ]
+
+-- Inspect idiom
+data Singleton {a} {A : Set a} (x : A) : Set a where
+  _with≡_ : (y : A) → x ≡ y → Singleton x
+
+inspect : ∀ {a} {A : Set a} (x : A) → Singleton x
+inspect x = x with≡ refl
