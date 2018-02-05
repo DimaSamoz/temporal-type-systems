@@ -25,81 +25,78 @@ record _⟹_ {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor ℂ
                 -> (G.fmap f 𝔻.∘ at A) 𝔻.≈ (at B 𝔻.∘ F.fmap f)
 
 -- Identity natural transformation
-instance
-    ιd : ∀ {n} {ℂ 𝔻 : Category n} -> (F : Functor ℂ 𝔻) -> F ⟹ F
-    ιd {n} {ℂ} {𝔻} F = record
-            { at = λ A -> F.fmap ℂ.id
-            ; nat-cond =  λ {A} {B} {f} ->
-                begin
-                    F.fmap f ∘ F.fmap ℂ.id
-                ≈⟨ ≈-cong-right (F.fmap-id) ⟩
-                    F.fmap f ∘ id
-                ≈⟨ id-comm ⟩
-                    id ∘ F.fmap f
-                ≈⟨ ≈-cong-left (F.fmap-id [sym]) ⟩
-                    F.fmap ℂ.id ∘ F.fmap  f
-                ∎
-            }
-
-        where
-        private module F = Functor F
-        private module ℂ = Category ℂ
-        open Category 𝔻
-
--- Vertical composition of natural transformations
-instance
-    _⊚_ : ∀ {n} {ℂ 𝔻 : Category n} -> {F G H : Functor ℂ 𝔻}
-       -> (G ⟹ H) -> (F ⟹ G) -> (F ⟹ H)
-    _⊚_ {n} {ℂ} {𝔻} {F} {G} {H} φ ψ = record
-        { at = λ A -> (φ.at A) ∘ (ψ.at A)
+ιd : ∀ {n} {ℂ 𝔻 : Category n} -> (F : Functor ℂ 𝔻) -> F ⟹ F
+ιd {n} {ℂ} {𝔻} F = record
+        { at = λ A -> F.fmap ℂ.id
         ; nat-cond =  λ {A} {B} {f} ->
             begin
-                H.fmap f ∘ (φ.at A ∘ ψ.at A)
-            ≈⟨ ∘-assoc [sym] ⟩
-                (H.fmap f ∘ φ.at A) ∘ ψ.at A
-            ≈⟨ ≈-cong-left (φ.nat-cond) ≈> ∘-assoc ⟩
-                φ.at B ∘ (G.fmap f ∘ ψ.at A)
-            ≈⟨ ≈-cong-right (ψ.nat-cond) ≈> (∘-assoc [sym])⟩
-                (φ.at B ∘ ψ.at B) ∘ F.fmap f
+                F.fmap f ∘ F.fmap ℂ.id
+            ≈⟨ ≈-cong-right (F.fmap-id) ⟩
+                F.fmap f ∘ id
+            ≈⟨ id-comm ⟩
+                id ∘ F.fmap f
+            ≈⟨ ≈-cong-left (F.fmap-id [sym]) ⟩
+                F.fmap ℂ.id ∘ F.fmap  f
             ∎
         }
-        where
-        open Category 𝔻
-        private module F = Functor F
-        private module G = Functor G
-        private module H = Functor H
-        private module φ   = _⟹_ φ
-        private module ψ = _⟹_ ψ
-        open import Relation.Binary using (IsEquivalence)
+
+    where
+    private module F = Functor F
+    private module ℂ = Category ℂ
+    open Category 𝔻
+
+-- Vertical composition of natural transformations
+_⊚_ : ∀ {n} {ℂ 𝔻 : Category n} -> {F G H : Functor ℂ 𝔻}
+   -> (G ⟹ H) -> (F ⟹ G) -> (F ⟹ H)
+_⊚_ {n} {ℂ} {𝔻} {F} {G} {H} φ ψ = record
+    { at = λ A -> (φ.at A) ∘ (ψ.at A)
+    ; nat-cond =  λ {A} {B} {f} ->
+        begin
+            H.fmap f ∘ (φ.at A ∘ ψ.at A)
+        ≈⟨ ∘-assoc [sym] ⟩
+            (H.fmap f ∘ φ.at A) ∘ ψ.at A
+        ≈⟨ ≈-cong-left (φ.nat-cond) ≈> ∘-assoc ⟩
+            φ.at B ∘ (G.fmap f ∘ ψ.at A)
+        ≈⟨ ≈-cong-right (ψ.nat-cond) ≈> (∘-assoc [sym])⟩
+            (φ.at B ∘ ψ.at B) ∘ F.fmap f
+        ∎
+    }
+    where
+    open Category 𝔻
+    private module F = Functor F
+    private module G = Functor G
+    private module H = Functor H
+    private module φ   = _⟹_ φ
+    private module ψ = _⟹_ ψ
+    open import Relation.Binary using (IsEquivalence)
 
 -- Horizontal composition of natural tranformations
-instance
-    _✦_ : ∀ {n} {ℂ 𝔻 𝔼 : Category n} {F F′ : Functor ℂ 𝔻} {G G′ : Functor 𝔻 𝔼}
-       -> (G ⟹ G′) -> (F ⟹ F′) -> (G ◯ F ⟹ G′ ◯ F′)
-    _✦_ {n} {ℂ} {𝔻} {𝔼} {F} {F′} {G} {G′} ψ φ = record
-        { at = λ A → G′.fmap (φ.at A) ∘ ψ.at (F.omap A)
-        ; nat-cond = λ {A} {B} {f} →
-            begin
-                Functor.fmap (G′ ◯ F′) f ∘ (G′.fmap (φ.at A) ∘ ψ.at (F.omap A))
-            ≈⟨ ∘-assoc [sym] ≈> ≈-cong-left (G′.fmap-∘ [sym]) ⟩
-                G′.fmap (F′.fmap f 𝔻.∘ φ.at A) ∘ ψ.at (F.omap A)
-            ≈⟨ ≈-cong-left (G′.fmap-cong (φ.nat-cond)) ⟩
-                G′.fmap (φ.at B 𝔻.∘ F.fmap f) ∘ ψ.at (F.omap A)
-            ≈⟨ ≈-cong-left (G′.fmap-∘) ≈> ∘-assoc ⟩
-                G′.fmap (φ.at B) ∘ (Functor.fmap (G′ ◯ F) f ∘ ψ.at (F.omap A))
-            ≈⟨ ≈-cong-right (ψ.nat-cond) ≈> ∘-assoc [sym] ⟩
-                (G′.fmap (φ.at B) ∘ ψ.at (F.omap B)) ∘ Functor.fmap (G ◯ F) f
-            ∎
-        }
-        where
-        private module 𝔻 = Category 𝔻
-        open Category 𝔼
-        private module F = Functor F
-        private module G = Functor G
-        private module F′ = Functor F′
-        private module G′ = Functor G′
-        private module φ   = _⟹_ φ
-        private module ψ = _⟹_ ψ
+_✦_ : ∀ {n} {ℂ 𝔻 𝔼 : Category n} {F F′ : Functor ℂ 𝔻} {G G′ : Functor 𝔻 𝔼}
+   -> (G ⟹ G′) -> (F ⟹ F′) -> (G ◯ F ⟹ G′ ◯ F′)
+_✦_ {n} {ℂ} {𝔻} {𝔼} {F} {F′} {G} {G′} ψ φ = record
+    { at = λ A → G′.fmap (φ.at A) ∘ ψ.at (F.omap A)
+    ; nat-cond = λ {A} {B} {f} →
+        begin
+            Functor.fmap (G′ ◯ F′) f ∘ (G′.fmap (φ.at A) ∘ ψ.at (F.omap A))
+        ≈⟨ ∘-assoc [sym] ≈> ≈-cong-left (G′.fmap-∘ [sym]) ⟩
+            G′.fmap (F′.fmap f 𝔻.∘ φ.at A) ∘ ψ.at (F.omap A)
+        ≈⟨ ≈-cong-left (G′.fmap-cong (φ.nat-cond)) ⟩
+            G′.fmap (φ.at B 𝔻.∘ F.fmap f) ∘ ψ.at (F.omap A)
+        ≈⟨ ≈-cong-left (G′.fmap-∘) ≈> ∘-assoc ⟩
+            G′.fmap (φ.at B) ∘ (Functor.fmap (G′ ◯ F) f ∘ ψ.at (F.omap A))
+        ≈⟨ ≈-cong-right (ψ.nat-cond) ≈> ∘-assoc [sym] ⟩
+            (G′.fmap (φ.at B) ∘ ψ.at (F.omap B)) ∘ Functor.fmap (G ◯ F) f
+        ∎
+    }
+    where
+    private module 𝔻 = Category 𝔻
+    open Category 𝔼
+    private module F = Functor F
+    private module G = Functor G
+    private module F′ = Functor F′
+    private module G′ = Functor G′
+    private module φ   = _⟹_ φ
+    private module ψ = _⟹_ ψ
 
 
 -- Natural isomorphism between two functors

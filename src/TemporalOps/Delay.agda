@@ -64,41 +64,40 @@ delay-+-zero : ∀{A} -> (n k : ℕ)
 delay-+-zero {A} n k rewrite +-identityʳ n = refl
 
 -- Functor instance for delay
-instance
-    F-delay : ℕ -> Endofunctor ℝeactive
-    F-delay k = record
-        { omap = delay_by k
-        ; fmap = fmap-delay k
-        ; fmap-id = λ {_ n a} -> fmap-delay-id k {_} {n} {a}
-        ; fmap-∘ = fmap-delay-∘ k
-        ; fmap-cong = fmap-delay-cong k
-        }
-        where
-        -- Lifting of delay
-        fmap-delay : {A B : τ} -> (k : ℕ) -> A ⇴ B -> delay A by k ⇴ delay B by k
-        fmap-delay zero    f = f
-        fmap-delay (suc k) f = Functor.fmap F-▹ (fmap-delay k f)
-        -- Delay preserves identities
-        fmap-delay-id : ∀ (k : ℕ) {A : τ} {n : ℕ} {a : (delay A by k) n}
-                 -> (fmap-delay k id at n) a ≡ a
-        fmap-delay-id zero = refl
-        fmap-delay-id (suc k) {A} {zero} = refl
-        fmap-delay-id (suc k) {A} {suc n} = fmap-delay-id k {A} {n}
-        -- Delay preserves composition
-        fmap-delay-∘ : ∀ (k : ℕ) {A B C : τ} {g : B ⇴ C} {f : A ⇴ B} {n : ℕ} {a : (delay A by k) n}
-                -> (fmap-delay k (g ∘ f) at n) a ≡ (fmap-delay k g ∘ fmap-delay k f at n) a
-        fmap-delay-∘ zero = refl
-        fmap-delay-∘ (suc k) {n = zero} = refl
-        fmap-delay-∘ (suc k) {n = suc n} = fmap-delay-∘ k {n = n}
-        -- Delay is congruent
-        fmap-delay-cong : ∀ (k : ℕ) {A B : τ} {f f′ : A ⇴ B}
-                -> ({n : ℕ} {a : A at n} -> f n a ≡ f′ n a)
-                -> ({n : ℕ} {a : delay A by k at n}
-                    -> (fmap-delay k f at n) a
-                     ≡ (fmap-delay k f′ at n) a)
-        fmap-delay-cong zero e = e
-        fmap-delay-cong (suc k) e {zero} = refl
-        fmap-delay-cong (suc k) e {suc n} = fmap-delay-cong k e
+F-delay : ℕ -> Endofunctor ℝeactive
+F-delay k = record
+    { omap = delay_by k
+    ; fmap = fmap-delay k
+    ; fmap-id = λ {_ n a} -> fmap-delay-id k {_} {n} {a}
+    ; fmap-∘ = fmap-delay-∘ k
+    ; fmap-cong = fmap-delay-cong k
+    }
+    where
+    -- Lifting of delay
+    fmap-delay : {A B : τ} -> (k : ℕ) -> A ⇴ B -> delay A by k ⇴ delay B by k
+    fmap-delay zero    f = f
+    fmap-delay (suc k) f = Functor.fmap F-▹ (fmap-delay k f)
+    -- Delay preserves identities
+    fmap-delay-id : ∀ (k : ℕ) {A : τ} {n : ℕ} {a : (delay A by k) n}
+             -> (fmap-delay k id at n) a ≡ a
+    fmap-delay-id zero = refl
+    fmap-delay-id (suc k) {A} {zero} = refl
+    fmap-delay-id (suc k) {A} {suc n} = fmap-delay-id k {A} {n}
+    -- Delay preserves composition
+    fmap-delay-∘ : ∀ (k : ℕ) {A B C : τ} {g : B ⇴ C} {f : A ⇴ B} {n : ℕ} {a : (delay A by k) n}
+            -> (fmap-delay k (g ∘ f) at n) a ≡ (fmap-delay k g ∘ fmap-delay k f at n) a
+    fmap-delay-∘ zero = refl
+    fmap-delay-∘ (suc k) {n = zero} = refl
+    fmap-delay-∘ (suc k) {n = suc n} = fmap-delay-∘ k {n = n}
+    -- Delay is congruent
+    fmap-delay-cong : ∀ (k : ℕ) {A B : τ} {f f′ : A ⇴ B}
+            -> ({n : ℕ} {a : A at n} -> f n a ≡ f′ n a)
+            -> ({n : ℕ} {a : delay A by k at n}
+                -> (fmap-delay k f at n) a
+                 ≡ (fmap-delay k f′ at n) a)
+    fmap-delay-cong zero e = e
+    fmap-delay-cong (suc k) e {zero} = refl
+    fmap-delay-cong (suc k) e {suc n} = fmap-delay-cong k e
 
 -- || Lemmas for the interaction of fmap and delay-+
 
