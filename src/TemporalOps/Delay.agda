@@ -7,6 +7,10 @@ open import CategoryTheory.Functor
 open import TemporalOps.Common
 open import TemporalOps.Next
 
+open import Data.Nat.Properties using (+-identityʳ ; +-comm)
+open import Relation.Binary.HeterogeneousEquality
+    using (_≅_ ; ≅-to-≡ ; ≡-to-≅ ; ≅-to-type-≡ ; ≅-to-subst-≡)
+import Relation.Binary.PropositionalEquality as ≡
 open Category ℝeactive
 
 -- General iteration
@@ -38,12 +42,26 @@ delay-plus-left0 : ∀{A} -> (n k : ℕ)
 delay-plus-left0 zero k = refl
 delay-plus-left0 (suc n) k = delay-plus-left0 n k
 
+-- Delay-plus-left0 can be converted to delay-plus (heterogeneously).
+delay-plus-left0-eq : ∀{A : τ} -> (n l : ℕ)
+                   -> (v : delay A by n at (n + l))
+                   -> (v′ : delay A by (n + 0) at (n + l))
+                   -> (p : v ≅ v′)
+                   -> rew (delay-plus-left0 {A} n l) v
+                    ≅ rew (delay-plus {A} n 0 l) v′
+delay-plus-left0-eq zero l v v′ p = p
+delay-plus-left0-eq (suc n) l v v′ p = delay-plus-left0-eq n l v v′ p
+
 -- Extra delay by n steps is cancelled out by waiting for n steps.
 delay-plus-right0 : ∀{A} -> (n l : ℕ)
               -> delay A by (n + l) at n ≡ delay A by l at 0
 delay-plus-right0 zero l = refl
 delay-plus-right0 (suc n) l = delay-plus-right0 n l
 
+-- Delaying by n is the same as delaying by (n + 0)
+delay-plus-zero : ∀{A} -> (n k : ℕ)
+              -> delay A by n at k ≡ delay A by (n + 0) at k
+delay-plus-zero {A} n k rewrite +-identityʳ n = refl
 
 -- Delay instances
 instance
