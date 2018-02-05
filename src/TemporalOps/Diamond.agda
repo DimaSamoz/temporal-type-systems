@@ -41,7 +41,7 @@ instance
         fmap-◇-id {A} {n} {zero , v} = refl
         fmap-◇-id {A} {zero} {suc k , v} = refl
         fmap-◇-id {A} {suc n} {suc k , v}
-            rewrite delay-plus {A} 1 k n
+            rewrite delay-+ {A} 1 k n
                   | Functor.fmap-id (F-delay (suc k)) {A} {suc n} {v}
             = refl
         -- ◇ preserves composition
@@ -50,7 +50,7 @@ instance
         fmap-◇-∘ {n = n} {zero , v} = refl
         fmap-◇-∘ {n = zero} {suc k , v} = refl
         fmap-◇-∘ {A} {B} {C} {g} {f} {suc n} {suc k , v}
-            rewrite delay-plus {A} 1 k n
+            rewrite delay-+ {A} 1 k n
                   | Functor.fmap-∘ (F-delay (suc k)) {A} {B} {C} {g} {f} {suc n} {v}
             = refl
         -- ▹ is congruent
@@ -59,11 +59,11 @@ instance
                 -> ({n : ℕ} {a : ◇ A at n} -> (fmap-◇ f at n) a
                                             ≡ (fmap-◇ f′ at n) a)
         fmap-◇-cong {A} e {n} {zero , a}
-            rewrite delay-plus-left0 {A} 0 n
+            rewrite delay-+-left0 {A} 0 n
                   | e {n} {a} = refl
         fmap-◇-cong e {zero} {suc k , a} = refl
         fmap-◇-cong {A} {B} {f} {f′} e {suc n} {suc k , a}
-            rewrite delay-plus {A} 1 k n
+            rewrite delay-+ {A} 1 k n
                   | Functor.fmap-cong (F-delay (suc k)) {A} {B} {f} {f′} e {suc n} {a}
                   = refl
 
@@ -97,7 +97,7 @@ instance
             -- || Multiplication definition
             -- Shifting an event by some interval
             μ-shift : {A : τ} -> (k l : ℕ) -> ◇ A at l -> ◇ A at (k + l)
-            μ-shift {A} k l (j , y) = k + j , rew (sym (delay-plus k j l)) y
+            μ-shift {A} k l (j , y) = k + j , rew (sym (delay-+ k j l)) y
 
             μ-shift-fmap : {A B : τ} {f : A ~> B} {k l : ℕ} {a : ◇ A at l}
                         -> F-◇.fmap f (k + l) (μ-shift {A} k l a)
@@ -105,20 +105,20 @@ instance
             μ-shift-fmap {A} {B} {f} {zero} {l} {j , y} = refl
             μ-shift-fmap {A} {B} {f} {suc k} {l} {j , y}
                 rewrite μ-shift-fmap {A} {B} {f} {k} {l} {j , y}
-                = cong (λ x → suc k + j , x) (fmap-delay-plus-k k j l y)
+                = cong (λ x → suc k + j , x) (fmap-delay-+-k k j l y)
 
             -- Auxiliary function for μ, taking the comparison of the delay and
             -- time index as an argument
             μ-compare : (A : τ) -> (n k : ℕ) -> (v : delay ◇ A by k at n)
                      -> LeqOrdering k n -> ◇ A at n
             μ-compare A .(k + l) k  v snd==[ .k + l ] =
-                μ-shift k l (rew (delay-plus-left0 k l) v)
+                μ-shift k l (rew (delay-+-left0 k l) v)
 
             μ-compare A n .(n + suc l) v fst==suc[ .n + l ] =
                 let eq : delay ◇ A by (n + suc l) at n
                        ≡ delay A by (n + suc l) at n
-                    eq = trans (delay-plus-right0 n (suc l))
-                               (sym (delay-plus-right0 n (suc l)))
+                    eq = trans (delay-+-right0 n (suc l))
+                               (sym (delay-+-right0 n (suc l)))
                 in (n + suc l) , rew eq v
 
             -- Join for ◇
@@ -141,19 +141,19 @@ instance
                 ≡⟨⟩ -- Def. of μ-◇-at
                     F-◇.fmap f (k + l) (μ-compare A (k + l) k v (compareLeq k (k + l)))
                 ≡⟨ cong (λ x → F-◇.fmap f (k + l) (μ-compare A (k + l) k v x)) pf ⟩
-                    F-◇.fmap f (k + l) (μ-shift k l (rew (delay-plus-left0 k l) v))
-                ≡⟨ μ-shift-fmap {_}{_}{_}{k}{l}{(rew (delay-plus-left0 k l) v)} ⟩
-                    μ-shift k l (F-◇.fmap f l (rew (delay-plus-left0 k l) v))
-                ≡⟨ cong (λ x → μ-shift k l (F-◇.fmap f l x)) (≅-to-≡ (delay-plus-left0-eq k l v v′ v≅v′)) ⟩
-                    μ-shift k l (F-◇.fmap f l (rew (delay-plus k 0 l) v′))
+                    F-◇.fmap f (k + l) (μ-shift k l (rew (delay-+-left0 k l) v))
+                ≡⟨ μ-shift-fmap {_}{_}{_}{k}{l}{(rew (delay-+-left0 k l) v)} ⟩
+                    μ-shift k l (F-◇.fmap f l (rew (delay-+-left0 k l) v))
+                ≡⟨ cong (λ x → μ-shift k l (F-◇.fmap f l x)) (≅-to-≡ (delay-+-left0-eq k l v v′ v≅v′)) ⟩
+                    μ-shift k l (F-◇.fmap f l (rew (delay-+ k 0 l) v′))
                 ≡⟨⟩ -- Def. of (F-delay 0).fmap
-                    μ-shift k l ((Functor.fmap (F-delay 0) (F-◇.fmap f) at l) (rew (delay-plus k 0 l) v′))
-                ≡⟨ cong (λ x → μ-shift k l x) (sym (fmap-delay-plus-n+k k 0 l v′)) ⟩
-                    μ-shift k l (rew (delay-plus k 0 l) ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′))
+                    μ-shift k l ((Functor.fmap (F-delay 0) (F-◇.fmap f) at l) (rew (delay-+ k 0 l) v′))
+                ≡⟨ cong (λ x → μ-shift k l x) (sym (fmap-delay-+-n+k k 0 l v′)) ⟩
+                    μ-shift k l (rew (delay-+ k 0 l) ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′))
                 ≡⟨ cong (λ x → μ-shift k l x)
-                    (sym (≅-to-≡ (delay-plus-left0-eq k l ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v)
+                    (sym (≅-to-≡ (delay-+-left0-eq k l ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v)
                                                           ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′) pr))) ⟩
-                    μ-shift k l (rew (delay-plus-left0 k l) ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v))
+                    μ-shift k l (rew (delay-+-left0 k l) ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v))
                 ≡⟨⟩ -- Def. of μ-compare
                     μ-compare B (k + l) k ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v) (snd==[ k + l ])
                 ≡⟨ cong (λ x → μ-compare B (k + l) k ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v) x) (sym pf) ⟩
@@ -164,9 +164,9 @@ instance
                 where
                 private module ≅ = Relation.Binary.HeterogeneousEquality
                 v′ : delay (◇ A) by (k + 0) at (k + l)
-                v′ = rew (delay-plus-zero k (k + l)) v
+                v′ = rew (delay-+-zero k (k + l)) v
                 v≅v′ : v ≅ v′
-                v≅v′ = rew-to-≅ (delay-plus-zero k (k + l))
+                v≅v′ = rew-to-≅ (delay-+-zero k (k + l))
                 pr : (Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v
                   ≅ (Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′
                 pr = ≅.cong₂ (λ x y → (Functor.fmap (F-delay x) (F-◇.fmap f) at (k + l)) y) (≡-to-≅ (sym (+-identityʳ k))) v≅v′
