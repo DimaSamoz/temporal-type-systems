@@ -4,6 +4,8 @@ module TemporalOps.Box where
 
 open import CategoryTheory.Categories
 open import CategoryTheory.Functor
+open import CategoryTheory.NatTrans
+open import CategoryTheory.Adjunction
 open import TemporalOps.Common
 
 open import Relation.Binary.PropositionalEquality
@@ -36,6 +38,23 @@ G = record
 □_ : τ -> τ
 (□ A) n = (k : ℕ) -> A k
 infixr 65 □_
+K⊣G : K ⊣ G
+K⊣G = record
+    { η = record
+        { at = λ A x n → x
+        ; nat-cond = λ {A} {B} {f} {a} → refl }
+    ; ε = record
+        { at = λ A n z → z n
+        ; nat-cond = λ {A} {B} {f} {n} {a} → refl }
+    ; tri1 = λ {A} {n} {a} → refl
+    ; tri2 = λ {B} {a} → refl
+    }
+
+-- | Box operator
+
+-- Comonad instance from adjunction
+W-□ : Comonad ℝeactive
+W-□ = AdjComonad K⊣G
 
 -- Functor instance for □
 F-□ : Endofunctor ℝeactive
