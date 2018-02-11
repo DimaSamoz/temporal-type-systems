@@ -39,9 +39,9 @@ record _⊣_ {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor �
         tri2 : ∀ {B : 𝔻.obj} -> G.fmap (ε.at B) ℂ.∘ η.at (G.omap B) ℂ.≈ ℂ.id
 
 -- || An adjunction induces a monad and a comonad
-AdjM : ∀ {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor 𝔻 ℂ)
+AdjMonad : ∀ {n} {ℂ 𝔻 : Category n} {F : Functor ℂ 𝔻} {G : Functor 𝔻 ℂ}
     -> F ⊣ G -> Monad ℂ
-AdjM {n} {ℂ} {𝔻} F G adj = record
+AdjMonad {n} {ℂ} {𝔻} {F} {G} adj = record
     { T = G ◯ F
     ; η = F⊣G.η
     ; μ = record
@@ -60,9 +60,9 @@ AdjM {n} {ℂ} {𝔻} F G adj = record
     private module G = Functor G
     open _⟹_
 
-AdjC : ∀ {n} {ℂ 𝔻 : Category n} (F : Functor ℂ 𝔻) (G : Functor 𝔻 ℂ)
+AdjComonad : ∀ {n} {ℂ 𝔻 : Category n} {F : Functor ℂ 𝔻} {G : Functor 𝔻 ℂ}
     -> F ⊣ G -> Comonad 𝔻
-AdjC {n} {ℂ} {𝔻} F G adj = record
+AdjComonad {n} {ℂ} {𝔻} {F} {G} adj = record
     { W = F ◯ G
     ; ε = F⊣G.ε
     ; δ = record
