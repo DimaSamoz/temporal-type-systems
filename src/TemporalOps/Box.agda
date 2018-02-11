@@ -34,22 +34,24 @@ G = record
 
 -- Box operator
 □_ : τ -> τ
-(□_ A) n = (n : ℕ) -> A n
+(□ A) n = (k : ℕ) -> A k
 infixr 65 □_
 
--- □ instances
-instance
-    F-□ : Functor ℝeactive ℝeactive
-    F-□ = record
-        { omap = □_
-        ; fmap = fmap-□
-        ; fmap-id = refl
-        ; fmap-∘ = refl
-        }
-        where
-        -- Lifting of □
-        fmap-□ : {A B : τ} -> A ⇴ B -> □ A ⇴ □ B
-        fmap-□ f n a = λ k → f k (a k)
+-- Functor instance for □
+F-□ : Endofunctor ℝeactive
+F-□ = record
+    { omap = □_
+    ; fmap = fmap-□
+    ; fmap-id = refl
+    ; fmap-∘ = refl
+    ; fmap-cong = fmap-□-cong
+    }
+    where
+    -- Lifting of □
+    fmap-□ : {A B : τ} -> A ⇴ B -> □ A ⇴ □ B
+    fmap-□ f n a = λ k → f k (a k)
 
-    EF-□ : Endofunctor ℝeactive
-    EF-□ = record { functor = F-□ }
+    fmap-□-cong : {A B : τ} {f f′ : A ⇴ B}
+               -> (∀{n : ℕ} {a : A at n} -> f n a ≡ f′ n a)
+               -> (∀{n : ℕ} {a : □ A at n} -> fmap-□ f n a ≡ fmap-□ f′ n a)
+    fmap-□-cong {A} {B} {f} {f′} p {n} {a} = ext (λ n → p)
