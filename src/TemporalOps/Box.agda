@@ -6,6 +6,7 @@ open import CategoryTheory.Categories
 open import CategoryTheory.Functor
 open import CategoryTheory.NatTrans
 open import CategoryTheory.Adjunction
+open import CategoryTheory.Comonad
 open import TemporalOps.Common
 
 open import Relation.Binary.PropositionalEquality
@@ -34,10 +35,6 @@ G = record
   ; fmap-cong = λ pf → ext (λ n → pf)
   }
 
--- Box operator
-□_ : τ -> τ
-(□ A) n = (k : ℕ) -> A k
-infixr 65 □_
 K⊣G : K ⊣ G
 K⊣G = record
     { η = record
@@ -56,21 +53,10 @@ K⊣G = record
 W-□ : Comonad ℝeactive
 W-□ = AdjComonad K⊣G
 
--- Functor instance for □
+-- Endofunctor from comonad
 F-□ : Endofunctor ℝeactive
-F-□ = record
-    { omap = □_
-    ; fmap = fmap-□
-    ; fmap-id = refl
-    ; fmap-∘ = refl
-    ; fmap-cong = fmap-□-cong
-    }
-    where
-    -- Lifting of □
-    fmap-□ : {A B : τ} -> A ⇴ B -> □ A ⇴ □ B
-    fmap-□ f n a = λ k → f k (a k)
+F-□ = Comonad.W W-□
 
-    fmap-□-cong : {A B : τ} {f f′ : A ⇴ B}
-               -> (∀{n : ℕ} {a : A at n} -> f n a ≡ f′ n a)
-               -> (∀{n : ℕ} {a : □ A at n} -> fmap-□ f n a ≡ fmap-□ f′ n a)
-    fmap-□-cong {A} {B} {f} {f′} p {n} {a} = ext (λ n → p)
+-- Operator from functor
+□_ : τ -> τ
+□_ = Functor.omap (Comonad.W W-□)
