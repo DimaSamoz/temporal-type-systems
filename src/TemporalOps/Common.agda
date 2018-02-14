@@ -34,14 +34,15 @@ data LeqOrdering : ℕ -> ℕ -> Set where
     snd==[_+_]    : ∀ k l → LeqOrdering k           (k + l)
     fst==suc[_+_] : ∀ k l → LeqOrdering (k + suc l) k
 
+-- Auxiliary function to compareLeq
+compareLeq-suc : ∀ n k -> LeqOrdering n k -> LeqOrdering (suc n) (suc k)
+compareLeq-suc n .(n + l)     snd==[ .n + l ]    = snd==[ suc n + l ]
+compareLeq-suc .(k + suc l) k fst==suc[ .k + l ] = fst==suc[ suc k + l ]
+
 compareLeq : ∀ n k -> LeqOrdering n k
-compareLeq zero               k    = snd==[ zero + k ]
-compareLeq (suc n)            zero = fst==suc[ zero + n ]
-compareLeq (suc n)            (suc k) with compareLeq n k
-compareLeq (suc n)            (suc .(n + l)) | snd==[ .n + l ] =
-    snd==[ suc n + l ]
-compareLeq (suc .(k + suc l)) (suc k)        | fst==suc[ .k + l ] =
-    fst==suc[ suc k + l ]
+compareLeq zero k          = snd==[ zero + k ]
+compareLeq (suc n) zero    = fst==suc[ zero + n ]
+compareLeq (suc n) (suc k) = compareLeq-suc n k (compareLeq n k)
 
 -- Inspect idiom
 data Singleton {a} {A : Set a} (x : A) : Set a where
