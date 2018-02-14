@@ -5,7 +5,7 @@ module TemporalOps.Common.Compare where
 open import CategoryTheory.Categories
 open import Relation.Binary.PropositionalEquality as ≡
 open import Relation.Binary.HeterogeneousEquality as ≅
-open import Data.Nat.Properties using (+-identityʳ ; +-assoc ; +-suc ; +-comm ; +-cancelˡ-≤)
+open import Data.Nat.Properties using (+-identityʳ ; +-assoc ; +-suc)
 
 -- (Very verbose) comparison view
 -- Like 'compare', but only distinguishes ≤ or >.

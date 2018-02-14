@@ -14,9 +14,9 @@ open import TemporalOps.Diamond.Join
 
 import Relation.Binary.PropositionalEquality as ≡
 open import Relation.Binary.HeterogeneousEquality as ≅
-    using (_≅_ ; ≅-to-≡ ; ≡-to-≅ ; cong₂)
+            using (_≅_ ; ≅-to-≡ ; ≡-to-≅ ; cong₂)
 open import Data.Nat.Properties
-    using (+-identityʳ ; +-comm ; +-suc ; +-assoc)
+            using (+-identityʳ ; +-comm ; +-suc ; +-assoc)
 
 -- | Auxiliary lemmas
 

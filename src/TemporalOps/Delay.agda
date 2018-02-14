@@ -8,8 +8,7 @@ open import TemporalOps.Common
 open import TemporalOps.Next
 
 open import Data.Nat.Properties using (+-identityʳ ; +-comm ; +-assoc)
-open import Relation.Binary.HeterogeneousEquality as ≅
-    using (_≅_ ; ≅-to-≡ ; ≡-to-≅ ; ≅-to-type-≡ ; ≅-to-subst-≡)
+open import Relation.Binary.HeterogeneousEquality as ≅ using (_≅_)
 import Relation.Binary.PropositionalEquality as ≡
 open Category ℝeactive
 
