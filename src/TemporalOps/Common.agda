@@ -3,16 +3,24 @@
 module TemporalOps.Common where
 
 open import CategoryTheory.Categories
-open import Relation.Binary.HeterogeneousEquality
-    using (_≅_)
+open import Relation.Binary.HeterogeneousEquality using (_≅_ ; ≅-to-≡ ; ≡-to-≅)
+import Relation.Binary.HeterogeneousEquality as ≅
+open import Data.Nat.Properties using (+-identityʳ ; +-assoc ; +-suc ; +-comm ; +-cancelˡ-≤)
+import Relation.Binary.PropositionalEquality as ≡
 
--- open import Relation.Binary.PropositionalEquality using (_≡_)
 
 -- Time indexing (for clarity, synonym of function appliation at any level)
 _at_ : ∀ {a b} {A : Set a} {B : A → Set b} →
       ((x : A) → B x) → ((x : A) → B x)
 f at n = f n
 infixl 45 _at_
+
+-- Heterogeneous congruence of three arguments
+≅-cong₃ : ∀ {a b c d} {A : Set a} {B : A → Set b} {C : ∀ (x : A) → B x → Set c}
+            {D : ∀ (x : A) -> (y : B x) -> C x y -> Set d} {x y z w u v}
+       -> (f : (x : A) (y : B x) (z : C x y) → D x y z)
+       -> x ≅ y -> z ≅ w -> u ≅ v -> f x z u ≅ f y w v
+≅-cong₃ f ≅.refl ≅.refl ≅.refl = ≅.refl
 
 -- Inspect idiom
 data Singleton {a} {A : Set a} (x : A) : Set a where
@@ -35,6 +43,12 @@ rew-to-≅ {x = x} {.x} {v} refl = _≅_.refl
             -> (p : x ≅ y) -> (e : P ≡ Q)
             -> rew e x ≡ y
 ≅-to-rew-≡ _≅_.refl refl = refl
+
+-- Rewriting by p is cancelled out by rewriting by (sym p)
+rew-cancel : ∀ {P Q : Set}
+            -> (v : P) -> (p : P ≡ Q)
+            -> rew (sym p) (rew p v) ≡ v
+rew-cancel v refl = refl
 
 -- (Very verbose) comparison view
 -- Like 'compare', but only distinguishes ≤ or >.
