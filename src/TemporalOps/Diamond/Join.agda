@@ -1,3 +1,4 @@
+
 {- Definition of join for ◇ and associated lemmas. -}
 module TemporalOps.Diamond.Join where
 
@@ -10,8 +11,8 @@ open import TemporalOps.Next
 open import TemporalOps.Delay
 open import TemporalOps.Diamond.Functor
 
-import Relation.Binary.PropositionalEquality
-open import Relation.Binary.HeterogeneousEquality
+import Relation.Binary.PropositionalEquality as ≡
+open import Relation.Binary.HeterogeneousEquality as ≅
     using (_≅_ ; ≅-to-≡ ; ≡-to-≅ ; cong₂)
 open import Data.Nat.Properties
     using (+-identityʳ ; +-comm ; +-suc ; +-assoc)
@@ -20,8 +21,8 @@ open import Data.Nat.Properties
 -- | Auxiliary definitions for μ
 
 -- Shifting an event by some interval
-μ-shift : {A : τ} -> (n k : ℕ) -> ◇ A at k -> ◇ A at (n + k)
-μ-shift {A} n k (l , y) = n + l , rew (sym (delay-+ n l k)) y
+μ-shift : {A : τ} -> (k n : ℕ) -> ◇ A at n -> ◇ A at (k + n)
+μ-shift {A} k n (l , v) = k + l , rew (sym (delay-+ k l n)) v
 
 -- Auxiliary function for μ, taking the comparison of the delay and
 -- time index as an argument
@@ -45,7 +46,7 @@ private module F-◇ = Functor F-◇
     where
     open Functor
     private module F-▹ = Functor F-▹
-    open Relation.Binary.PropositionalEquality.≡-Reasoning
+    open ≡.≡-Reasoning
 
     -- The order of mapping and shifting of events can be interchanged
     μ-shift-fmap : {A B : τ} {f : A ~> B} {k l : ℕ} {a : ◇ A at l}
