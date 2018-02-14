@@ -7,8 +7,8 @@ open import CategoryTheory.Functor
 open import TemporalOps.Common
 open import TemporalOps.Next
 
-open import Data.Nat.Properties using (+-identityʳ ; +-comm)
-open import Relation.Binary.HeterogeneousEquality
+open import Data.Nat.Properties using (+-identityʳ ; +-comm ; +-assoc)
+open import Relation.Binary.HeterogeneousEquality as ≅
     using (_≅_ ; ≅-to-≡ ; ≡-to-≅ ; ≅-to-type-≡ ; ≅-to-subst-≡)
 import Relation.Binary.PropositionalEquality as ≡
 open Category ℝeactive
@@ -67,6 +67,17 @@ delay-+0-left {A} k n rewrite +-identityʳ k = refl
 delay-⊤ : ∀{A} -> (n k : ℕ)
        -> ⊤ at n ≡ delay A by (n + suc k) at n
 delay-⊤ {A} n k = sym (delay-+-right0 n (suc k))
+
+-- Associativity of arguments in the delay lemma
+delay-assoc-sym : ∀{A} (n k l j : ℕ)
+               -> (v : delay A by l at j)
+               -> (v′ : delay A by (k + l) at (k + j))
+               -> v ≅ v′
+               -> rew (sym (delay-+ n (k + l) (k + j))) v′
+                ≅ rew (sym (delay-+ (n + k) l j)) v
+delay-assoc-sym n zero l j v .v _≅_.refl rewrite +-identityʳ n = _≅_.refl
+delay-assoc-sym zero (suc k) l j v v′ v≅v′ = delay-assoc-sym zero k l j v v′ v≅v′
+delay-assoc-sym (suc n) (suc k) l j v v′ v≅v′ = delay-assoc-sym n (suc k) l j v v′ v≅v′
 
 -- Functor instance for delay
 F-delay : ℕ -> Endofunctor ℝeactive
@@ -139,7 +150,6 @@ fmap-delay-+-k : ∀ {A B : τ} {f : A ⇴ B} (n k l : ℕ) (v : delay A by k at
 fmap-delay-+-k {A} {B} {f} n k l v =
     sym (≅-to-rew-≡ (≅.sym (fmap-delay-+ n k l v′ v v≅v′)) (sym (delay-+ n k l)))
     where
-    private module ≅ = Relation.Binary.HeterogeneousEquality
     v′ : delay A by (n + k) at (n + l)
     v′ = rew (sym (delay-+ n k l)) v
     v≅v′ : v′ ≅ v
