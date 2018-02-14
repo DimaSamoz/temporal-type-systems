@@ -157,7 +157,7 @@ M-◇ = record
                -> (v′ : delay A by (k + 0) at (k + l))
                -> v ≅ v′
                -> (rew (delay-+-left0 k l) v) ≡ (rew (delay-+ k 0 l) v′)
-        v≡v′-rew zero l v v′ _≅_.refl = refl
+        v≡v′-rew zero l v v′ ≅.refl = refl
         v≡v′-rew (suc k) l v v′ pf = v≡v′-rew k l v v′ pf
     -- k = suc n + l
     μ-assoc-◇ {A} {.n} {.(n + suc l) , v} | fst==suc[ n + l ] with≡ pf =

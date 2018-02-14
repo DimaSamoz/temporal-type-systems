@@ -75,7 +75,7 @@ delay-assoc-sym : ∀{A} (n k l j : ℕ)
                -> v ≅ v′
                -> rew (sym (delay-+ n (k + l) (k + j))) v′
                 ≅ rew (sym (delay-+ (n + k) l j)) v
-delay-assoc-sym n zero l j v .v _≅_.refl rewrite +-identityʳ n = _≅_.refl
+delay-assoc-sym n zero l j v .v ≅.refl rewrite +-identityʳ n = ≅.refl
 delay-assoc-sym zero (suc k) l j v v′ v≅v′ = delay-assoc-sym zero k l j v v′ v≅v′
 delay-assoc-sym (suc n) (suc k) l j v v′ v≅v′ = delay-assoc-sym n (suc k) l j v v′ v≅v′
 
@@ -124,7 +124,7 @@ fmap-delay-+ : ∀ {A B : τ} {f : A ⇴ B} (n k l : ℕ)
                -> v ≅ v′
                -> (Functor.fmap (F-delay (n + k)) f at (n + l)) v
                 ≅ (Functor.fmap (F-delay      k)  f at      l)  v′
-fmap-delay-+ zero    k l v .v _≅_.refl = _≅_.refl
+fmap-delay-+ zero    k l v .v ≅.refl = ≅.refl
 fmap-delay-+ (suc n) k l v  v′ pf       = fmap-delay-+ n k l v v′ pf
 
 

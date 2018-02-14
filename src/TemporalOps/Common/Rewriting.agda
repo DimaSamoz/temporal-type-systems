@@ -14,14 +14,14 @@ rew refl x = x
 
 -- Rewriting preserves heterogeneous equality
 rew-to-≅ : ∀{ℓ}{A B : Set ℓ}{v : A} -> (p : A ≡ B) -> v ≅ rew p v
-rew-to-≅ {A = A} {.A} {v} refl = _≅_.refl
+rew-to-≅ {A = A} {.A} {v} refl = ≅.refl
 
 -- Heterogenous equality with differently typed arguments
 -- can be converted to homogeneous equality via rewriting of the types
 ≅-to-rew-≡ : ∀ {P Q : Set} {x : P} {y : Q}
             -> (p : x ≅ y) -> (e : P ≡ Q)
             -> rew e x ≡ y
-≅-to-rew-≡ _≅_.refl refl = refl
+≅-to-rew-≡ ≅.refl refl = refl
 
 -- Rewriting by p is cancelled out by rewriting by (sym p)
 rew-cancel : ∀ {P Q : Set}

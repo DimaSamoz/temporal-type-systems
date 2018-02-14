@@ -111,7 +111,7 @@ open ≅.≅-Reasoning
       -> v ≅ v′
       -> rew (delay-+-left0 (k + l) m) v
        ≅ (rew (delay-+-left0 l m) v′)
-    eq zero l m v .v _≅_.refl = _≅_.refl
+    eq zero l m v .v ≅.refl = ≅.refl
     eq (suc k) l m v v′ v≅v′ = eq k l m v v′ v≅v′
 
 -- l = n + suc j
@@ -151,5 +151,5 @@ open ≅.≅-Reasoning
     v′≅v″ = rew-to-≅ (lemma-assoc k n (suc l))
     pr : ∀{A} (n k l : ℕ) -> rew (delay-⊤ {A} (k + n) l) top.tt
        ≅ rew (sym (delay-+ {A} k (n + suc l) n)) (rew (delay-⊤ n l) top.tt)
-    pr n zero l = _≅_.refl
+    pr n zero l = ≅.refl
     pr n (suc k) l = pr n k l
