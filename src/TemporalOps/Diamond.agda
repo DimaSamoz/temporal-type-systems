@@ -55,8 +55,8 @@ M-◇ = record
         ≡⟨⟩
             μ-shift k l (rew (delay-+-left0 k l) ((Functor.fmap (F-delay k) (η.at A) at (k + l)) v))
         ≡⟨ cong (λ x → μ-shift k l x)
-            (≅-to-≡ (delay-+-left0-eq k l ((Functor.fmap (F-delay k) (η.at A) at (k + l)) v)
-                                          ((Functor.fmap (F-delay (k + 0)) (η.at A) at (k + l)) v′) pr))
+            (delay-+-left0-eq k l ((Functor.fmap (F-delay k) (η.at A) at (k + l)) v)
+                                          ((Functor.fmap (F-delay (k + 0)) (η.at A) at (k + l)) v′) pr)
          ⟩
             μ-shift k l (rew (delay-+ k 0 l) ((Functor.fmap (F-delay (k + 0)) (η.at A) at (k + l)) v′))
         ≡⟨ cong (λ x → μ-shift k l x) (fmap-delay-+-n+k k 0 l v′) ⟩
@@ -131,8 +131,8 @@ M-◇ = record
         ≡⟨ cong (λ x → μ-shift k l x) (sym (fmap-delay-+-n+k k 0 l v′)) ⟩
             μ-shift k l (rew (delay-+ k 0 l) ((Functor.fmap (F-delay (k + 0)) (μ.at A) at (k + l)) v′))
         ≡⟨ cong (λ x → μ-shift k l x)
-            (sym (≅-to-≡ (delay-+-left0-eq k l ((Functor.fmap (F-delay k) (μ.at A) at (k + l)) v)
-                                               ((Functor.fmap (F-delay (k + 0)) (μ.at A) at (k + l)) v′) pr)))
+            (sym (delay-+-left0-eq k l ((Functor.fmap (F-delay k) (μ.at A) at (k + l)) v)
+                                       ((Functor.fmap (F-delay (k + 0)) (μ.at A) at (k + l)) v′) pr))
          ⟩
             μ-shift k l (rew (delay-+-left0 k l) ((Functor.fmap (F-delay k) (μ.at A) at (k + l)) v))
         ≡⟨⟩
@@ -150,15 +150,13 @@ M-◇ = record
         v≅v′ : v ≅ v′
         v≅v′ = rew-to-≅ (delay-+0-left k (k + l))
         pr : (Functor.fmap (F-delay k) (μ.at A) at (k + l)) v
-          ≅ (Functor.fmap (F-delay (k + 0)) (μ.at A) at (k + l)) v′
-        pr = ≅.cong₂ (λ x y → (Functor.fmap (F-delay x) (μ.at A) at (k + l)) y) (≡-to-≅ (sym (+-identityʳ k))) v≅v′
-        v≡v′-rew : ∀ {A} (k l : ℕ)
-               -> (v : delay A by k at (k + l))
-               -> (v′ : delay A by (k + 0) at (k + l))
-               -> v ≅ v′
-               -> (rew (delay-+-left0 k l) v) ≡ (rew (delay-+ k 0 l) v′)
+           ≅ (Functor.fmap (F-delay (k + 0)) (μ.at A) at (k + l)) v′
+        pr = ≅.cong₂ (λ x y → (Functor.fmap (F-delay x) (μ.at A) at (k + l)) y)
+                (≡-to-≅ (sym (+-identityʳ k))) v≅v′
+        v≡v′-rew : ∀ {A} (k l : ℕ) -> Proof-≡ (delay-+-left0 {A} k l)
+                                              (delay-+ {A} k 0 l)
         v≡v′-rew zero l v v′ ≅.refl = refl
-        v≡v′-rew (suc k) l v v′ pf = v≡v′-rew k l v v′ pf
+        v≡v′-rew (suc k) l = v≡v′-rew k l
     -- k = suc n + l
     μ-assoc-◇ {A} {.n} {.(n + suc l) , v} | fst==suc[ n + l ] with≡ pf =
         begin

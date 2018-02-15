@@ -76,15 +76,15 @@ private module F-◇ = Functor F-◇
             F-◇.fmap f (k + l) (μ-shift k l (rew (delay-+-left0 k l) v))
         ≡⟨ μ-shift-fmap {_}{_}{_}{k}{l}{(rew (delay-+-left0 k l) v)} ⟩
             μ-shift k l (F-◇.fmap f l (rew (delay-+-left0 k l) v))
-        ≡⟨ cong (λ x → μ-shift k l (F-◇.fmap f l x)) (≅-to-≡ (delay-+-left0-eq k l v v′ v≅v′)) ⟩
+        ≡⟨ cong (λ x → μ-shift k l (F-◇.fmap f l x)) (delay-+-left0-eq k l v v′ v≅v′) ⟩
             μ-shift k l (F-◇.fmap f l (rew (delay-+ k 0 l) v′))
         ≡⟨⟩ -- Def. of (F-delay 0).fmap
             μ-shift k l ((Functor.fmap (F-delay 0) (F-◇.fmap f) at l) (rew (delay-+ k 0 l) v′))
         ≡⟨ cong (λ x → μ-shift k l x) (sym (fmap-delay-+-n+k k 0 l v′)) ⟩
             μ-shift k l (rew (delay-+ k 0 l) ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′))
         ≡⟨ cong (λ x → μ-shift k l x)
-            (sym (≅-to-≡ (delay-+-left0-eq k l ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v)
-                                               ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′) pr)))
+            (sym (delay-+-left0-eq k l ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v)
+                                       ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′) pr))
          ⟩
             μ-shift k l (rew (delay-+-left0 k l) ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v))
         ≡⟨⟩ -- Def. of μ-compare
@@ -101,7 +101,8 @@ private module F-◇ = Functor F-◇
         v≅v′ = rew-to-≅ (delay-+0-left k (k + l))
         pr : (Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v
            ≅ (Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′
-        pr = cong₂ (λ x y → (Functor.fmap (F-delay x) (F-◇.fmap f) at (k + l)) y) (≡-to-≅ (sym (+-identityʳ k))) v≅v′
+        pr = cong₂ (λ x y → (Functor.fmap (F-delay x) (F-◇.fmap f) at (k + l)) y) 
+                (≡-to-≅ (sym (+-identityʳ k))) v≅v′
 
     -- k = suc n + l
     μ-◇-nat-cond {A} {B} {f} {.n} {.(n + suc l) , v} | fst==suc[ n + l ] with≡ pf =

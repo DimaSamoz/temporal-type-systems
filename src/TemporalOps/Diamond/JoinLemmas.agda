@@ -55,7 +55,7 @@ open import Data.Nat.Properties
     v≅v′ = rew-to-≅ (sym (delay-+ k j n))
     pr : rew (sym (delay-+ l (k + j) (k + n))) v′
         ≅ rew (sym (delay-+ (l + k) j n)) v
-    pr = delay-assoc-sym l k j n v v′ v≅v′
+    pr = delay-assoc-sym l k j n v′ v (≅.sym v≅v′)
 
 private module μ = _⟹_ μ-◇
 open ≅.≅-Reasoning
@@ -79,7 +79,7 @@ open ≅.≅-Reasoning
         μ-compare A ((k + l) + m) (k + l) v″ (snd==[ (k + l) + m ])
     ≡⟨⟩
         μ-shift (k + l) m (rew (delay-+-left0 (k + l) m) v″)
-    ≅⟨ ≅.cong (λ x → μ-shift (k + l) m x) (eq k l m v″ v v″≅v) ⟩
+    ≡⟨ cong (λ x → μ-shift (k + l) m x) (pr k l m v″ v v″≅v) ⟩
         μ-shift (k + l) m (rew (delay-+-left0 l m) v)
     ≅⟨ ≅.sym ( μ-shift-comp {A} {m} {l} {k} {(rew (delay-+-left0 l m) v)} ) ⟩
         μ-shift k (l + m) (μ-shift l m (rew (delay-+-left0 l m) v))
@@ -105,14 +105,10 @@ open ≅.≅-Reasoning
     v′≅v″ = rew-to-≅ (lemma-assoc k l m)
     v″≅v : v″ ≅ v
     v″≅v = ≅.trans (≅.sym v′≅v″) (≅.sym v≅v′)
-    eq : ∀ {A} (k l m : ℕ)
-      -> (v : delay ◇ A by (k + l) at ((k + l) + m))
-      -> (v′ : delay ◇ A by l at (l + m))
-      -> v ≅ v′
-      -> rew (delay-+-left0 (k + l) m) v
-       ≅ (rew (delay-+-left0 l m) v′)
-    eq zero l m v .v ≅.refl = ≅.refl
-    eq (suc k) l m v v′ v≅v′ = eq k l m v v′ v≅v′
+    pr : ∀{A} (k l m : ℕ) -> Proof-≡ (delay-+-left0 {A} (k + l) m)
+                                     (delay-+-left0 {A} l m)
+    pr zero l m v .v ≅.refl = refl
+    pr (suc k) l m = pr k l m
 
 -- l = n + suc j
 μ-interchange {A} {.n} {k} {.(n + suc l) , v} | fst==suc[ n + l ] with≡ pf =
@@ -149,7 +145,8 @@ open ≅.≅-Reasoning
     v″ = (rew (lemma-assoc k n (suc l)) v′)
     v′≅v″ : v′ ≅ v″
     v′≅v″ = rew-to-≅ (lemma-assoc k n (suc l))
-    pr : ∀{A} (n k l : ℕ) -> rew (delay-⊤ {A} (k + n) l) top.tt
+    pr : ∀{A} (n k l : ℕ)
+      -> rew (delay-⊤ {A} (k + n) l) top.tt
        ≅ rew (sym (delay-+ {A} k (n + suc l) n)) (rew (delay-⊤ n l) top.tt)
     pr n zero l = ≅.refl
     pr n (suc k) l = pr n k l

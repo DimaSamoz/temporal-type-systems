@@ -8,7 +8,7 @@ open import TemporalOps.Common
 open import TemporalOps.Next
 
 open import Data.Nat.Properties using (+-identityʳ ; +-comm ; +-assoc)
-open import Relation.Binary.HeterogeneousEquality as ≅ using (_≅_)
+open import Relation.Binary.HeterogeneousEquality as ≅ using (_≅_ ; ≅-to-≡)
 import Relation.Binary.PropositionalEquality as ≡
 open Category ℝeactive
 
@@ -43,13 +43,9 @@ delay-+-left0 (suc n) k = delay-+-left0 n k
 
 -- delay-+-left0 can be converted to delay-+ (heterogeneously).
 delay-+-left0-eq : ∀{A : τ} -> (n l : ℕ)
-                   -> (v : delay A by n at (n + l))
-                   -> (v′ : delay A by (n + 0) at (n + l))
-                   -> (p : v ≅ v′)
-                   -> rew (delay-+-left0 {A} n l) v
-                    ≅ rew (delay-+ {A} n 0 l) v′
-delay-+-left0-eq zero l v v′ p = p
-delay-+-left0-eq (suc n) l v v′ p = delay-+-left0-eq n l v v′ p
+                -> Proof-≡ (delay-+-left0 {A} n l) (delay-+ {A} n 0 l)
+delay-+-left0-eq zero l v v′ pf = ≅-to-≡ pf
+delay-+-left0-eq (suc n) l = delay-+-left0-eq n l
 
 -- Extra delay by n steps is cancelled out by waiting for n steps.
 delay-+-right0 : ∀{A} -> (n l : ℕ)
@@ -69,14 +65,12 @@ delay-⊤ {A} n k = sym (delay-+-right0 n (suc k))
 
 -- Associativity of arguments in the delay lemma
 delay-assoc-sym : ∀{A} (n k l j : ℕ)
-               -> (v : delay A by l at j)
-               -> (v′ : delay A by (k + l) at (k + j))
-               -> v ≅ v′
-               -> rew (sym (delay-+ n (k + l) (k + j))) v′
-                ≅ rew (sym (delay-+ (n + k) l j)) v
-delay-assoc-sym n zero l j v .v ≅.refl rewrite +-identityʳ n = ≅.refl
-delay-assoc-sym zero (suc k) l j v v′ v≅v′ = delay-assoc-sym zero k l j v v′ v≅v′
-delay-assoc-sym (suc n) (suc k) l j v v′ v≅v′ = delay-assoc-sym n (suc k) l j v v′ v≅v′
+               -> Proof-≅ (sym (delay-+ {A} n (k + l) (k + j)))
+                          (sym (delay-+ {A} (n + k) l j))
+delay-assoc-sym zero zero l j v v′ pr = pr
+delay-assoc-sym zero (suc k) l j = delay-assoc-sym zero k l j
+delay-assoc-sym (suc n) k l j = delay-assoc-sym n k l j
+
 
 -- Functor instance for delay
 F-delay : ℕ -> Endofunctor ℝeactive
@@ -119,10 +113,8 @@ F-delay k = record
 -- Lifted version of the delay-+ lemma
 -- Arguments have different types, so we need heterogeneous equality
 fmap-delay-+ : ∀ {A B : τ} {f : A ⇴ B} (n k l : ℕ)
-               -> (v : delay A by (n + k) at (n + l)) (v′ : delay A by k at l)
-               -> v ≅ v′
-               -> (Functor.fmap (F-delay (n + k)) f at (n + l)) v
-                ≅ (Functor.fmap (F-delay      k)  f at      l)  v′
+            -> Fun-≅ (Functor.fmap (F-delay (n + k)) f at (n + l))
+                     (Functor.fmap (F-delay      k)  f at      l)
 fmap-delay-+ zero    k l v .v ≅.refl = ≅.refl
 fmap-delay-+ (suc n) k l v  v′ pf       = fmap-delay-+ n k l v v′ pf
 
@@ -143,9 +135,10 @@ fmap-delay-+-n+k {A} n k l v =
 
 -- Specialised version with v of type delay A by k at l
 -- Uses explicit rewrites and homogeneous equality
-fmap-delay-+-k : ∀ {A B : τ} {f : A ⇴ B} (n k l : ℕ) (v : delay A by k at l)
-               -> Functor.fmap (F-delay (n + k)) f (n + l) (rew (sym (delay-+ n k l)) v)
-                ≡ rew (sym (delay-+ n k l)) (Functor.fmap (F-delay k) f l v)
+fmap-delay-+-k : ∀ {A B : τ} {f : A ⇴ B} (n k l : ℕ)
+              ->(v : delay A by k at l)
+              -> Functor.fmap (F-delay (n + k)) f (n + l) (rew (sym (delay-+ n k l)) v)
+               ≡ rew (sym (delay-+ n k l)) (Functor.fmap (F-delay k) f l v)
 fmap-delay-+-k {A} {B} {f} n k l v =
     sym (≅-to-rew-≡ (≅.sym (fmap-delay-+ n k l v′ v v≅v′)) (sym (delay-+ n k l)))
     where
