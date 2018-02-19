@@ -72,7 +72,11 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
         -- Terminal object
         ⊤ : TerminalObj ℂ
         -- Binary products for all pairs of objects
-        _⊗_ : ∀(A B : obj) -> Product ℂ A B
+        prod : ∀(A B : obj) -> Product ℂ A B
+
+    -- Shorthand for product object
+    _⊗_ : (A B : obj) -> obj
+    _⊗_ A B = Product.A⊗B (prod A B)
 
 
 𝕊et-Cartesian : Cartesian 𝕊et
@@ -82,7 +86,7 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
         ; ! = λ {A} _ → top.tt
         ; unique = λ m → refl
         }
-    ; _⊗_ = λ A B → record
+    ; prod = λ A B → record
         { A⊗B = A × B
         ; π₁ = proj₁
         ; π₂ = proj₂

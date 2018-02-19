@@ -73,7 +73,11 @@ record Cocartesian {n} (ℂ : Category n) : Set (lsuc n) where
         -- Initial object
         ⊥ : InitialObj ℂ
         -- Binary sums for all pairs of objects
-        _⊕_ : ∀(A B : obj) -> Sum ℂ A B
+        sum : ∀(A B : obj) -> Sum ℂ A B
+
+    -- Shorthand for sum object
+    _⊕_ : (A B : obj) -> obj
+    _⊕_ A B = Sum.A⊕B (sum A B)
 
 
 𝕊et-Cocartesan : Cocartesian 𝕊et
@@ -83,7 +87,7 @@ record Cocartesian {n} (ℂ : Category n) : Set (lsuc n) where
         ; ¡ = ⊥-elim
         ; unique = λ {A} m → λ {}
         }
-    ; _⊕_ = λ A B → record
+    ; sum = λ A B → record
         { A⊕B = A ⊎ B
         ; ι₁ = inj₁
         ; ι₂ = inj₂
