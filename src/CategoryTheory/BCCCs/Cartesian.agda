@@ -52,13 +52,16 @@ module _ {n} (ℂ : Category n) where
             unique  : ∀{P} -> {p₁ : P ~> A} {p₂ : P ~> B} {m : P ~> A⊗B}
                    -> π₁ ∘ m ≈ p₁ -> π₂ ∘ m ≈ p₂ -> ⟨ p₁ , p₂ ⟩ ≈ m
 
+        -- η-expansion of function pairs (via morphisms)
         ⊗-η-exp : ∀{P} -> {m : P ~> A⊗B}
                -> ⟨ π₁ ∘ m , π₂ ∘ m ⟩ ≈ m
         ⊗-η-exp = unique (IsEquivalence.refl ≈-equiv) (IsEquivalence.refl ≈-equiv)
 
+        -- Pairing of projection functions is the identity
         ⊗-η-id : ⟨ π₁ , π₂ ⟩ ≈ id
         ⊗-η-id = unique id-right id-right
 
+        -- Congruence over function pairing
         ⟨,⟩-cong : ∀{P} -> {p₁ q₁ : P ~> A} {p₂ q₂ : P ~> B}
                -> p₁ ≈ q₁ -> p₂ ≈ q₂
                -> ⟨ p₁ , p₂ ⟩ ≈ ⟨ q₁ , q₂ ⟩
@@ -67,6 +70,7 @@ module _ {n} (ℂ : Category n) where
 -- Type class for Cartesian categories
 record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
     open Category ℂ
+    open Product hiding (⟨_,_⟩)
     field
         -- | Data
         -- Terminal object
@@ -75,9 +79,16 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
         prod : ∀(A B : obj) -> Product ℂ A B
 
     -- Shorthand for product object
+    infixr 70 _⊗_
     _⊗_ : (A B : obj) -> obj
-    _⊗_ A B = Product.A⊗B (prod A B)
+    _⊗_ A B = A⊗B (prod A B)
 
+    -- Parallel product of morphisms
+    _*_ : {A B P Q : obj} -> (A ~> P) -> (B ~> Q)
+       -> (A ⊗ B ~> P ⊗ Q)
+    _*_ {A} {B} {P} {Q} f g = ⟨ f ∘ π₁ (prod A B) , g ∘ π₂ (prod A B) ⟩
+        where
+        open Product (prod P Q) using (⟨_,_⟩)
 
 𝕊et-Cartesian : Cartesian 𝕊et
 𝕊et-Cartesian = record

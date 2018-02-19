@@ -53,13 +53,16 @@ module _ {n} (ℂ : Category n) where
             unique  : ∀{S} -> {i₁ : A ~> S} {i₂ : B ~> S} {m : A⊕B ~> S}
                    -> m ∘ ι₁ ≈ i₁ -> m ∘ ι₂ ≈ i₂ -> [ i₁ , i₂ ] ≈ m
 
+        -- η-expansion of function sums (via morphisms)
         ⊕-η-exp : ∀{S} -> {m : A⊕B ~> S}
                -> [ m ∘ ι₁ , m ∘ ι₂ ] ≈ m
         ⊕-η-exp = unique (IsEquivalence.refl ≈-equiv) (IsEquivalence.refl ≈-equiv)
 
+        -- Summing of injection functions is the identity
         ⊕-η-id : [ ι₁ , ι₂ ] ≈ id
         ⊕-η-id = unique id-left id-left
 
+        -- Congruence over function summing
         ⟨,⟩-cong : ∀{S} -> {i₁ j₁ : A ~> S} {i₂ j₂ : B ~> S}
                -> i₁ ≈ j₁ -> i₂ ≈ j₂
                -> [ i₁ , i₂ ] ≈ [ j₁ , j₂ ]
@@ -68,6 +71,7 @@ module _ {n} (ℂ : Category n) where
 -- Type class for cocartesian categories
 record Cocartesian {n} (ℂ : Category n) : Set (lsuc n) where
     open Category ℂ
+    open Sum hiding ([_,_])
     field
         -- | Data
         -- Initial object
@@ -76,8 +80,17 @@ record Cocartesian {n} (ℂ : Category n) : Set (lsuc n) where
         sum : ∀(A B : obj) -> Sum ℂ A B
 
     -- Shorthand for sum object
+    infixr 65 _⊕_
     _⊕_ : (A B : obj) -> obj
     _⊕_ A B = Sum.A⊕B (sum A B)
+
+    -- Parallel sum of morphisms
+    _⊹_ : {A B P Q : obj} -> (A ~> P) -> (B ~> Q)
+       -> (A ⊕ B ~> P ⊕ Q)
+    _⊹_ {A} {B} {P} {Q} f g = [ ι₁ (sum P Q) ∘ f , ι₂ (sum P Q) ∘ g ]
+        where
+        open Sum (sum A B) using ([_,_])
+
 
 
 𝕊et-Cocartesan : Cocartesian 𝕊et
