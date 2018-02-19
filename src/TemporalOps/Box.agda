@@ -9,12 +9,6 @@ open import CategoryTheory.Adjunction
 open import CategoryTheory.Comonad
 open import TemporalOps.Common
 
-open import Relation.Binary.PropositionalEquality
-
--- Function extensionality
-postulate
-    ext : ∀{a b} -> Extensionality a b
-
 -- The box operator can be derived as a comonad from an adjunction K ⊣ G
 
 K : Functor 𝕊et ℝeactive

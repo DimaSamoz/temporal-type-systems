@@ -10,6 +10,12 @@ open import Data.Product public
 open import Data.Sum renaming (_⊎_ to _∨_)
 open import Relation.Binary using (IsEquivalence)
 open import Agda.Primitive using (Level ; _⊔_ ; lzero ; lsuc) public
+open import Relation.Binary.PropositionalEquality
+
+-- Function extensionality
+postulate
+    ext : ∀{a b} -> Extensionality a b
+
 
 -- Type class for categories.
 -- Based on https://github.com/UlfNorell/category-theory-experiments
@@ -143,27 +149,3 @@ infixr 30 _⇴_
                       | ge {n} {f′ n a′} = refl
 
 
--- || Cartesian, cocartesian, exponential structure
-
--- Final object
-⊤ : τ
-⊤ n = top
-
--- Products
-_⊗_ : τ -> τ -> τ
-(A ⊗ B) n = A n × B n
-infixl 60 _⊗_
-
--- Initial object
-⊥ : τ
-⊥ n = bot
-
--- Products
-_⊕_ : τ -> τ -> τ
-(A ⊕ B) n = A n ∨ B n
-infixl 55 _⊕_
-
--- Exponentials
-_⇒_ : τ -> τ -> τ
-(A ⇒ B) n = A n -> B n
-infixr 50 _⇒_
