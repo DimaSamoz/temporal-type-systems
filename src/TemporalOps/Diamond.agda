@@ -10,7 +10,7 @@ open import CategoryTheory.Monad
 open import TemporalOps.Common
 open import TemporalOps.Next
 open import TemporalOps.Delay
-open import TemporalOps.Diamond.Functor
+open import TemporalOps.Diamond.Functor public
 open import TemporalOps.Diamond.Join
 open import TemporalOps.Diamond.JoinLemmas
 
