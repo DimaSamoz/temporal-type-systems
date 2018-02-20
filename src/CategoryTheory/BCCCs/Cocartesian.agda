@@ -4,9 +4,11 @@ module CategoryTheory.BCCCs.Cocartesian where
 
 open import CategoryTheory.Categories
 open import Relation.Binary using (IsEquivalence)
+open import Data.Empty using (⊥-elim) renaming (⊥ to bot) public
 open import Data.Sum renaming ([_,_] to ⟦_,_⟧)
 import Function as F using (_∘_)
-open import Data.Empty using (⊥-elim)
+
+
 module _ {n} (ℂ : Category n) where
 
     open Category ℂ

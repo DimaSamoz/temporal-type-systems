@@ -3,7 +3,10 @@
 module CategoryTheory.BCCCs.Cartesian where
 
 open import CategoryTheory.Categories
+
 open import Relation.Binary using (IsEquivalence)
+open import Data.Unit using () renaming (⊤ to top) public
+open import Data.Product public
 import Function as F using (_∘_)
 
 module _ {n} (ℂ : Category n) where

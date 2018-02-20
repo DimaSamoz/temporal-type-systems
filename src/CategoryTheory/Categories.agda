@@ -3,11 +3,8 @@
 module CategoryTheory.Categories where
 
 open import Data.Nat using (ℕ ; zero ; suc ; _+_) public
-open import Relation.Binary.PropositionalEquality using (_≡_ ; refl ; sym ; trans ; subst ; cong) public
-open import Data.Unit using () renaming (⊤ to top) public
-open import Data.Empty using () renaming (⊥ to bot) public
-open import Data.Product public
-open import Data.Sum renaming (_⊎_ to _∨_)
+open import Relation.Binary.PropositionalEquality
+            using (_≡_ ; refl ; sym ; trans ; subst ; cong) public
 open import Relation.Binary using (IsEquivalence)
 open import Agda.Primitive using (Level ; _⊔_ ; lzero ; lsuc) public
 open import Relation.Binary.PropositionalEquality
@@ -149,3 +146,27 @@ infixr 30 _⇴_
                       | ge {n} {f′ n a′} = refl
 
 
+-- -- || Cartesian, cocartesian, exponential structure
+--
+-- -- Final object
+-- ⊤ : τ
+-- ⊤ n = top
+--
+-- -- Products
+-- _⊗_ : τ -> τ -> τ
+-- (A ⊗ B) n = A n × B n
+-- infixl 60 _⊗_
+--
+-- -- Initial object
+-- ⊥ : τ
+-- ⊥ n = bot
+--
+-- -- Products
+-- _⊕_ : τ -> τ -> τ
+-- (A ⊕ B) n = A n ∨ B n
+-- infixl 55 _⊕_
+--
+-- -- Exponentials
+-- _⇒_ : τ -> τ -> τ
+-- (A ⇒ B) n = A n -> B n
+-- infixr 50 _⇒_
