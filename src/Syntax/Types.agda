@@ -1,8 +1,8 @@
 
 {- Type system of the language. -}
-module Types where
+module Syntax.Types where
 
--- Abstract grammar of types for the language.
+-- Abstract syntax of types for the language.
 data Type : Set where
     -- Unit type
     Unit   : Type

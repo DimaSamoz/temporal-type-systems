@@ -1,8 +1,8 @@
 
 {- Denotational semantics of the types in the category of temporal types. -}
-module Semantics where
+module Semantics.Denotational where
 
-open import Types
+open import Syntax.Types
 open import CategoryTheory.Instances.Reactive
 open import TemporalOps.Box
 open import TemporalOps.Diamond
