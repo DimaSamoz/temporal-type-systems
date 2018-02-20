@@ -5,9 +5,6 @@ module CategoryTheory.BCCCs.Cartesian where
 open import CategoryTheory.Categories
 
 open import Relation.Binary using (IsEquivalence)
-open import Data.Unit using () renaming (⊤ to top) public
-open import Data.Product public
-import Function as F using (_∘_)
 
 module _ {n} (ℂ : Category n) where
 
@@ -92,27 +89,3 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
     _*_ {A} {B} {P} {Q} f g = ⟨ f ∘ π₁ (prod A B) , g ∘ π₂ (prod A B) ⟩
         where
         open Product (prod P Q) using (⟨_,_⟩)
-
-𝕊et-Cartesian : Cartesian 𝕊et
-𝕊et-Cartesian = record
-    { ⊤ = record
-        { ⊤ = top
-        ; ! = λ {A} _ → top.tt
-        ; unique = λ m → refl
-        }
-    ; prod = λ A B → record
-        { A⊗B = A × B
-        ; π₁ = proj₁
-        ; π₂ = proj₂
-        ; ⟨_,_⟩ = <_,_>
-        ; comm-π₁ = refl
-        ; comm-π₂ = refl
-        ; unique = λ pr1 pr2 → unique-𝕊et (ext λ x → pr1 {x}) (ext λ x → pr2 {x})
-        }
-    }
-    where
-    unique-𝕊et : ∀{A B P : Set}{a}
-              -> {p₁ : P -> A} {p₂ : P -> B} {m : P -> A × B}
-              -> proj₁ F.∘ m ≡ p₁ -> proj₂ F.∘ m ≡ p₂
-              -> < p₁ , p₂ > a ≡ m a
-    unique-𝕊et refl refl = refl

@@ -40,22 +40,3 @@ record Closed {n} {ℂ : Category n} (Cℂ : Cartesian ℂ) : Set (lsuc n) where
     infixr 70 _⇒_
     _⇒_ : (A B : obj) -> obj
     _⇒_ A B = A⇒B (exp A B)
-
-𝕊et-Closed : Closed (𝕊et-Cartesian)
-𝕊et-Closed = record
-    { exp = λ A B → record
-        { A⇒B = A -> B
-        ; eval = λ fa → proj₁ fa (proj₂ fa)
-        ; ƛ = λ f a b → f (a , b)
-        ; comm-ƛ = refl
-        ; unique = λ pr → λ {a} ->  unique-𝕊et (ext λ x → pr {x})
-        }
-    }
-    where
-    open Cartesian
-    open Category 𝕊et
-    unique-𝕊et : ∀{A B E : Set}{a}
-              -> {e : E × A -> B} {m : E -> (A -> B)}
-              -> (λ fa → proj₁ fa (proj₂ fa)) ∘ < m ∘ proj₁ , proj₂ > ≡ e
-              -> (λ b → e (a , b)) ≡ m a
-    unique-𝕊et refl = refl

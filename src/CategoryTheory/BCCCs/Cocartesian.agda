@@ -3,11 +3,8 @@
 module CategoryTheory.BCCCs.Cocartesian where
 
 open import CategoryTheory.Categories
-open import Relation.Binary using (IsEquivalence)
-open import Data.Empty using (⊥-elim) renaming (⊥ to bot) public
-open import Data.Sum renaming ([_,_] to ⟦_,_⟧)
-import Function as F using (_∘_)
 
+open import Relation.Binary using (IsEquivalence)
 
 module _ {n} (ℂ : Category n) where
 
@@ -92,31 +89,3 @@ record Cocartesian {n} (ℂ : Category n) : Set (lsuc n) where
     _⊹_ {A} {B} {P} {Q} f g = [ ι₁ (sum P Q) ∘ f , ι₂ (sum P Q) ∘ g ]
         where
         open Sum (sum A B) using ([_,_])
-
-
-
-𝕊et-Cocartesan : Cocartesian 𝕊et
-𝕊et-Cocartesan = record
-    { ⊥ = record
-        { ⊥ = bot
-        ; ¡ = ⊥-elim
-        ; unique = λ {A} m → λ {}
-        }
-    ; sum = λ A B → record
-        { A⊕B = A ⊎ B
-        ; ι₁ = inj₁
-        ; ι₂ = inj₂
-        ; [_,_] = ⟦_,_⟧
-        ; comm-ι₁ = λ {S} {i₁} {i₂} {a} → refl
-        ; comm-ι₂ = λ {S} {i₁} {i₂} {a} → refl
-        ; unique = λ {S} {i₁} {i₂} {m} pr1 pr2
-                  -> unique-𝕊et {m = m} (ext λ x → pr1 {x}) (ext λ x → pr2 {x})
-        }
-    }
-    where
-    unique-𝕊et : ∀{A B S : Set}{a}
-              -> {i₁ : A -> S} {i₂ : B -> S} {m : A ⊎ B -> S}
-              -> m F.∘ inj₁ ≡ i₁ -> m F.∘ inj₂ ≡ i₂
-              -> ⟦ i₁ , i₂ ⟧ a ≡ m a
-    unique-𝕊et {a = inj₁ x} refl refl = refl
-    unique-𝕊et {a = inj₂ y} refl refl = refl
