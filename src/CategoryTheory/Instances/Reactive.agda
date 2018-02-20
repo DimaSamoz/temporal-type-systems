@@ -116,3 +116,26 @@ infixr 30 _⇴_
               -> (λ n fa → proj₁ fa (proj₂ fa)) ∘ ((λ n (a : E n × A n) -> ( (m n F.∘ proj₁) a , proj₂ a ))) ≡ e
               -> ∀{n}{a : E n} -> (λ b → e n (a , b)) ≡ m n a
     unique-closed refl = refl
+
+-- Top-level shorthands for distinguished BCCC objects
+open BicartesianClosed ℝeactive-BCCC
+
+-- Terminal object: the constant unit type
+⊤ : τ
+⊤ = TerminalObj.⊤ (Cartesian.term cart)
+
+-- Initial object: the constant void type
+⊥ : τ
+⊥ = InitialObj.⊥ (Cocartesian.init cocart)
+
+-- Product object: pairwise product of types
+_⊗_ : τ -> τ -> τ
+A ⊗ B = Product.A⊗B (Cartesian.prod cart A B)
+
+-- Sum object: pairwise sum of types
+_⊕_ : τ -> τ -> τ
+A ⊕ B = Sum.A⊕B (Cocartesian.sum cocart A B)
+
+-- Exponential object: pointwise functions
+_⇒_ : τ -> τ -> τ
+A ⇒ B = Exponential.A⇒B (Closed.exp closed A B)

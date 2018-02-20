@@ -3,9 +3,9 @@
 module CategoryTheory.BCCCs where
 
 open import CategoryTheory.Categories
-open import CategoryTheory.BCCCs.Cartesian
-open import CategoryTheory.BCCCs.Cocartesian
-open import CategoryTheory.BCCCs.Closed
+open import CategoryTheory.BCCCs.Cartesian public
+open import CategoryTheory.BCCCs.Cocartesian public
+open import CategoryTheory.BCCCs.Closed public
 
 -- Bicartesian categories
 record Bicartesian {n} (ℂ : Category n) : Set (lsuc n) where
