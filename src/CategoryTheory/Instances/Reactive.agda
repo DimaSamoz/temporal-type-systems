@@ -5,6 +5,7 @@ module CategoryTheory.Instances.Reactive where
 open import CategoryTheory.Categories
 open import CategoryTheory.BCCCs
 
+open import Data.Nat using (ℕ ; zero ; suc ; _+_) public
 open import Data.Unit using () renaming (⊤ to top) public
 open import Data.Product public
 open import Data.Empty using (⊥-elim) renaming (⊥ to bot) public

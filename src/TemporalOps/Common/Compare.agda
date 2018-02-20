@@ -6,6 +6,7 @@ open import CategoryTheory.Categories
 open import Relation.Binary.PropositionalEquality as ≡
 open import Relation.Binary.HeterogeneousEquality as ≅
 open import Data.Nat.Properties using (+-identityʳ ; +-assoc ; +-suc)
+open import Data.Nat using (ℕ ; zero ; suc ; _+_) public
 
 -- (Very verbose) comparison view
 -- Like 'compare', but only distinguishes ≤ or >.

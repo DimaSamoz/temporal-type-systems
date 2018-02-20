@@ -2,7 +2,6 @@
 {- Type classes and instances for categories. -}
 module CategoryTheory.Categories where
 
-open import Data.Nat using (ℕ ; zero ; suc ; _+_) public
 open import Relation.Binary.PropositionalEquality
             using (_≡_ ; refl ; sym ; trans ; subst ; cong) public
 open import Relation.Binary using (IsEquivalence)

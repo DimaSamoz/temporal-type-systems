@@ -3,6 +3,7 @@
 module TemporalOps.Diamond.Join where
 
 open import CategoryTheory.Categories
+open import CategoryTheory.Instances.Reactive
 open import CategoryTheory.Functor
 open import CategoryTheory.NatTrans
 open import CategoryTheory.Monad
@@ -101,7 +102,7 @@ private module F-◇ = Functor F-◇
         v≅v′ = rew-to-≅ (delay-+0-left k (k + l))
         pr : (Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v
            ≅ (Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′
-        pr = cong₂ (λ x y → (Functor.fmap (F-delay x) (F-◇.fmap f) at (k + l)) y) 
+        pr = cong₂ (λ x y → (Functor.fmap (F-delay x) (F-◇.fmap f) at (k + l)) y)
                 (≡-to-≅ (sym (+-identityʳ k))) v≅v′
 
     -- k = suc n + l

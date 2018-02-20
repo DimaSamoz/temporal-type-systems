@@ -3,6 +3,7 @@
 module TemporalOps.Diamond.JoinLemmas where
 
 open import CategoryTheory.Categories
+open import CategoryTheory.Instances.Reactive
 open import CategoryTheory.Functor
 open import CategoryTheory.NatTrans
 open import CategoryTheory.Monad

@@ -3,6 +3,8 @@
 module TemporalOps.Box where
 
 open import CategoryTheory.Categories
+open import CategoryTheory.Instances.Sets
+open import CategoryTheory.Instances.Reactive
 open import CategoryTheory.Functor
 open import CategoryTheory.NatTrans
 open import CategoryTheory.Adjunction
