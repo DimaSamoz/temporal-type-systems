@@ -74,9 +74,13 @@ record Cocartesian {n} (ℂ : Category n) : Set (lsuc n) where
     field
         -- | Data
         -- Initial object
-        ⊥ : InitialObj ℂ
+        init : InitialObj ℂ
         -- Binary sums for all pairs of objects
         sum : ∀(A B : obj) -> Sum ℂ A B
+
+    -- Shorthand for initial object
+    ⊥ : obj
+    ⊥ = InitialObj.⊥ init
 
     -- Shorthand for sum object
     infixr 65 _⊕_

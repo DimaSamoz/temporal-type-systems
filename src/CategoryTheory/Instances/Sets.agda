@@ -38,7 +38,7 @@ open import Data.Sum renaming ([_,_] to ⟦_,_⟧)
 𝕊et-BCCC : BicartesianClosed 𝕊et
 𝕊et-BCCC = record
     { cart = record
-        { ⊤ = record
+        { term = record
             { ⊤ = top
             ; ! = λ {A} _ → top.tt
             ; unique = λ m → refl
@@ -54,7 +54,7 @@ open import Data.Sum renaming ([_,_] to ⟦_,_⟧)
             }
         }
     ; cocart = record
-        { ⊥ = record
+        { init = record
             { ⊥ = bot
             ; ¡ = ⊥-elim
             ; unique = λ {A} m → λ {}

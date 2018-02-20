@@ -74,9 +74,13 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
     field
         -- | Data
         -- Terminal object
-        ⊤ : TerminalObj ℂ
+        term : TerminalObj ℂ
         -- Binary products for all pairs of objects
         prod : ∀(A B : obj) -> Product ℂ A B
+
+    -- Shorthand for terminal object
+    ⊤ : obj
+    ⊤ = TerminalObj.⊤ term
 
     -- Shorthand for product object
     infixr 70 _⊗_
