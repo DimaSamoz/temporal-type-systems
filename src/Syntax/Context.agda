@@ -15,6 +15,7 @@ infixl 50 _,_
 -- Typing environment as a dual context
 data Environment : Set where
     _⁏_ : Context -> Context -> Environment
+infix 40 _⁏_
 
 
 -- | Context operations and predicates
