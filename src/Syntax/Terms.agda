@@ -11,6 +11,7 @@ mutual
     -- Pure terms of the language, expressed as typing judgements
     infix 10 _⊢_
     data _⊢_ : Environment -> Type -> Set where
+        -- | Simply typed lambda calculus
         -- Variables
         Var : ∀{Γ Δ A}          ->                  A ∈ Γ
                                                  -----------
@@ -26,6 +27,43 @@ mutual
                                         -------------------------------
                                 ->                Δ ⁏ Γ ⊢ B
 
+        -- | Basic data types
+        -- Unit                                 ---------------
+        Unit : ∀{Γ Δ}           ->               Δ ⁏ Γ ⊢ Unit
+
+        -- Pair of two terms
+        [_,_] : ∀{Γ Δ A B}      ->        Δ ⁏ Γ ⊢ A   ->   Δ ⁏ Γ ⊢ B
+                                         ----------------------------
+                                ->               Δ ⁏ Γ ⊢ A & B
+
+        -- First projection
+        Fst : ∀{Γ Δ A B}        ->               Δ ⁏ Γ ⊢ A & B
+                                                ---------------
+                                ->                 Δ ⁏ Γ ⊢ A
+
+        -- Second projection
+        Snd : ∀{Γ Δ A B}        ->               Δ ⁏ Γ ⊢ A & B
+                                                ---------------
+                                ->                 Δ ⁏ Γ ⊢ B
+
+        -- Left injection
+        Inl : ∀{Γ Δ A B}        ->                 Δ ⁏ Γ ⊢ A
+                                                ---------------
+                                ->               Δ ⁏ Γ ⊢ A + B
+
+        -- Right injection
+        Inr : ∀{Γ Δ A B}        ->                 Δ ⁏ Γ ⊢ B
+                                                ---------------
+                                ->               Δ ⁏ Γ ⊢ A + B
+
+        -- Case split
+        Case_Inl↦_||Inr↦_ : ∀{Γ Δ A B C}
+                                ->               Δ ⁏ Γ ⊢ A + B
+                                ->      Δ ⁏ Γ , A ⊢ C   ->   Δ ⁏ Γ , B ⊢ C
+                                       ------------------------------------
+                                ->                 Δ ⁏ Γ ⊢ C
+
+        -- | Modal operators
         -- Stable variables
         SVar : ∀{Γ Δ A}         ->                   A ∈ Δ
                                                   -----------
