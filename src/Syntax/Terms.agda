@@ -98,7 +98,7 @@ mutual
                                  ->                 Δ ⁏ Γ ⊨ B
 
         -- Event destructor
-        letEvt_In_ : ∀{Γ Δ A B}  ->   Δ ⁏ Γ ⊢ Event A   ->   Δ ⁏ [ A ] ⊢ B
+        letEvt_In_ : ∀{Γ Δ A B}  ->   Δ ⁏ Γ ⊢ Event A   ->   Δ ⁏ [ A ] ⊨ B
                                      ----------------------------------------
                                  ->                 Δ ⁏ Γ ⊨ B
 
