@@ -40,6 +40,7 @@ mutual
         LetSig_In_ : ∀{Γ Δ A B} ->   Δ ⁏ Γ ⊢ Signal A   ->   Δ , A ⁏ Γ ⊢ B
                                     ----------------------------------------
                                 ->                 Δ ⁏ Γ ⊢ B
+
         -- Event constructor
         Event : ∀{Γ Δ A}        ->                 Δ ⁏ Γ ⊨ A
                                                ------------------
@@ -52,11 +53,21 @@ mutual
         Pure : ∀{Γ Δ A}          ->                 Δ ⁏ Γ ⊢ A
                                                   -------------
                                  ->                 Δ ⁏ Γ ⊨ A
+
         -- Computational signal destructor
         LetSig_InC_ : ∀{Γ Δ A B} ->   Δ ⁏ Γ ⊢ Signal A   ->   Δ , A ⁏ Γ ⊨ B
                                      ----------------------------------------
                                  ->                 Δ ⁏ Γ ⊨ B
+
         -- Event destructor
         LetEvt_In_ : ∀{Γ Δ A B}  ->   Δ ⁏ Γ ⊢ Event A   ->   Δ ⁏ [ A ] ⊢ B
                                      ----------------------------------------
                                  ->                 Δ ⁏ Γ ⊨ B
+
+        -- Select the event that happens first
+        Select_↦_||_↦_||Both↦_ : ∀{Γ Δ A B C}
+            ->   Δ ⁏ Γ ⊢ Event A   ->   Δ ⁏ [ A ] , Event B ⊨ C   -- A happens first
+            ->   Δ ⁏ Γ ⊢ Event B   ->   Δ ⁏ [ B ] , Event A ⊨ C   -- B happens first
+            ->              Δ ⁏ ∙ , A , B ⊨ C                     -- A and B happen at the same time
+                -------------------------------------------------
+            ->                  Δ ⁏ Γ ⊨ C
