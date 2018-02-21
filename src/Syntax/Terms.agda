@@ -13,12 +13,12 @@ mutual
     data _⊢_ : Environment -> Type -> Set where
         -- | Simply typed lambda calculus
         -- Variables
-        Var : ∀{Γ Δ A}          ->                  A ∈ Γ
+        var : ∀{Γ Δ A}          ->                  A ∈ Γ
                                                  -----------
                                 ->                Δ ⁏ Γ ⊢ A
 
         -- Lambda abstraction
-        Lam : ∀{Γ Δ A B}        ->              Δ ⁏ Γ , A ⊢ B
+        lam : ∀{Γ Δ A B}        ->              Δ ⁏ Γ , A ⊢ B
                                                ----------------
                                 ->              Δ ⁏ Γ ⊢ A => B
 
@@ -29,7 +29,7 @@ mutual
 
         -- | Basic data types
         -- Unit                                 ---------------
-        Unit : ∀{Γ Δ}           ->               Δ ⁏ Γ ⊢ Unit
+        unit : ∀{Γ Δ}           ->               Δ ⁏ Γ ⊢ Unit
 
         -- Pair of two terms
         [_,_] : ∀{Γ Δ A B}      ->        Δ ⁏ Γ ⊢ A   ->   Δ ⁏ Γ ⊢ B
@@ -37,27 +37,27 @@ mutual
                                 ->               Δ ⁏ Γ ⊢ A & B
 
         -- First projection
-        Fst : ∀{Γ Δ A B}        ->               Δ ⁏ Γ ⊢ A & B
+        fst : ∀{Γ Δ A B}        ->               Δ ⁏ Γ ⊢ A & B
                                                 ---------------
                                 ->                 Δ ⁏ Γ ⊢ A
 
         -- Second projection
-        Snd : ∀{Γ Δ A B}        ->               Δ ⁏ Γ ⊢ A & B
+        snd : ∀{Γ Δ A B}        ->               Δ ⁏ Γ ⊢ A & B
                                                 ---------------
                                 ->                 Δ ⁏ Γ ⊢ B
 
         -- Left injection
-        Inl : ∀{Γ Δ A B}        ->                 Δ ⁏ Γ ⊢ A
+        inl : ∀{Γ Δ A B}        ->                 Δ ⁏ Γ ⊢ A
                                                 ---------------
                                 ->               Δ ⁏ Γ ⊢ A + B
 
         -- Right injection
-        Inr : ∀{Γ Δ A B}        ->                 Δ ⁏ Γ ⊢ B
+        inr : ∀{Γ Δ A B}        ->                 Δ ⁏ Γ ⊢ B
                                                 ---------------
                                 ->               Δ ⁏ Γ ⊢ A + B
 
         -- Case split
-        Case_Inl↦_||Inr↦_ : ∀{Γ Δ A B C}
+        case_inl↦_||inr↦_ : ∀{Γ Δ A B C}
                                 ->               Δ ⁏ Γ ⊢ A + B
                                 ->      Δ ⁏ Γ , A ⊢ C   ->   Δ ⁏ Γ , B ⊢ C
                                        ------------------------------------
@@ -65,22 +65,22 @@ mutual
 
         -- | Modal operators
         -- Stable variables
-        SVar : ∀{Γ Δ A}         ->                   A ∈ Δ
+        svar : ∀{Γ Δ A}         ->                   A ∈ Δ
                                                   -----------
                                 ->                 Δ ⁏ Γ ⊢ A
 
         -- Signal constructor
-        Sig : ∀{Γ Δ A}          ->                 Δ ⁏ ∙ ⊢ A
+        sig : ∀{Γ Δ A}          ->                 Δ ⁏ ∙ ⊢ A
                                                ------------------
                                 ->              Δ ⁏ Γ ⊢ Signal A
 
         -- Signal destructor
-        LetSig_In_ : ∀{Γ Δ A B} ->   Δ ⁏ Γ ⊢ Signal A   ->   Δ , A ⁏ Γ ⊢ B
+        letSig_In_ : ∀{Γ Δ A B} ->   Δ ⁏ Γ ⊢ Signal A   ->   Δ , A ⁏ Γ ⊢ B
                                     ----------------------------------------
                                 ->                 Δ ⁏ Γ ⊢ B
 
         -- Event constructor
-        Event : ∀{Γ Δ A}        ->                 Δ ⁏ Γ ⊨ A
+        event : ∀{Γ Δ A}        ->                 Δ ⁏ Γ ⊨ A
                                                ------------------
                                 ->              Δ ⁏ Γ ⊢ Event A
 
@@ -88,22 +88,22 @@ mutual
     infix 10 _⊨_
     data _⊨_ : Environment -> Type -> Set where
         -- Pure term is a computational term
-        Pure : ∀{Γ Δ A}          ->                 Δ ⁏ Γ ⊢ A
+        pure : ∀{Γ Δ A}          ->                 Δ ⁏ Γ ⊢ A
                                                   -------------
                                  ->                 Δ ⁏ Γ ⊨ A
 
         -- Computational signal destructor
-        LetSig_InC_ : ∀{Γ Δ A B} ->   Δ ⁏ Γ ⊢ Signal A   ->   Δ , A ⁏ Γ ⊨ B
+        letSig_InC_ : ∀{Γ Δ A B} ->   Δ ⁏ Γ ⊢ Signal A   ->   Δ , A ⁏ Γ ⊨ B
                                      ----------------------------------------
                                  ->                 Δ ⁏ Γ ⊨ B
 
         -- Event destructor
-        LetEvt_In_ : ∀{Γ Δ A B}  ->   Δ ⁏ Γ ⊢ Event A   ->   Δ ⁏ [ A ] ⊢ B
+        letEvt_In_ : ∀{Γ Δ A B}  ->   Δ ⁏ Γ ⊢ Event A   ->   Δ ⁏ [ A ] ⊢ B
                                      ----------------------------------------
                                  ->                 Δ ⁏ Γ ⊨ B
 
         -- Select the event that happens first
-        Select_↦_||_↦_||Both↦_ : ∀{Γ Δ A B C}
+        select_↦_||_↦_||both↦_ : ∀{Γ Δ A B C}
             ->   Δ ⁏ Γ ⊢ Event A   ->   Δ ⁏ [ A ] , Event B ⊨ C   -- A happens first
             ->   Δ ⁏ Γ ⊢ Event B   ->   Δ ⁏ [ B ] , Event A ⊨ C   -- B happens first
             ->              Δ ⁏ ∙ , A , B ⊨ C                     -- A and B happen at the same time
