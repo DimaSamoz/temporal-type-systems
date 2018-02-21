@@ -1,0 +1,28 @@
+
+module Syntax.Substitution where
+
+open import Syntax.Types
+open import Syntax.Context
+open import Syntax.Terms
+
+
+[_/]_ : ∀{Γ Δ F G}  ->  Δ ⁏ Γ ⊢ F   ->   Δ ⁏ Γ , F ⊢ G
+                       --------------------------------
+                    ->           Δ ⁏ Γ ⊢ G
+[ M /] var top          = M
+[ M /] var (pop x)      = var x
+[ M /] lam A            = lam {!    !}
+[ M /] (F $ A)          = ([ M /] F) $ ([ M /] A)
+[ M /] unit             = unit
+[ M /] [ A , B ]        = [ [ M /] A , [ M /] B ]
+[ M /] fst A            = fst ([ M /] A)
+[ M /] snd A            = snd ([ M /] A)
+[ M /] inl A            = inl ([ M /] A)
+[ M /] inr A            = inr ([ M /] A)
+[ M /] (case S inl↦ B₁
+             ||inr↦ B₂) = case [ M /] S inl↦ {!   !}
+                                      ||inr↦ {!   !}
+[ M /] svar x           = svar x
+[ M /] sig A            = sig A
+[ M /] (letSig S In B)  = letSig [ M /] S In {!   !}
+[ M /] event A          = {!  !}
