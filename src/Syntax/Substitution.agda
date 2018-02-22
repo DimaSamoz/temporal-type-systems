@@ -50,3 +50,14 @@ mutual
     ⟦ M /⟧ sig A           = sig (⟦ M /⟧ A)
     ⟦ M /⟧ (letSig S In B) = letSig ⟦ M /⟧ S In {!   !}
     ⟦ M /⟧ event A         = {!   !}
+
+
+    -- Substitution for of computational terms
+    ⟪_/⟫_ : ∀{Γ Δ F G}  ->  Δ ⁏ Γ ⊨ F   ->   Δ ⁏ [ F ] ⊨ G
+                           --------------------------------
+                        ->           Δ ⁏ Γ ⊨ G
+    ⟪ pure M /⟫         A   = {!  !}
+    ⟪ letSig S InC B /⟫ A   = letSig S InC (⟪ B /⟫ {! A  !})
+    ⟪ letEvt E In B /⟫  A   = letEvt E In (⟪ B /⟫ A)
+    ⟪ select E₁ ↦ B₁ || E₂ ↦ B₂ ||both↦ B₃ /⟫ A =
+        select E₁ ↦ ⟪ B₁ /⟫ A || E₂ ↦ ⟪ B₂ /⟫ A ||both↦ (⟪ B₃ /⟫ A)
