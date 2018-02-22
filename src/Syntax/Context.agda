@@ -25,16 +25,21 @@ infix 40 _⁏_
 [ A ] = ∙ , A
 
 -- Concatenation of contexts
-_++_ : Context -> Context -> Context
-Γ ++ ∙ = Γ
-Γ ++ (Γ′ , A) = (Γ ++ Γ′) , A
-infix 45 _++_
+_⌊⌋_ : Context -> Context -> Context
+Γ ⌊⌋ ∙ = Γ
+Γ ⌊⌋ (Γ′ , A) = (Γ ⌊⌋ Γ′) , A
+infix 45 _⌊⌋_
+
+-- Type in the middle of a context
+_⌊_⌋_ : Context -> Type -> Context -> Context
+Γ ⌊ A ⌋ Γ′ = Γ , A ⌊⌋ Γ′
+infix 40 _⌊_⌋_
 
 -- Predicate for context membership
 data _∈_ : Type -> Context -> Set where
     top : ∀{Γ A} -> A ∈ Γ , A
     pop : ∀{Γ A B} -> A ∈ Γ -> A ∈ Γ , B
-infix 40 _∈_
+infix 35 _∈_
 
 -- Predicate for context subset relation
 data _⊆_ : Context -> Context -> Set where
