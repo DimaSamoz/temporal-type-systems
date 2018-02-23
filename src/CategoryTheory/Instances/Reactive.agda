@@ -7,7 +7,7 @@ open import CategoryTheory.BCCCs
 
 open import Data.Nat using (ℕ ; zero ; suc ; _+_) public
 open import Data.Unit using () renaming (⊤ to top) public
-open import Data.Product public
+open import Data.Product
 open import Data.Empty using (⊥-elim) renaming (⊥ to bot) public
 open import Data.Sum renaming ([_,_] to ⟦_,_⟧)
 import Function as F using (_∘_)

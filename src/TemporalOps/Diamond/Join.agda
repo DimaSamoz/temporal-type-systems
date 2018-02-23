@@ -13,6 +13,7 @@ open import TemporalOps.Delay
 open import TemporalOps.Diamond.Functor
 
 import Relation.Binary.PropositionalEquality as ≡
+open import Data.Product
 open import Relation.Binary.HeterogeneousEquality as ≅
             using (_≅_ ; ≅-to-≡ ; ≡-to-≅ ; cong₂)
 open import Data.Nat.Properties

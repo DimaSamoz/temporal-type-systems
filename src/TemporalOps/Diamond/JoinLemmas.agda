@@ -14,6 +14,7 @@ open import TemporalOps.Diamond.Functor
 open import TemporalOps.Diamond.Join
 
 import Relation.Binary.PropositionalEquality as ≡
+open import Data.Product
 open import Relation.Binary.HeterogeneousEquality as ≅
             using (_≅_ ; ≅-to-≡ ; ≡-to-≅ ; cong₂)
 open import Data.Nat.Properties

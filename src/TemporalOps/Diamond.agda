@@ -15,6 +15,7 @@ open import TemporalOps.Diamond.Join
 open import TemporalOps.Diamond.JoinLemmas
 
 import Relation.Binary.PropositionalEquality
+open import Data.Product
 open import Relation.Binary.HeterogeneousEquality as ≅
             using (_≅_ ; ≅-to-≡ ; ≡-to-≅ ; cong₂)
 open import Data.Nat.Properties
