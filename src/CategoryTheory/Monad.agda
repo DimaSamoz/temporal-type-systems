@@ -8,27 +8,27 @@ open import CategoryTheory.NatTrans
 
 -- A monad on a category
 record Monad {n} (ℂ : Category n) : Set (lsuc n) where
-    private module ℂ = Category ℂ
+    open Category ℂ
     field
         -- Underlying endofunctor
         T : Endofunctor ℂ
-    private module T = Functor T
+    open Functor T
 
     field
         -- || Definitions
         -- Unit / return
         η : I ⟹ T
         -- Multiplication / join
-        μ : (T ²) ⟹ T
+        μ : (T ²) ⟹ T    
 
     private module η = _⟹_ η
     private module μ = _⟹_ μ
     field
         -- || Laws
         -- Unit on both sides is cancelled by multiplication (unit)
-        η-unit1 : ∀ {A : ℂ.obj} -> (μ.at A) ℂ.∘ (η.at (T.omap A)) ℂ.≈ ℂ.id
-        η-unit2 : ∀ {A : ℂ.obj} -> (μ.at A) ℂ.∘ (T.fmap (η.at A)) ℂ.≈ ℂ.id
+        η-unit1 : ∀ {A : obj} -> (μ.at A) ∘ (η.at (omap A)) ≈ id
+        η-unit2 : ∀ {A : obj} -> (μ.at A) ∘ (fmap (η.at A)) ≈ id
 
         -- Multiplication can be performed on both sides (associativity)
-        μ-assoc : ∀ {A : ℂ.obj} -> (μ.at A) ℂ.∘ (μ.at (T.omap A))
-                               ℂ.≈ (μ.at A) ℂ.∘ (T.fmap (μ.at A))
+        μ-assoc : ∀ {A : obj} -> (μ.at A) ∘ (μ.at (omap A))
+                               ≈ (μ.at A) ∘ (fmap (μ.at A))
