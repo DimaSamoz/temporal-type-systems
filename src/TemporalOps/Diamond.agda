@@ -184,3 +184,12 @@ M-◇ = record
         ≡⟨⟩
             μ.at A n (F-◇.fmap (μ.at A) n (n + suc l , v))
         ∎
+
+open Monad M-◇
+private module μ = _⟹_ μ
+private module η = _⟹_ η
+private module F-◇ = Functor F-◇
+
+-- Bind operator
+_>>=_ : ∀{A B : τ}{n : ℕ} -> (◇ A) n -> (A ⇴ (◇ B)) -> (◇ B) n
+_>>=_ {A}{B} {n} a f = μ.at B n (F-◇.fmap f n a)
