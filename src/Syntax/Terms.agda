@@ -104,8 +104,8 @@ mutual
 
         -- Select the event that happens first
         select_↦_||_↦_||both↦_ : ∀{Γ Δ A B C}
-            ->   Δ ⁏ Γ ⊢ Event A   ->   Δ ⁏ [ A ] , Event B ⊨ C   -- A happens first
-            ->   Δ ⁏ Γ ⊢ Event B   ->   Δ ⁏ [ B ] , Event A ⊨ C   -- B happens first
+            ->   Δ ⁏ Γ ⊢ Event A   ->   Δ ⁏ [ Event B ] , A ⊨ C   -- A happens first
+            ->   Δ ⁏ Γ ⊢ Event B   ->   Δ ⁏ [ Event A ] , B ⊨ C   -- B happens first
             ->              Δ ⁏ ∙ , A , B ⊨ C                     -- A and B happen at the same time
                 -------------------------------------------------
             ->                  Δ ⁏ Γ ⊨ C
