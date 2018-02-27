@@ -7,6 +7,8 @@ open import CategoryTheory.Instances.Reactive
 open import CategoryTheory.Functor
 open import TemporalOps.Common
 
+open import Data.Product
+
 open Category ℝeactive
 
 -- One-step delay operator.
@@ -47,3 +49,8 @@ F-▹ = record
                                         ≡ (fmap-▹ f′ at n) a)
     fmap-▹-cong e {zero} = refl
     fmap-▹-cong e {suc n} = e
+
+-- ▹ preserves products
+pair-▹ : ∀{A B : τ} -> (▹ A ⊗ ▹ B) ⇴ ▹ (A ⊗ B)
+pair-▹ {A} {B} zero (▹A , ▹B) = top.tt
+pair-▹ {A} {B} (suc n) (▹A , ▹B) = ▹A , ▹B

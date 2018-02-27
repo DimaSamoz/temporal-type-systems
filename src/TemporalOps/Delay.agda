@@ -11,6 +11,8 @@ open import TemporalOps.Next
 open import Data.Nat.Properties using (+-identityʳ ; +-comm ; +-assoc)
 open import Relation.Binary.HeterogeneousEquality as ≅ using (_≅_ ; ≅-to-≡)
 import Relation.Binary.PropositionalEquality as ≡
+open import Data.Product
+open import Data.Nat as N using (_⊔_ ; _⊓_)
 open Category ℝeactive
 
 -- General iteration
@@ -147,3 +149,9 @@ fmap-delay-+-k {A} {B} {f} n k l v =
     v′ = rew (sym (delay-+ n k l)) v
     v≅v′ : v′ ≅ v
     v≅v′ = ≅.sym (rew-to-≅ (sym (delay-+ n k l)))
+
+-- Delay preserves products
+pair-delay : ∀{A B : τ} -> (k : ℕ) -> (delay A by k ⊗ delay B by k) ⇴ delay (A ⊗ B) by k
+pair-delay {A} {B} zero n (dA , dB) = dA , dB
+pair-delay {A} {B} (suc k) n (dA , dB) =
+    Functor.fmap F-▹ (pair-delay k) n (pair-▹ n (dA , dB))

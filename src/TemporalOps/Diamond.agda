@@ -1,4 +1,4 @@
-
+{-# OPTIONS --allow-unsolved-metas #-}
 {- Diamond operator. -}
 module TemporalOps.Diamond where
 
@@ -189,7 +189,24 @@ open Monad M-◇
 private module μ = _⟹_ μ
 private module η = _⟹_ η
 private module F-◇ = Functor F-◇
+open import Data.Nat
+
+pair-◇ : ∀{A B : τ} -> (◇ A ⊗ ◇ B) ⇴ (◇ (A ⊗ B))
+pair-◇ {A}{B} n ((k , v) , (l , w)) with compare k l
+-- A happened first
+pair-◇ {A} {B} n ((k , v) , .(suc (k + j)) , w) | less .k j with compareLeq k n
+pair-◇ {A} {B} .(k + m) ((k , v) , .(suc (k + j)) , w) | less .k j | snd==[ .k + m ] = (k + m) , {!   !}
+pair-◇ {A} {B} n ((.(n + suc l) , v) , .(suc (n + suc l + j)) , w) | less .(n + suc l) j | fst==suc[ .n + l ] = {!   !}
+-- B happened first
+pair-◇ {A} {B} n ((.(suc (l + j)) , v) , l , w) | greater .l j = {!   !}
+-- Both happened at the same time
+pair-◇ {A} {B} n ((k , v) , .k , w) | equal .k = k , (pair-delay k n (v , w))
+    where
 
 -- Bind operator
 _>>=_ : ∀{A B : τ}{n : ℕ} -> (◇ A) n -> (A ⇴ (◇ B)) -> (◇ B) n
 _>>=_ {A}{B} {n} a f = μ.at B n (F-◇.fmap f n a)
+
+-- Binary bind operator
+_-⊗-_>>=_ : ∀{A B C : τ}{n : ℕ} -> (◇ A) n -> (◇ B) n -> ((A ⊗ B) ⇴ ◇ C) -> (◇ C) n
+_-⊗-_>>=_ {A}{B}{C}{n} a b f = pair-◇ n (a , b) >>= f
