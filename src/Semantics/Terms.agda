@@ -33,7 +33,7 @@ mutual
     ⟦ lam M      ⟧ₘ n (⟦Δ⟧ , ⟦Γ⟧) ⟦A⟧ = ⟦ M ⟧ₘ n (⟦Δ⟧ , (⟦Γ⟧ , ⟦A⟧))
     ⟦ F $ M      ⟧ₘ n env     = ⟦ F ⟧ₘ n env (⟦ M ⟧ₘ n env)
     ⟦ unit       ⟧ₘ n env     = top.tt
-    ⟦ [ M , N ]  ⟧ₘ n env     = ⟦ M ⟧ₘ n env , ⟦ N ⟧ₘ n env
+    ⟦ [ M ,, N ] ⟧ₘ n env     = ⟦ M ⟧ₘ n env , ⟦ N ⟧ₘ n env
     ⟦ fst M      ⟧ₘ n env     = proj₁ (⟦ M ⟧ₘ n env)
     ⟦ snd M      ⟧ₘ n env     = proj₂ (⟦ M ⟧ₘ n env)
     ⟦ inl M      ⟧ₘ n env     = inj₁ (⟦ M ⟧ₘ n env)
