@@ -10,102 +10,107 @@ open import Syntax.Context
 mutual
     -- Pure terms of the language, expressed as typing judgements
     infix 10 _⊢_
-    data _⊢_ : Environment -> Type -> Set where
+    data _⊢_ : Context -> Judgement -> Set where
         -- | Simply typed lambda calculus
         -- Variables
-        var : ∀{Γ Δ A}          ->                  A ∈ Γ
-                                                 -----------
-                                ->                Δ ⁏ Γ ⊢ A
+        var : ∀{Γ A}            ->                 A now ∈ Γ
+                                                  -----------
+                                ->                 Γ ⊢ A now
 
         -- Lambda abstraction
-        lam : ∀{Γ Δ A B}        ->              Δ ⁏ Γ , A ⊢ B
-                                               ----------------
-                                ->              Δ ⁏ Γ ⊢ A => B
+        lam : ∀{Γ A B}          ->             Γ , A now ⊢ B now
+                                              -------------------
+                                ->               Γ ⊢ A => B now
 
         -- Application
-        _$_ : ∀{Γ Δ A B}        ->       Δ ⁏ Γ ⊢ A => B   ->   Δ ⁏ Γ ⊢ A
-                                        -------------------------------
-                                ->                Δ ⁏ Γ ⊢ B
+        _$_ : ∀{Γ A B}          ->         Γ ⊢ A => B now  ->   Γ ⊢ A now
+                                          -------------------------------
+                                ->                  Γ ⊢ B now
 
         -- | Basic data types
-        -- Unit                                 ---------------
-        unit : ∀{Γ Δ}           ->               Δ ⁏ Γ ⊢ Unit
+        -- Unit                                  ---------------
+        unit : ∀{Γ}             ->                Γ ⊢ Unit now
 
         -- Pair of two terms
-        [_,,_] : ∀{Γ Δ A B}     ->        Δ ⁏ Γ ⊢ A   ->   Δ ⁏ Γ ⊢ B
-                                         ----------------------------
-                                ->               Δ ⁏ Γ ⊢ A & B
+        [_,,_] : ∀{Γ A B}       ->          Γ ⊢ A now   ->   Γ ⊢ B now
+                                        ----------------------------
+                                ->                 Γ ⊢ A & B now
 
         -- First projection
-        fst : ∀{Γ Δ A B}        ->               Δ ⁏ Γ ⊢ A & B
-                                                ---------------
-                                ->                 Δ ⁏ Γ ⊢ A
+        fst : ∀{Γ A B}          ->                 Γ ⊢ A & B now
+                                                  ---------------
+                                ->                   Γ ⊢ A now
 
         -- Second projection
-        snd : ∀{Γ Δ A B}        ->               Δ ⁏ Γ ⊢ A & B
-                                                ---------------
-                                ->                 Δ ⁏ Γ ⊢ B
+        snd : ∀{Γ A B}          ->                 Γ ⊢ A & B now
+                                                  ---------------
+                                ->                   Γ ⊢ B now
 
         -- Left injection
-        inl : ∀{Γ Δ A B}        ->                 Δ ⁏ Γ ⊢ A
-                                                ---------------
-                                ->               Δ ⁏ Γ ⊢ A + B
+        inl : ∀{Γ A B}          ->                   Γ ⊢ A now
+                                                  ---------------
+                                ->                 Γ ⊢ A + B now
 
         -- Right injection
-        inr : ∀{Γ Δ A B}        ->                 Δ ⁏ Γ ⊢ B
-                                                ---------------
-                                ->               Δ ⁏ Γ ⊢ A + B
+        inr : ∀{Γ A B}          ->                   Γ ⊢ B now
+                                                  ---------------
+                                ->                 Γ ⊢ A + B now
 
         -- Case split
-        case_inl↦_||inr↦_ : ∀{Γ Δ A B C}
-                                ->               Δ ⁏ Γ ⊢ A + B
-                                ->      Δ ⁏ Γ , A ⊢ C   ->   Δ ⁏ Γ , B ⊢ C
-                                       ------------------------------------
-                                ->                 Δ ⁏ Γ ⊢ C
+        case_inl↦_||inr↦_ : ∀{Γ A B C}
+                                ->                 Γ ⊢ A + B now
+                                ->    Γ , A now ⊢ C now  ->   Γ , B now ⊢ C now
+                                     -------------------------------------------
+                                ->                   Γ ⊢ C now
 
         -- | Modal operators
         -- Stable variables
-        svar : ∀{Γ Δ A}         ->                   A ∈ Δ
-                                                  -----------
-                                ->                 Δ ⁏ Γ ⊢ A
+        svar : ∀{Γ A}           ->                 A always ∈ Γ
+                                                  --------------
+                                ->                  Γ ⊢ A now
+
+        -- Types in stable contexts are always inhabited
+        stable : ∀{Γ A}         ->                 Γ ˢ ⊢ A now
+                                                  --------------
+                                ->                 Γ ⊢ A always
 
         -- Signal constructor
-        sig : ∀{Γ Δ A}          ->                 Δ ⁏ ∙ ⊢ A
+        sig : ∀{Γ A}            ->                Γ ⊢ A always
                                                ------------------
-                                ->              Δ ⁏ Γ ⊢ Signal A
+                                ->              Γ ⊢ Signal A now
 
         -- Signal destructor
-        letSig_In_ : ∀{Γ Δ A B} ->   Δ ⁏ Γ ⊢ Signal A   ->   Δ , A ⁏ Γ ⊢ B
+        letSig_In_ : ∀{Γ A B}   ->   Γ ⊢ Signal A now  ->   Γ , A always ⊢ B now
                                     ----------------------------------------
-                                ->                 Δ ⁏ Γ ⊢ B
+                                ->                 Γ ⊢ B now
 
         -- Event constructor
-        event : ∀{Γ Δ A}        ->                 Δ ⁏ Γ ⊨ A
+        event : ∀{Γ A}          ->                 Γ ⊨ A now
                                                ------------------
-                                ->              Δ ⁏ Γ ⊢ Event A
+                                ->              Γ ⊢ Event A now
 
     -- Computational terms of the language
     infix 10 _⊨_
-    data _⊨_ : Environment -> Type -> Set where
+    data _⊨_ : Context -> Judgement -> Set where
         -- Pure term is a computational term
-        pure : ∀{Γ Δ A}          ->                 Δ ⁏ Γ ⊢ A
+        pure : ∀{Γ A}           ->                 Γ ⊢ A now
                                                   -------------
-                                 ->                 Δ ⁏ Γ ⊨ A
+                                ->                 Γ ⊨ A now
 
         -- Computational signal destructor
-        letSig_InC_ : ∀{Γ Δ A B} ->   Δ ⁏ Γ ⊢ Signal A   ->   Δ , A ⁏ Γ ⊨ B
-                                     ----------------------------------------
-                                 ->                 Δ ⁏ Γ ⊨ B
+        letSig_InC_ : ∀{Γ A B}  ->   Γ ⊢ Signal A now   ->   Γ , A now ⊨ B now
+                                    -------------------------------------------
+                                ->                 Γ ⊨ B now
 
         -- Event destructor
-        letEvt_In_ : ∀{Γ Δ A B}  ->   Δ ⁏ Γ ⊢ Event A   ->   Δ ⁏ [ A ] ⊨ B
-                                     ----------------------------------------
-                                 ->                 Δ ⁏ Γ ⊨ B
+        letEvt_In_ : ∀{Γ A B}   ->   Γ ⊢ Event A now  ->   [ A now ] ⊨ B now
+                                    ----------------------------------------
+                                ->                 Γ ⊨ B now
 
         -- Select the event that happens first
-        select_↦_||_↦_||both↦_ : ∀{Γ Δ A B C}
-            ->   Δ ⁏ Γ ⊢ Event A   ->   Δ ⁏ [ Event B ] , A ⊨ C   -- A happens first
-            ->   Δ ⁏ Γ ⊢ Event B   ->   Δ ⁏ [ Event A ] , B ⊨ C   -- B happens first
-            ->              Δ ⁏ ∙ , A , B ⊨ C                     -- A and B happen at the same time
+        select_↦_||_↦_||both↦_ : ∀{Γ A B C}
+            ->   Γ ⊢ Event A now  ->  [ Event B now ] , A now ⊨ C now   -- A happens first
+            ->   Γ ⊢ Event B now  ->  [ Event A now ] , B now ⊨ C now   -- B happens first
+            ->              ∙ , A now , B now ⊨ C now                    -- A and B happen at the same time
                 -------------------------------------------------
-            ->                  Δ ⁏ Γ ⊨ C
+            ->                  Γ ⊨ C now

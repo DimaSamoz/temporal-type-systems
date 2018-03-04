@@ -9,43 +9,39 @@ open import Syntax.Context
 
 -- | Structural lemmas
 
--- Element of a subset is an element of a set.
-∈-⊆-monotone : ∀{Γ Γ′ J} -> Γ ⊆ Γ′ -> J ∈ Γ -> J ∈ Γ′
-∈-⊆-monotone empt ()
-∈-⊆-monotone (keep p) top     = top
-∈-⊆-monotone (keep p) (pop e) = pop (∈-⊆-monotone p e)
-∈-⊆-monotone (drop p) e       = pop (∈-⊆-monotone p e)
-
-
--- Weakening lemma for Γ
+-- Weakening lemma
 mutual
-    weaken-Γ : ∀{Γ Γ′ Δ M} ->     Γ ⊆ Γ′   ->   Δ ⁏ Γ ⊢ M
-                               -------------------------
-                          ->            Δ ⁏ Γ′ ⊢ M
-    weaken-Γ s (var x)    = var (∈-⊆-monotone s x)
-    weaken-Γ s (lam M)    = lam (weaken-Γ (keep s) M)
-    weaken-Γ s (F $ A)    = weaken-Γ s F $ weaken-Γ s A
-    weaken-Γ s unit       = unit
-    weaken-Γ s [ M ,, N ] = [ (weaken-Γ s M) ,, (weaken-Γ s N) ]
-    weaken-Γ s (fst M)    = fst (weaken-Γ s M)
-    weaken-Γ s (snd M)    = snd (weaken-Γ s M)
-    weaken-Γ s (inl M)    = inl (weaken-Γ s M)
-    weaken-Γ s (inr M)    = inr (weaken-Γ s M)
-    weaken-Γ s (case S inl↦ B₁ ||inr↦ B₂) = case weaken-Γ s S
-                                                inl↦ weaken-Γ (keep s) B₁
-                                              ||inr↦ weaken-Γ (keep s) B₂
-    weaken-Γ s (svar x)        = svar x
-    weaken-Γ s (sig S)         = sig S
-    weaken-Γ s (letSig S In B) = letSig weaken-Γ s S In weaken-Γ s B
-    weaken-Γ s (event E)       = event (weaken-Γ′ s E)
+    weaken : ∀{Γ Γ′ M}   ->     Γ ⊆ Γ′   ->   Γ ⊢ M
+                               --------------------
+                        ->            Γ′ ⊢ M
 
-    weaken-Γ′ : ∀{Γ Γ′ Δ M} ->     Γ ⊆ Γ′   ->   Δ ⁏ Γ ⊨ M
-                               -------------------------
-                          ->            Δ ⁏ Γ′ ⊨ M
-    weaken-Γ′ s (pure M)         = pure (weaken-Γ s M)
-    weaken-Γ′ s (letSig S InC B) = letSig weaken-Γ s S InC weaken-Γ′ s B
-    weaken-Γ′ s (letEvt E In B)  = letEvt weaken-Γ s E In B
-    weaken-Γ′ s (select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃) =
-        select weaken-Γ s E₁ ↦ C₁
-            || weaken-Γ s E₂ ↦ C₂
-            ||both↦ C₃
+    weaken s (var x) = var (∈-⊆-monotone s x)
+    weaken s (lam M) = lam (weaken (keep s) M)
+    weaken s (F $ M) = weaken s F $ weaken s M
+    weaken s unit = unit
+    weaken s [ M ,, N ] = [ weaken s M ,, weaken s N ]
+    weaken s (fst M) = fst (weaken s M)
+    weaken s (snd M) = snd (weaken s M)
+    weaken s (inl M) = inl (weaken s M)
+    weaken s (inr M) = inr (weaken s M)
+    weaken s (case S inl↦ B₁ ||inr↦ B₂) = case weaken s S
+                                                inl↦ weaken (keep s) B₁
+                                              ||inr↦ weaken (keep s) B₂
+    weaken s (svar x) = svar (∈-⊆-monotone s x)
+    weaken s (stable M) = stable (weaken (ˢ-⊆-monotone s) M)
+    weaken s (sig M) = sig (weaken s M)
+    weaken s (letSig S In B) = letSig weaken s S In weaken (keep s) B
+    weaken s (event E) = event (weaken-⊨ s E)
+
+    weaken-⊨ : ∀{Γ Γ′ M} ->     Γ ⊆ Γ′   ->   Γ ⊨ M
+                               --------------------
+                        ->            Γ′ ⊨ M
+    weaken-⊨ s (pure M) = pure (weaken s M)
+    weaken-⊨ s (letSig S InC B) = letSig weaken s S InC weaken-⊨ (keep s) B
+    weaken-⊨ s (letEvt E In B) = letEvt weaken s E In B
+    weaken-⊨ s (select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃) =
+            select weaken s E₁ ↦ C₁
+                || weaken s E₂ ↦ C₂
+                ||both↦ C₃
+
+mutual

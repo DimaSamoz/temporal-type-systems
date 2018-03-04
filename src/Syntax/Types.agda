@@ -16,3 +16,6 @@ data Type : Set where
     Event  : Type -> Type
     -- Signal type
     Signal : Type -> Type
+infixr 65 _=>_
+infixl 68 _+_
+infixl 70 _&_
