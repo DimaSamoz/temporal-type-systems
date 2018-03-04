@@ -4,6 +4,7 @@ module Syntax.Substitution where
 open import Syntax.Types
 open import Syntax.Context
 open import Syntax.Terms
+open import Syntax.Lemmas
 
 mutual
     -- Normal substitution for object variables.
@@ -12,10 +13,10 @@ mutual
                         ->           Δ ⁏ Γ ⊢ G
     [ M /] var top          = M
     [ M /] var (pop x)      = var x
-    [ M /] lam A            = lam {!    !}
+    [ M /] lam A            = lam {!  !}
     [ M /] (F $ A)          = ([ M /] F) $ ([ M /] A)
     [ M /] unit             = unit
-    [ M /] [ A , B ]        = [ [ M /] A , [ M /] B ]
+    [ M /] [ A ,, B ]        = [ [ M /] A ,, [ M /] B ]
     [ M /] fst A            = fst ([ M /] A)
     [ M /] snd A            = snd ([ M /] A)
     [ M /] inl A            = inl ([ M /] A)
@@ -37,7 +38,7 @@ mutual
     ⟦ M /⟧ lam A           = lam (⟦ M /⟧ A)
     ⟦ M /⟧ (F $ A)         = (⟦ M /⟧ F) $ (⟦ M /⟧ A)
     ⟦ M /⟧ unit            = unit
-    ⟦ M /⟧ [ A , B ]       = [ ⟦ M /⟧ A , ⟦ M /⟧ B ]
+    ⟦ M /⟧ [ A ,, B ]       = [ ⟦ M /⟧ A ,, ⟦ M /⟧ B ]
     ⟦ M /⟧ fst A           = fst (⟦ M /⟧ A)
     ⟦ M /⟧ snd A           = snd (⟦ M /⟧ A)
     ⟦ M /⟧ inl A           = inl (⟦ M /⟧ A)
