@@ -8,6 +8,7 @@ open import CategoryTheory.Functor
 open import TemporalOps.Common
 
 open import Data.Product
+open import Data.Sum
 
 open Category ℝeactive
 
@@ -54,3 +55,8 @@ F-▹ = record
 pair-▹ : ∀{A B : τ} -> (▹ A ⊗ ▹ B) ⇴ ▹ (A ⊗ B)
 pair-▹ {A} {B} zero (▹A , ▹B) = top.tt
 pair-▹ {A} {B} (suc n) (▹A , ▹B) = ▹A , ▹B
+
+-- ▹ preserves coproducts
+sum-▹ : ∀{A B : τ} -> (▹ A ⊕ ▹ B) ⇴ ▹ (A ⊕ B)
+sum-▹ zero v = top.tt
+sum-▹ (suc n) v = v
