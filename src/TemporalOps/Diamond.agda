@@ -185,12 +185,47 @@ M-◇ = record
             μ.at A n (F-◇.fmap (μ.at A) n (n + suc l , v))
         ∎
 
+-- | Monadic operations
+
 open Monad M-◇
 private module μ = _⟹_ μ
 private module η = _⟹_ η
 private module F-◇ = Functor F-◇
 open import Data.Nat
+open import Data.Sum
 
 -- Bind operator
 _>>=_ : ∀{A B : τ}{n : ℕ} -> (◇ A) n -> (A ⇴ (◇ B)) -> (◇ B) n
 _>>=_ {A}{B} {n} a f = μ.at B n (F-◇.fmap f n a)
+
+
+-- If we know that A and B eventually happens, then at a future point either
+--   * A happens and B still hasn't
+--   * B happens but A still hasn't
+--   * A and B happen at the same time
+-- This is expressed as the sum of the three possibilities
+◇-select : ∀{A B : τ} -> (◇ A ⊗ ◇ B) ⇴ ◇ ((A ⊗ ◇ B) ⊕ (◇ A ⊗ B) ⊕ (A ⊗ B))
+◇-select n ((k₁ , v₁) , (k₂ , v₂)) with compare k₁ k₂
+◇-select {A} {B} n ((k₁ , v₁) , .(suc (k₁ + l)) , v₂) | less .k₁ l  =
+    k₁ , sum-delay k₁ n (inj₁ (sum-delay k₁ n
+                        (inj₁ (pair-delay-◇ k₁ (suc l) n (v₁ , v₂′)))))
+    where
+    v₂′ : delay B by (k₁ + suc l) at n
+    v₂′ rewrite +-suc k₁ l = v₂
+    pair-delay-◇ : ∀{A B : τ} -> (k l : ℕ) -> (delay A by k ⊗ delay B by (k + l))
+                                   ⇴ delay (A ⊗ ◇ B) by k
+    pair-delay-◇ zero l n (dA , dB) = dA , (l , dB)
+    pair-delay-◇ (suc k) l n p = Functor.fmap F-▹ (pair-delay-◇ k l) n (pair-▹ n p)
+◇-select {A} {B} n ((.(suc (k₂ + l)) , v₁) , k₂ , v₂)  | greater .k₂ l =
+    k₂ , sum-delay k₂ n (inj₁ (sum-delay k₂ n
+                        (inj₂ (pair-delay-◇ k₂ (suc l) n (v₁′ , v₂)))))
+    where
+    v₁′ : delay A by (k₂ + suc l) at n
+    v₁′ rewrite +-suc k₂ l = v₁
+    pair-delay-◇ : ∀{A B : τ} -> (k l : ℕ) -> (delay A by (k + l) ⊗ delay B by k)
+                                   ⇴ delay (◇ A ⊗ B) by k
+    pair-delay-◇ zero l n (dA , dB) = (l , dA) , dB
+    pair-delay-◇ (suc k) l n p = Functor.fmap F-▹ (pair-delay-◇ k l) n (pair-▹ n p)
+
+◇-select n ((k₁ , v₁)              , .k₁ , v₂) | equal .k₁ =
+    k₁ , sum-delay k₁ n (inj₂ (pair-delay k₁ n (v₁ , v₂)))

@@ -21,7 +21,7 @@ import Function as F using (_∘_)
 -- Time-indexed functions.
 _⇴_ : τ -> τ -> Set
 A ⇴ B = ∀(n : ℕ) -> A n -> B n
-infixr 30 _⇴_
+infixr 10 _⇴_
 
 -- Category of reactive types
 ℝeactive : Category lzero
