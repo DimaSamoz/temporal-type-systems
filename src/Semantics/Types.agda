@@ -3,7 +3,7 @@
 module Semantics.Types where
 
 open import Syntax.Types
-open import CategoryTheory.Instances.Reactive
+open import CategoryTheory.Instances.Reactive hiding (_+_)
 open import TemporalOps.Box
 open import TemporalOps.Diamond
 
