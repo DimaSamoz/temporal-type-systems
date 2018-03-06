@@ -98,9 +98,9 @@ mutual
     infix 10 _⊨_
     data _⊨_ : Context -> Judgement -> Set where
         -- Pure term is a computational term
-        pure : ∀{Γ A}           ->                 Γ ⊢ A now
-                                                  -------------
-                                ->                 Γ ⊨ A now
+        pure : ∀{Γ A}           ->                   Γ ⊢ A
+                                                    -------
+                                ->                   Γ ⊨ A
 
         -- Computational signal destructor
         letSig_InC_ : ∀{Γ A B}  ->   Γ ⊢ Signal A now   ->   Γ , A now ⊨ B now
