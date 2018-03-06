@@ -23,7 +23,7 @@ data Context : Set where
     _,_ : Context -> Judgement -> Context
 infixl 50 _,_
 
--- Filter out the stable types from the context
+-- Stabilise the context by filtering out the stable types
 _ˢ : Context -> Context
 ∙ ˢ = ∙
 (Γ , A now) ˢ = Γ ˢ
@@ -61,11 +61,20 @@ data _⊆_ : Context -> Context -> Set where
     drop : ∀{Γ Γ′ A} -> Γ ⊆ Γ′ -> Γ     ⊆ Γ′ , A
 infix 30 _⊆_
 
+-- | Context lemmas
+
+-- Stabilisation
 -- Stabilised context is a subset of the full context
 Γˢ⊆Γ : ∀{Γ} -> Γ ˢ ⊆ Γ
 Γˢ⊆Γ {∙} = refl
 Γˢ⊆Γ {Γ , A now} = drop Γˢ⊆Γ
 Γˢ⊆Γ {Γ , A always} = keep Γˢ⊆Γ
+
+-- Stabilisation preserves concatenation
+ˢ-preserves-⌊⌋ : ∀{Γ Γ′} -> (Γ ⌊⌋ Γ′) ˢ ≡ Γ ˢ ⌊⌋ Γ′ ˢ
+ˢ-preserves-⌊⌋ {Γ} {∙} = refl
+ˢ-preserves-⌊⌋ {Γ} {Γ′ , A now} = ˢ-preserves-⌊⌋ {Γ} {Γ′}
+ˢ-preserves-⌊⌋ {Γ} {Γ′ , A always} rewrite ˢ-preserves-⌊⌋ {Γ} {Γ′} = refl
 
 -- Stable filtering preserves subcontext relation
 ˢ-⊆-monotone : ∀{Γ Γ′} -> Γ ⊆ Γ′ -> Γ ˢ ⊆ Γ′ ˢ
@@ -74,6 +83,19 @@ infix 30 _⊆_
 ˢ-⊆-monotone (keep {Γ} {Γ′} {A always} s) = keep (ˢ-⊆-monotone s)
 ˢ-⊆-monotone (drop {Γ} {Γ′} {A now} s) = ˢ-⊆-monotone s
 ˢ-⊆-monotone (drop {Γ} {Γ′} {A always} s) = drop (ˢ-⊆-monotone s)
+
+∈-weaken : ∀{Γ Γ′ A} -> Γ ⊆ Γ′ -> A ∈ Γ -> A ∈ Γ′
+∈-weaken refl e = e
+∈-weaken (keep s) top = top
+∈-weaken (keep s) (pop e) = pop (∈-weaken s e)
+∈-weaken (drop s) e = pop (∈-weaken s e)
+--
+-- ˢ-exchange : ∀{Γ Γ′ A B} -> (Γ , A , B ⌊⌋ Γ′) ˢ ≡ (Γ , B , A ⌊⌋ Γ′) ˢ
+-- ˢ-exchange {Γ} {Γ′} {A now} {B now} rewrite ˢ-preserves-⌊⌋ {Γ , A now , B now} {Γ′}
+--                                         | ˢ-preserves-⌊⌋ {Γ , B now , A now} {Γ′}= refl
+-- ˢ-exchange {Γ} {Γ′} {A now} {B always} = {!   !}
+-- ˢ-exchange {Γ} {Γ′} {A always} {B now} = {!   !}
+-- ˢ-exchange {Γ} {Γ′} {A always} {B always} = {!   !}
 
 -- Element of a subset is an element of a set.
 ∈-⊆-monotone : ∀{Γ Γ′ J} -> Γ ⊆ Γ′ -> J ∈ Γ -> J ∈ Γ′
