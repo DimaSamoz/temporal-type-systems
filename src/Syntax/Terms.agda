@@ -67,7 +67,12 @@ mutual
         -- Stable variables
         svar : ∀{Γ A}           ->                 A always ∈ Γ
                                                   --------------
-                                ->                  Γ ⊢ A now
+                                ->                 Γ ⊢ A always
+
+        -- A stable type is available now
+        present : ∀{Γ A}        ->                 Γ ⊢ A always
+                                                  --------------
+                                ->                   Γ ⊢ A now
 
         -- Types in stable contexts are always inhabited
         stable : ∀{Γ A}         ->                 Γ ˢ ⊢ A now

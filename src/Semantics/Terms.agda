@@ -42,9 +42,10 @@ mutual
     ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ n env with ⟦ M ⟧ₘ n env
     ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ n env | inj₁ x = ⟦ lam B₁ ⟧ₘ n env x
     ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ n env | inj₂ y = ⟦ lam B₂ ⟧ₘ n env y
-    ⟦ svar _∈_.top ⟧ₘ n (⟦Γ⟧ , ⟦A⟧) = ⟦A⟧ n
-    ⟦ svar (pop {B = B now}    x) ⟧ₘ n (⟦Γ⟧ , _) = ⟦ svar x ⟧ₘ n ⟦Γ⟧
-    ⟦ svar (pop {B = B always} x) ⟧ₘ n (⟦Γ⟧ , _) = ⟦ svar x ⟧ₘ n ⟦Γ⟧
+    ⟦ svar _∈_.top ⟧ₘ n (⟦Γ⟧ , ⟦A⟧) = ⟦A⟧
+    ⟦ svar (pop {B = B now} x) ⟧ₘ n (⟦Γ⟧ , ⟦A⟧) = ⟦ svar x ⟧ₘ n ⟦Γ⟧
+    ⟦ svar (pop {B = B always} x) ⟧ₘ n (⟦Γ⟧ , ⟦A⟧) = ⟦ svar x ⟧ₘ n ⟦Γ⟧
+    ⟦ present S ⟧ₘ n env = ⟦ S ⟧ₘ n env n
     ⟦_⟧ₘ {Γ} (stable S) n env = λ k → ⟦ S ⟧ₘ k (⟦ Γ ⟧ˢₓ n env k)
     ⟦ sig S ⟧ₘ n env = ⟦ S ⟧ₘ n env
     ⟦ letSig S In B ⟧ₘ n env = ⟦ B ⟧ₘ n (env , ⟦ S ⟧ₘ n env)
