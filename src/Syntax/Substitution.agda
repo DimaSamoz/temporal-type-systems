@@ -6,17 +6,18 @@ open import Syntax.Context
 open import Syntax.Terms
 open import Syntax.Lemmas
 
+open import Data.Sum
+open import Relation.Binary.PropositionalEquality using (_≡_ ; refl ; sym)
+
 mutual
     -- Substitution of normal terms.
-    subst : ∀(Γ Γ′ : Context) {M N}
-                        ->  Γ ⌊⌋ Γ′ ⊢ M   ->   Γ ⌊ M ⌋ Γ′ ⊢ N
+    subst : ∀(Γ Γ′ : Context) {A B}
+                        ->  Γ ⌊⌋ Γ′ ⊢ A   ->   Γ ⌊ A ⌋ Γ′ ⊢ B
                            --------------------------------
-                        ->           Γ ⌊⌋ Γ′ ⊢ N
-    subst Γ ∙ M (var top) = M
-    subst Γ ∙ M (var (pop x)) = var x
-    subst Γ (Γ′ , B now) M (var top) = var top
-    subst Γ (Γ′ , B now) M (var (pop x)) = var (pop {!   !})
-    subst Γ (Γ′ , B always) M (var (pop x)) = {!    !}
+                        ->           Γ ⌊⌋ Γ′ ⊢ B
+    subst Γ Γ′ M (var x) with var-disjoint Γ Γ′ x
+    subst Γ Γ′ M (var x) | inj₁ refl = M
+    subst Γ Γ′ M (var x) | inj₂ y = var y
     subst Γ Γ′ M (lam {A = A} B) = lam (subst Γ (Γ′ , A now) (weaken (drop refl) M) B)
     subst Γ Γ′ M (F $ A) = subst Γ Γ′ M F $ subst Γ Γ′ M A
     subst Γ Γ′ M unit = unit
@@ -29,13 +30,103 @@ mutual
         case subst Γ Γ′ M S
            inl↦ subst Γ (Γ′ , A now) (weaken (drop refl) M) B₁
          ||inr↦ subst Γ (Γ′ , B now) (weaken (drop refl) M) B₂
-    subst Γ ∙ M (svar top) = svar {!   !}
-    subst Γ ∙ M (svar (pop x)) = {!   !}
-    subst Γ (Γ′ , x₁) M (svar x) = {!   !}
-    subst Γ Γ′ M (stable S) = stable {!   !}
+    subst Γ Γ′ M (svar x) with var-disjoint Γ Γ′ x
+    subst Γ Γ′ M (svar x) | inj₁ refl = M
+    subst Γ Γ′ M (svar x) | inj₂ y = svar y
+    subst Γ Γ′ M (present A) = present (subst Γ Γ′ M A)
+    subst Γ Γ′ {C now} M (stable S) rewrite ˢ-preserves-⌊⌋ {Γ , C now} {Γ′}
+                                         | sym (ˢ-preserves-⌊⌋ {Γ} {Γ′})
+                                         = stable S
+    subst Γ Γ′ {C always} M (stable {A = A} S) rewrite ˢ-preserves-⌊⌋ {Γ , C always} {Γ′}
+            = stable S′
+        where
+        S′ : (Γ ⌊⌋ Γ′) ˢ ⊢ A now
+        S′ rewrite ˢ-preserves-⌊⌋ {Γ} {Γ′} = subst (Γ ˢ) (Γ′ ˢ) M′ S
+            where
+            M′ : Γ ˢ ⌊⌋ Γ′ ˢ ⊢ C always
+            M′ rewrite sym (ˢ-preserves-⌊⌋ {Γ} {Γ′}) = ˢ-always M
     subst Γ Γ′ M (sig S) = sig (subst Γ Γ′ M S)
-    subst Γ Γ′ M (letSig S In B) = {!   !}
-    subst Γ Γ′ M (event x) = {!   !}
+    subst Γ Γ′ M (letSig_In_ {A = A} S B) = letSig (subst Γ Γ′ M S)
+                                               In (subst Γ (Γ′ , A always) (weaken (drop refl) M) B)
+    subst Γ Γ′ M (event E) = event (subst′ Γ Γ′ M E)
+
+    subst′ : ∀(Γ Γ′ : Context) {A B}
+                        ->  Γ ⌊⌋ Γ′ ⊢ A   ->   Γ ⌊ A ⌋ Γ′ ⊨ B
+                           --------------------------------
+                        ->           Γ ⌊⌋ Γ′ ⊨ B
+    subst′ Γ Γ′ M (pure A) = pure (subst Γ Γ′ M A)
+    subst′ Γ Γ′ M (letSig_InC_ {A = A} S C) =
+        letSig subst Γ Γ′ M S
+           InC subst′ Γ (Γ′ , A now) (weaken (drop refl) M) C
+    subst′ Γ Γ′ {D now} M (letEvt E In C)
+          rewrite ˢ-filter {Γ} {Γ′} {D}
+        = letEvt subst Γ Γ′ M E In C
+    subst′ Γ Γ′ {D always} M (letEvt_In_ {A = A} {B} E C)
+          rewrite ˢ-preserves-⌊⌋ {Γ , D always} {Γ′}
+        = letEvt subst Γ Γ′ M E In C′
+        where
+        C′ : (Γ ⌊⌋ Γ′) ˢ , A now ⊨ B now
+        C′ rewrite ˢ-preserves-⌊⌋ {Γ} {Γ′}
+            = subst′ (Γ ˢ) (Γ′ ˢ , A now) (weaken (drop refl) M′) C
+            where
+            M′ : Γ ˢ ⌊⌋ Γ′ ˢ ⊢ D always
+            M′ rewrite sym (ˢ-preserves-⌊⌋ {Γ} {Γ′}) = ˢ-always M
+
+    subst′ Γ Γ′ {D now} M (select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃)
+        rewrite ˢ-filter {Γ} {Γ′} {D}
+        = select (subst Γ Γ′ M E₁) ↦ C₁ || (subst Γ Γ′ M E₂) ↦ C₂ ||both↦ C₃
+    subst′ Γ Γ′ {D always} M (select_↦_||_↦_||both↦_ {A = A} {B} E₁ C₁ E₂ C₂ C₃) =
+        select subst Γ Γ′ M E₁ ↦ ˢ-subst Γ Γ′ (∙ , Event B now , A now) M C₁
+            || subst Γ Γ′ M E₂ ↦ ˢ-subst Γ Γ′ (∙ , Event A now , B now) M C₂
+            ||both↦             ˢ-subst Γ Γ′ (∙ , A now , B now) M C₃
+            where
+            ˢ-subst : ∀(Γ Γ′ Δ : Context) {A B} -> Γ ⌊⌋ Γ′ ⊢ A always
+                   -> (Γ ⌊ A always ⌋ Γ′) ˢ ⌊⌋ Δ ⊨ B
+                   -> (Γ ⌊⌋ Γ′) ˢ ⌊⌋ Δ ⊨ B
+            ˢ-subst Γ Γ′ Δ {A} {B} M N
+                rewrite ˢ-preserves-⌊⌋ {Γ , A always} {Γ′}
+                      | ⌊⌋-assoc (Γ ˢ , A always) (Γ′ ˢ) Δ
+                      | ˢ-preserves-⌊⌋ {Γ} {Γ′}
+                      | ⌊⌋-assoc (Γ ˢ) (Γ′ ˢ) Δ
+                = subst′ (Γ ˢ) (Γ′ ˢ ⌊⌋ Δ) M′ N
+                where
+                M′ : Γ ˢ ⌊⌋ (Γ′ ˢ ⌊⌋ Δ) ⊢ A always
+                M′ rewrite sym (⌊⌋-assoc (Γ ˢ) (Γ′ ˢ) Δ)
+                      | sym (ˢ-preserves-⌊⌋ {Γ} {Γ′})
+                    = weaken (Γ⊆Γ⌊⌋Δ ((Γ ⌊⌋ Γ′) ˢ) Δ) (ˢ-always M)
+
+
+    subst″ : ∀(Γ Γ′ : Context) {A B}
+                        ->  Γ ⌊⌋ Γ′ ⊨ A now  ->   Γ ˢ ⌊ A now ⌋ Γ′ ˢ ⊨ B now
+                           --------------------------------
+                        ->           Γ ⌊⌋ Γ′ ⊨ B now
+    subst″ Γ Γ′ (pure {A = A} M) C = subst′ Γ Γ′ M (weaken-⊨ (sub Γ Γ′) C)
+        where
+        sub : ∀ (Γ Γ′ : Context) -> Γ ˢ ⌊ A now ⌋ Γ′ ˢ ⊆ Γ ⌊ A now ⌋ Γ′
+        sub Γ ∙ = keep Γˢ⊆Γ
+        sub Γ (Γ′ , B now) = drop (sub Γ Γ′)
+        sub Γ (Γ′ , B always) = keep (sub Γ Γ′)
+    subst″ Γ Γ′ (letSig_InC_ {A = A} S M) C = letSig S InC subst″ Γ (Γ′ , A now) M C
+    subst″ Γ Γ′ {D}{F} (letEvt_In_ {A = A} E M) C
+        = letEvt E In C′
+        where
+        C-idemp : Γ ˢ ˢ ⌊ D now ⌋ Γ′ ˢ ˢ ⊨ F now
+        C-idemp rewrite ˢ-idemp Γ | ˢ-idemp Γ′ = C
+        C′ : (Γ ⌊⌋ Γ′) ˢ , A now ⊨ F now
+        C′ rewrite ˢ-preserves-⌊⌋ {Γ} {Γ′} = subst″ (Γ ˢ) (Γ′ ˢ , A now) M C-idemp
+    subst″ Γ Γ′ {D}{F} (select_↦_||_↦_||both↦_ {A = A} {B} E₁ M₁ E₂ M₂ M₃) C
+        = select E₁ ↦ C′ (Event B) A M₁
+              || E₂ ↦ C′ (Event A) B M₂
+              ||both↦ C′ A B M₃
+        where
+        C-idemp : Γ ˢ ˢ ⌊ D now ⌋ Γ′ ˢ ˢ ⊨ F now
+        C-idemp rewrite ˢ-idemp Γ | ˢ-idemp Γ′ = C
+        C′ : ∀ (A B : Type) -> (Γ ⌊⌋ Γ′) ˢ , A now , B now ⊨ D now
+                           -> (Γ ⌊⌋ Γ′) ˢ , A now , B now ⊨ F now
+        C′ A B M rewrite ˢ-preserves-⌊⌋ {Γ} {Γ′} =
+            subst″ (Γ ˢ) (Γ′ ˢ , A now , B now) M C-idemp
+
+
     -- [_/]_ {Γ} {∙} M (var top) = M
     -- [_/]_ {Γ} {∙} M (var (pop x)) = var x
     -- [_/]_ {Γ} {Γ′ , .(_ now)} M (var top) = var top
