@@ -7,6 +7,7 @@ open import Syntax.Terms
 open import Syntax.Context
 
 open import Relation.Binary.PropositionalEquality
+open import Data.Sum
 
 -- | Structural lemmas
 
@@ -45,15 +46,22 @@ mutual
                 || weaken s E₂ ↦ weaken-⊨ (keep (keep (ˢ-⊆-monotone s))) C₂
                 ||both↦ weaken-⊨ ((keep (keep (ˢ-⊆-monotone s)))) C₃
 
+-- Context of a stable type can be stabilised
+ˢ-always : ∀{Γ A} -> Γ ⊢ A always -> Γ ˢ ⊢ A always
+ˢ-always {∙} M = M
+ˢ-always {Γ , B now} (svar (pop x)) = svar (ˢ-∈-always x)
+ˢ-always {Γ , B now} (stable M) = ˢ-always {Γ} (stable M)
+ˢ-always {Γ , B always} (svar {A = A} x) with var-disjoint Γ ∙ x
+ˢ-always {Γ , B always} (svar {A = .B} x) | inj₁ refl = svar top
+ˢ-always {Γ , B always} (svar {A = A} x) | inj₂ y = weaken (drop refl) (svar (ˢ-∈-always y))
+ˢ-always {Γ , B always} (stable {A = A} M) = stable M′
+    where
+    M′ : Γ ˢ ˢ , B always ⊢ A now
+    M′ rewrite (ˢ-idemp Γ) = M
 
-∈-subst : ∀{Γ Γ′ A M}
-                    ->  Γ ⌊⌋ Γ′ ⊢ M   ->   A ∈ Γ ⌊ M ⌋ Γ′
-                       --------------------------------
-                    ->           A ∈ Γ ⌊⌋ Γ′
-∈-subst {Γ} {∙} {A} {.A} J top = {!  !}
-∈-subst {Γ} {∙} {A} {M} J (pop e) = e
-∈-subst {Γ} {Γ′ , B} {.B} {M} J top = top
-∈-subst {Γ} {Γ′ , B} {A} {M} J (pop e) = ({!   !}) -- pop (∈-subst {Γ} {{!   !}} J e)
+-- Stabilisation filters out reactive types from the middle of a context
+ˢ-filter : ∀{Γ Γ′ A} -> (Γ ⌊ A now ⌋ Γ′) ˢ ≡ (Γ ⌊⌋ Γ′) ˢ
+ˢ-filter {Γ} {Γ′} {A} rewrite ˢ-preserves-⌊⌋ {Γ , A now} {Γ′} = sym (ˢ-preserves-⌊⌋ {Γ} {Γ′})
 
 -- mutual
 --     exchange : ∀(Γ Γ′ : Context){M N P}

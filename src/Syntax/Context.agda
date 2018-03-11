@@ -70,6 +70,12 @@ infix 30 _⊆_
 Γˢ⊆Γ {Γ , A now} = drop Γˢ⊆Γ
 Γˢ⊆Γ {Γ , A always} = keep Γˢ⊆Γ
 
+-- Stabilisation is idempotent
+ˢ-idemp : ∀ Γ -> Γ ˢ ˢ ≡ Γ ˢ
+ˢ-idemp ∙ = refl
+ˢ-idemp (Γ , A now) = ˢ-idemp Γ
+ˢ-idemp (Γ , A always) rewrite ˢ-idemp Γ = refl
+
 -- Stabilisation preserves concatenation
 ˢ-preserves-⌊⌋ : ∀{Γ Γ′} -> (Γ ⌊⌋ Γ′) ˢ ≡ Γ ˢ ⌊⌋ Γ′ ˢ
 ˢ-preserves-⌊⌋ {Γ} {∙} = refl
@@ -84,18 +90,27 @@ infix 30 _⊆_
 ˢ-⊆-monotone (drop {Γ} {Γ′} {A now} s) = ˢ-⊆-monotone s
 ˢ-⊆-monotone (drop {Γ} {Γ′} {A always} s) = drop (ˢ-⊆-monotone s)
 
+-- The context of stable variables can be stabilised
+ˢ-∈-always : ∀{Γ A} -> A always ∈ Γ -> A always ∈ Γ ˢ
+ˢ-∈-always {.(_ , _ always)} top = top
+ˢ-∈-always {Γ , B now} (pop e) = ˢ-∈-always e
+ˢ-∈-always {Γ , B always} (pop e) = pop (ˢ-∈-always e)
+
 ∈-weaken : ∀{Γ Γ′ A} -> Γ ⊆ Γ′ -> A ∈ Γ -> A ∈ Γ′
 ∈-weaken refl e = e
 ∈-weaken (keep s) top = top
 ∈-weaken (keep s) (pop e) = pop (∈-weaken s e)
 ∈-weaken (drop s) e = pop (∈-weaken s e)
---
--- ˢ-exchange : ∀{Γ Γ′ A B} -> (Γ , A , B ⌊⌋ Γ′) ˢ ≡ (Γ , B , A ⌊⌋ Γ′) ˢ
--- ˢ-exchange {Γ} {Γ′} {A now} {B now} rewrite ˢ-preserves-⌊⌋ {Γ , A now , B now} {Γ′}
---                                         | ˢ-preserves-⌊⌋ {Γ , B now , A now} {Γ′}= refl
--- ˢ-exchange {Γ} {Γ′} {A now} {B always} = {!   !}
--- ˢ-exchange {Γ} {Γ′} {A always} {B now} = {!   !}
--- ˢ-exchange {Γ} {Γ′} {A always} {B always} = {!   !}
+
+-- Concatenation of two contexts is a superset of one of the contexts
+Γ⊆Γ⌊⌋Δ : ∀(Γ Δ : Context) -> Γ ⊆ Γ ⌊⌋ Δ
+Γ⊆Γ⌊⌋Δ Γ ∙ = refl
+Γ⊆Γ⌊⌋Δ Γ (Δ , x) = drop (Γ⊆Γ⌊⌋Δ Γ Δ)
+
+-- Context of two contexts is associative
+⌊⌋-assoc : ∀(Γ Δ Ξ : Context) -> (Γ ⌊⌋ Δ) ⌊⌋ Ξ ≡ Γ ⌊⌋ (Δ ⌊⌋ Ξ)
+⌊⌋-assoc Γ Δ ∙ = refl
+⌊⌋-assoc Γ Δ (Ξ , C) = cong (_, C) (⌊⌋-assoc Γ Δ Ξ)
 
 -- Element of a subset is an element of a set.
 ∈-⊆-monotone : ∀{Γ Γ′ J} -> Γ ⊆ Γ′ -> J ∈ Γ -> J ∈ Γ′
@@ -123,3 +138,14 @@ infix 30 _⊆_
     ; reflexive = ⊆-refl-eq
     ; trans = ⊆-trans
     }
+
+open import Data.Sum
+
+-- If B ∈ Γ ⌊ A ⌋ Γ′ then either B is equal to A, or B is in Γ ⌊⌋ Γ′
+var-disjoint : ∀(Γ Γ′ : Context) {A B} ->  B ∈ Γ ⌊ A ⌋ Γ′ -> (B ≡ A) ⊎ (B ∈ Γ ⌊⌋ Γ′)
+var-disjoint Γ ∙ top = inj₁ refl
+var-disjoint Γ ∙ (pop e) = inj₂ e
+var-disjoint Γ (Γ′ , C) top = inj₂ top
+var-disjoint Γ (Γ′ , C) (pop e) with var-disjoint Γ Γ′ e
+var-disjoint Γ (Γ′ , C) (pop e) | inj₁ B≡A = inj₁ B≡A
+var-disjoint Γ (Γ′ , C) (pop e) | inj₂ y = inj₂ (pop y)
