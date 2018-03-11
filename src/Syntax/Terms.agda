@@ -108,7 +108,7 @@ mutual
                                 ->                 Γ ⊨ B now
 
         -- Event destructor
-        letEvt_In_ : ∀{Γ A B}   ->   Γ ⊢ Event A now  ->   [ A now ] ⊨ B now
+        letEvt_In_ : ∀{Γ A B}   ->   Γ ⊢ Event A now  ->   Γ ˢ , A now  ⊨ B now
                                     ----------------------------------------
                                 ->                 Γ ⊨ B now
 

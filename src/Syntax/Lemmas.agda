@@ -39,7 +39,7 @@ mutual
                         ->            Γ′ ⊨ M
     weaken-⊨ s (pure M) = pure (weaken s M)
     weaken-⊨ s (letSig S InC B) = letSig weaken s S InC weaken-⊨ (keep s) B
-    weaken-⊨ s (letEvt E In B) = letEvt weaken s E In B
+    weaken-⊨ s (letEvt E In B) = letEvt weaken s E In weaken-⊨ (keep (ˢ-⊆-monotone s)) B
     weaken-⊨ s (select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃) =
             select weaken s E₁ ↦ C₁
                 || weaken s E₂ ↦ C₂

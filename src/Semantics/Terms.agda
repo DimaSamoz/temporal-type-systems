@@ -56,7 +56,7 @@ mutual
     ⟦_⟧ᵐ : ∀{Γ A} -> Γ ⊨ A -> (⟦ Γ ⟧ₓ ⇴ ◇ ⟦ A ⟧ⱼ)
     ⟦_⟧ᵐ {A = A} (pure M) n env = η.at ⟦ A ⟧ⱼ n (⟦ M ⟧ₘ n env)
     ⟦ letSig S InC C ⟧ᵐ n env = ⟦ C ⟧ᵐ n (env , (⟦ S ⟧ₘ n env n))
-    ⟦ letEvt_In_ {A = A} {B} E C ⟧ᵐ n env = ⟦◇A⟧ >>= ⟦A=>◇B⟧
+    ⟦_⟧ᵐ {Γ} (letEvt_In_ {A = A} {B} E C) n env = ⟦◇A⟧ >>= ⟦A=>◇B⟧
             where
             ⟦◇A⟧ : (◇ ⟦ A ⟧ₜ) n
             ⟦◇A⟧ = ⟦ E ⟧ₘ n env
