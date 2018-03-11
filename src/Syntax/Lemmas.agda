@@ -41,9 +41,9 @@ mutual
     weaken-⊨ s (letSig S InC B) = letSig weaken s S InC weaken-⊨ (keep s) B
     weaken-⊨ s (letEvt E In B) = letEvt weaken s E In weaken-⊨ (keep (ˢ-⊆-monotone s)) B
     weaken-⊨ s (select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃) =
-            select weaken s E₁ ↦ C₁
-                || weaken s E₂ ↦ C₂
-                ||both↦ C₃
+            select weaken s E₁ ↦ weaken-⊨ (keep (keep (ˢ-⊆-monotone s))) C₁
+                || weaken s E₂ ↦ weaken-⊨ (keep (keep (ˢ-⊆-monotone s))) C₂
+                ||both↦ weaken-⊨ ((keep (keep (ˢ-⊆-monotone s)))) C₃
 
 
 ∈-subst : ∀{Γ Γ′ A M}

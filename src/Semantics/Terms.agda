@@ -61,8 +61,8 @@ mutual
             ⟦◇A⟧ : (◇ ⟦ A ⟧ₜ) n
             ⟦◇A⟧ = ⟦ E ⟧ₘ n env
             ⟦A=>◇B⟧ : ⟦ A ⟧ₜ ⇴ (◇ ⟦ B ⟧ₜ)
-            ⟦A=>◇B⟧ k ⟦A⟧ = ⟦ C ⟧ᵐ k (top.tt , ⟦A⟧)
-    ⟦ select_↦_||_↦_||both↦_ {A = A} {B} {C} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ n env =
+            ⟦A=>◇B⟧ k ⟦A⟧ = ⟦ C ⟧ᵐ k (⟦ Γ ⟧ˢₓ n env k , ⟦A⟧)
+    ⟦_⟧ᵐ {Γ} (select_↦_||_↦_||both↦_ {A = A} {B} {C} E₁ C₁ E₂ C₂ C₃) n env =
         ◇-select n (⟦ E₁ ⟧ₘ n env , ⟦ E₂ ⟧ₘ n env) >>= ⟦select⟧
         where
         -- Handle all three possibilities of event ordering by selecting
@@ -70,6 +70,6 @@ mutual
         ⟦select⟧ :  (  ⟦ A ⟧ₜ ⊗ ◇ ⟦ B ⟧ₜ)
                  ⊕ (◇ ⟦ A ⟧ₜ ⊗   ⟦ B ⟧ₜ)
                  ⊕ (  ⟦ A ⟧ₜ ⊗   ⟦ B ⟧ₜ) ⇴ ◇ ⟦ C ⟧ₜ
-        ⟦select⟧ n (inj₁ (inj₁ (⟦A⟧ , ⟦◇B⟧))) = ⟦ C₁ ⟧ᵐ n ((top.tt , ⟦◇B⟧) , ⟦A⟧)
-        ⟦select⟧ n (inj₁ (inj₂ (⟦◇A⟧ , ⟦B⟧))) = ⟦ C₂ ⟧ᵐ n ((top.tt , ⟦◇A⟧) , ⟦B⟧)
-        ⟦select⟧ n (inj₂ (⟦A⟧ , ⟦B⟧))         = ⟦ C₃ ⟧ᵐ n ((top.tt , ⟦A⟧)  , ⟦B⟧)
+        ⟦select⟧ k (inj₁ (inj₁ (⟦A⟧ , ⟦◇B⟧))) = ⟦ C₁ ⟧ᵐ k ((⟦ Γ ⟧ˢₓ n env k , ⟦◇B⟧) , ⟦A⟧)
+        ⟦select⟧ k (inj₁ (inj₂ (⟦◇A⟧ , ⟦B⟧))) = ⟦ C₂ ⟧ᵐ k ((⟦ Γ ⟧ˢₓ n env k , ⟦◇A⟧) , ⟦B⟧)
+        ⟦select⟧ k (inj₂ (⟦A⟧ , ⟦B⟧))         = ⟦ C₃ ⟧ᵐ k ((⟦ Γ ⟧ˢₓ n env k , ⟦A⟧)  , ⟦B⟧)
