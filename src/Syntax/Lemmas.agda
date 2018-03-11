@@ -6,13 +6,14 @@ open import Syntax.Types
 open import Syntax.Terms
 open import Syntax.Context
 
-open import Relation.Binary.PropositionalEquality
+open import Relation.Binary.PropositionalEquality using (_≡_ ; refl ; sym)
 open import Data.Sum
 
 -- | Structural lemmas
 
--- Weakening lemma
+-- Weakening lemmas
 mutual
+    -- Weakening for pure terms
     weaken : ∀{Γ Γ′ M}   ->     Γ ⊆ Γ′   ->   Γ ⊢ M
                                --------------------
                         ->            Γ′ ⊢ M
@@ -35,6 +36,7 @@ mutual
     weaken s (letSig S In B) = letSig weaken s S In weaken (keep s) B
     weaken s (event E) = event (weaken-⊨ s E)
 
+    -- Weakening for computational terms
     weaken-⊨ : ∀{Γ Γ′ M} ->     Γ ⊆ Γ′   ->   Γ ⊨ M
                                --------------------
                         ->            Γ′ ⊨ M
@@ -45,6 +47,89 @@ mutual
             select weaken s E₁ ↦ weaken-⊨ (keep (keep (ˢ-⊆-monotone s))) C₁
                 || weaken s E₂ ↦ weaken-⊨ (keep (keep (ˢ-⊆-monotone s))) C₂
                 ||both↦ weaken-⊨ ((keep (keep (ˢ-⊆-monotone s)))) C₃
+
+
+-- Exchange lemmas
+mutual
+    -- Exchange for pure terms
+    exchange : ∀(Γ Γ′ : Context){A B C}
+                            ->   Γ , A , B ⌊⌋ Γ′ ⊢ C
+                                --------------------
+                            ->   Γ , B , A ⌊⌋ Γ′ ⊢ C
+    exchange Γ ∙ (var top) = var (pop top)
+    exchange Γ ∙ (var (pop x)) = weaken (keep (drop refl)) (var x)
+    exchange Γ (Γ′ , .(_ now)) (var top) = var top
+    exchange Γ (Γ′ , y) (var (pop x)) = weaken (drop refl) (exchange Γ Γ′ (var x))
+    exchange Γ Γ′ (lam {A = A} M) = lam (exchange Γ (Γ′ , A now) M)
+    exchange Γ Γ′ (F $ A) = exchange Γ Γ′ F $ exchange Γ Γ′ A
+    exchange Γ Γ′ unit = unit
+    exchange Γ Γ′ [ M ,, N ] = [ exchange Γ Γ′ M ,, exchange Γ Γ′ N ]
+    exchange Γ Γ′ (fst M) = fst (exchange Γ Γ′ M)
+    exchange Γ Γ′ (snd M) = snd (exchange Γ Γ′ M)
+    exchange Γ Γ′ (inl M) = inl (exchange Γ Γ′ M)
+    exchange Γ Γ′ (inr M) = inr (exchange Γ Γ′ M)
+    exchange Γ Γ′ (case_inl↦_||inr↦_ {A = A}{B} S B₁ B₂) =
+                                            case exchange Γ Γ′ S
+                                                  inl↦ exchange Γ (Γ′ , A now) B₁
+                                                ||inr↦ exchange Γ (Γ′ , B now) B₂
+    exchange Γ ∙ (svar top) = svar (pop top)
+    exchange Γ ∙ (svar (pop x)) = weaken (keep (drop refl)) (svar x)
+    exchange Γ (Γ′ , .(_ always)) (svar top) = svar top
+    exchange Γ (Γ′ , y) (svar (pop x)) = weaken (drop refl) (exchange Γ Γ′ (svar x))
+    exchange Γ Γ′ (stable S) = stable (ˢ-exchange Γ Γ′ S)
+    exchange Γ Γ′ (sig S) = sig (exchange Γ Γ′ S)
+    exchange Γ Γ′ (letSig_In_ {A = A} S B) = letSig exchange Γ Γ′ S In exchange Γ (Γ′ , A always) B
+    exchange Γ Γ′ (event E) = event (exchange′ Γ Γ′ E)
+
+    -- Exchange under stabilisation for pure terms
+    ˢ-exchange : ∀(Γ Γ′ : Context) {A B C} -> (Γ , A , B ⌊⌋ Γ′) ˢ ⊢ C
+                                          -> (Γ , B , A ⌊⌋ Γ′) ˢ ⊢ C
+    ˢ-exchange Γ Γ′ {A now} {B now} M
+        rewrite ˢ-preserves-⌊⌋ {Γ , A now , B now} {Γ′}
+              | ˢ-preserves-⌊⌋ {Γ , B now , A now} {Γ′} = M
+    ˢ-exchange Γ Γ′ {A now} {B always} M
+        rewrite ˢ-preserves-⌊⌋ {Γ , A now , B always} {Γ′}
+              | ˢ-preserves-⌊⌋ {Γ , B always , A now} {Γ′} = M
+    ˢ-exchange Γ Γ′ {A always} {B now} M
+        rewrite ˢ-preserves-⌊⌋ {Γ , A always , B now} {Γ′}
+              | ˢ-preserves-⌊⌋ {Γ , B now , A always} {Γ′} = M
+    ˢ-exchange Γ Γ′ {A always} {B always} M
+        rewrite ˢ-preserves-⌊⌋ {Γ , A always , B always} {Γ′}
+              | ˢ-preserves-⌊⌋ {Γ , B always , A always} {Γ′} = exchange (Γ ˢ) (Γ′ ˢ) M
+
+    -- Exchange for computational terms
+    exchange′ : ∀(Γ Γ′ : Context){A B C}
+                            ->   Γ , A , B ⌊⌋ Γ′ ⊨ C
+                                --------------------
+                            ->   Γ , B , A ⌊⌋ Γ′ ⊨ C
+    exchange′ Γ Γ′ (pure M) = pure (exchange Γ Γ′ M)
+    exchange′ Γ Γ′ (letSig_InC_ {A = A} S C) = letSig exchange Γ Γ′ S InC exchange′ Γ (Γ′ , A now) C
+    exchange′ Γ Γ′ (letEvt_In_ {A = A} E C) = letEvt exchange Γ Γ′ E In ˢ-exchange′ Γ Γ′ [ A now ] C
+    exchange′ Γ Γ′ (select_↦_||_↦_||both↦_ {A = A} {B} E₁ C₁ E₂ C₂ C₃) =
+        select (exchange Γ Γ′ E₁) ↦ ˢ-exchange′ Γ Γ′ (∙ , Event B now , A now) C₁
+            || (exchange Γ Γ′ E₂) ↦ ˢ-exchange′ Γ Γ′ (∙ , Event A now , B now) C₂
+            ||both↦ ˢ-exchange′ Γ Γ′ (∙ , A now , B now) C₃
+
+    -- Exchange under stabilisation for computational terms
+    ˢ-exchange′ : ∀(Γ Γ′ Δ : Context) {A B C} -> (Γ , A , B ⌊⌋ Γ′) ˢ ⌊⌋ Δ ⊨ C
+                                            -> (Γ , B , A ⌊⌋ Γ′) ˢ ⌊⌋ Δ ⊨ C
+    ˢ-exchange′ Γ Γ′ Δ {A now} {B now} M
+        rewrite ˢ-preserves-⌊⌋ {Γ , A now , B now} {Γ′}
+              | ˢ-preserves-⌊⌋ {Γ , B now , A now} {Γ′} = M
+    ˢ-exchange′ Γ Γ′ Δ {A now} {B always} M
+        rewrite ˢ-preserves-⌊⌋ {Γ , A now , B always} {Γ′}
+              | ˢ-preserves-⌊⌋ {Γ , B always , A now} {Γ′} = M
+    ˢ-exchange′ Γ Γ′ Δ {A always} {B now} M
+        rewrite ˢ-preserves-⌊⌋ {Γ , A always , B now} {Γ′}
+              | ˢ-preserves-⌊⌋ {Γ , B now , A always} {Γ′} = M
+    ˢ-exchange′ Γ Γ′ Δ {A always} {B always} M
+        rewrite ˢ-preserves-⌊⌋ {Γ , A always , B always} {Γ′}
+              | ˢ-preserves-⌊⌋ {Γ , B always , A always} {Γ′}
+              | ⌊⌋-assoc (Γ ˢ , B always , A always) (Γ′ ˢ) Δ
+              | ⌊⌋-assoc (Γ ˢ , A always , B always) (Γ′ ˢ) Δ = exchange′ (Γ ˢ) (Γ′ ˢ ⌊⌋ Δ) M
+
+
+-- | Other lemmas
 
 -- Context of a stable type can be stabilised
 ˢ-always : ∀{Γ A} -> Γ ⊢ A always -> Γ ˢ ⊢ A always
@@ -62,55 +147,3 @@ mutual
 -- Stabilisation filters out reactive types from the middle of a context
 ˢ-filter : ∀{Γ Γ′ A} -> (Γ ⌊ A now ⌋ Γ′) ˢ ≡ (Γ ⌊⌋ Γ′) ˢ
 ˢ-filter {Γ} {Γ′} {A} rewrite ˢ-preserves-⌊⌋ {Γ , A now} {Γ′} = sym (ˢ-preserves-⌊⌋ {Γ} {Γ′})
-
--- mutual
---     exchange : ∀(Γ Γ′ : Context){M N P}
---                             ->   Γ , M , N ⌊⌋ Γ′ ⊢ P
---                                 --------------------
---                             ->   Γ , N , M ⌊⌋ Γ′ ⊢ P
---     exchange Γ ∙ (var top) = var (pop top)
---     exchange Γ ∙ (var (pop x)) = weaken (keep (drop refl)) (var x)
---     exchange Γ (Γ′ , .(_ now)) (var top) = var top
---     exchange Γ (Γ′ , y) (var (pop x)) = weaken (drop refl) (exchange Γ Γ′ (var x))
---     exchange Γ Γ′ (lam {A = A} M) = lam (exchange Γ (Γ′ , A now) M)
---     exchange Γ Γ′ (F $ A) = exchange Γ Γ′ F $ exchange Γ Γ′ A
---     exchange Γ Γ′ unit = unit
---     exchange Γ Γ′ [ M ,, N ] = [ exchange Γ Γ′ M ,, exchange Γ Γ′ N ]
---     exchange Γ Γ′ (fst M) = fst (exchange Γ Γ′ M)
---     exchange Γ Γ′ (snd M) = snd (exchange Γ Γ′ M)
---     exchange Γ Γ′ (inl M) = inl (exchange Γ Γ′ M)
---     exchange Γ Γ′ (inr M) = inr (exchange Γ Γ′ M)
---     exchange Γ Γ′ (case_inl↦_||inr↦_ {A = A}{B} S B₁ B₂) =
---                                             case exchange Γ Γ′ S
---                                                   inl↦ exchange Γ (Γ′ , A now) B₁
---                                                 ||inr↦ exchange Γ (Γ′ , B now) B₂
---     exchange Γ ∙ (svar top) = svar (pop top)
---     exchange Γ ∙ (svar (pop x)) = weaken (keep (drop refl)) (svar x)
---     exchange Γ (Γ′ , .(_ always)) (svar top) = svar top
---     exchange Γ (Γ′ , y) (svar (pop x)) = weaken (drop refl) (exchange Γ Γ′ (svar x))
---     exchange Γ Γ′ {M now} {N now} (stable S) rewrite ˢ-preserves-⌊⌋ {Γ , M now , N now} {Γ′} = stable (exchange (Γ ˢ) {! Γ′ ˢ  !} S)
---     exchange Γ Γ′ {M now} {N always} (stable S) = stable {!   !}
---     exchange Γ Γ′ {M always} {N now} (stable S) = stable {!   !}
---     exchange Γ Γ′ {M always} {N always} (stable S) = stable {!   !}
---     exchange Γ Γ′ (sig S) = {!   !}
---     exchange Γ Γ′ (letSig S In B) = {!   !}
---     exchange Γ Γ′ (event E) = {!   !}
--- mutual
---     intchange : ∀{Γ Δ A B M} ->  Δ ⁏ Γ , A , B ⊢ M
---                                   --------------------
---                           ->        Δ ⁏ Γ , B , A ⊢ M
---     intchange (var top) = var (pop top)
---     intchange (var (pop x)) = var (∈-⊆-monotone (keep (drop ⊆-refl)) x)
---     intchange (lam M) = lam (weaken-Γ {!   !} (intchange M))
---     intchange (M $ M₁) = intchange M $ intchange M₁
---     intchange unit = unit
---     intchange [ M ,, M₁ ] = [ intchange M ,, intchange M₁ ]
---     intchange (fst M) = fst (intchange M)
---     intchange (snd M) = snd (intchange M)
---     intchange (inl M) = inl (intchange M)
---     intchange (inr M) = inr (intchange M)
---     intchange (case M inl↦ M₁ ||inr↦ M₂) = {!   !}
---     intchange (svar x) = svar x
---     intchange (sig M) = sig M
---     intchange (letSig M In M₁) = letSig intchange M In intchange M₁
---     intchange (event x) = {!   !}
