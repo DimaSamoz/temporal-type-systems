@@ -101,7 +101,7 @@ mutual
                         ->  Γ ⌊⌋ Γ′ ⊨ A now  ->   Γ ˢ ⌊ A now ⌋ Γ′ ˢ ⊨ B now
                            ----------------------------------------------
                         ->                Γ ⌊⌋ Γ′ ⊨ B now
-    substᶜ Γ Γ′ (pure {A = A} M) C = substₚᶜ Γ Γ′ M (weaken-⊨ (Γˢ⊆Γ-mid Γ Γ′) C)
+    substᶜ Γ Γ′ (pure {A = A} M) C = substₚᶜ Γ Γ′ M (weaken′ (Γˢ⊆Γ-mid Γ Γ′) C)
     substᶜ Γ Γ′ (letSig_InC_ {A = A} S M) C = letSig S InC substᶜ Γ (Γ′ , A now) M C
     substᶜ Γ Γ′ {D}{F} (letEvt_In_ {A = A} E M) C
         = letEvt E In C′
