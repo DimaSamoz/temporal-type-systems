@@ -7,7 +7,7 @@ open import CategoryTheory.BCCCs
 
 open import Data.Nat using (ℕ ; zero ; suc ; _+_) public
 open import Data.Unit using () renaming (⊤ to top) public
-open import Data.Product public
+open import Data.Product
 open import Data.Empty using (⊥-elim) renaming (⊥ to bot) public
 open import Data.Sum renaming ([_,_] to ⟦_,_⟧)
 import Function as F using (_∘_)
@@ -21,7 +21,7 @@ import Function as F using (_∘_)
 -- Time-indexed functions.
 _⇴_ : τ -> τ -> Set
 A ⇴ B = ∀(n : ℕ) -> A n -> B n
-infixr 30 _⇴_
+infixr 10 _⇴_
 
 -- Category of reactive types
 ℝeactive : Category lzero
@@ -132,11 +132,14 @@ open BicartesianClosed ℝeactive-BCCC
 -- Product object: pairwise product of types
 _⊗_ : τ -> τ -> τ
 A ⊗ B = Product.A⊗B (Cartesian.prod cart A B)
+infixl 25 _⊗_
 
 -- Sum object: pairwise sum of types
 _⊕_ : τ -> τ -> τ
 A ⊕ B = Sum.A⊕B (Cocartesian.sum cocart A B)
+infixl 22 _⊕_
 
 -- Exponential object: pointwise functions
 _⇒_ : τ -> τ -> τ
 A ⇒ B = Exponential.A⇒B (Closed.exp closed A B)
+infixl 20 _⇒_
