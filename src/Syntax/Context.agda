@@ -111,14 +111,14 @@ infix 30 _⊆_
 -- | Stabilisation
 
 -- Stabilised context is a subset of the full context
-Γˢ⊆Γ : ∀{Γ} -> Γ ˢ ⊆ Γ
-Γˢ⊆Γ {∙} = refl
-Γˢ⊆Γ {Γ , A now} = drop Γˢ⊆Γ
-Γˢ⊆Γ {Γ , A always} = keep Γˢ⊆Γ
+Γˢ⊆Γ : ∀ Γ -> Γ ˢ ⊆ Γ
+Γˢ⊆Γ ∙ = refl
+Γˢ⊆Γ (Γ , A now) = drop (Γˢ⊆Γ Γ)
+Γˢ⊆Γ (Γ , A always) = keep (Γˢ⊆Γ Γ)
 
 -- Stabilised spliced context is subset of full spliced context
 Γˢ⊆Γ-mid : ∀ (Γ Γ′ : Context) {A} -> Γ ˢ ⌊ A ⌋ Γ′ ˢ ⊆ Γ ⌊ A ⌋ Γ′
-Γˢ⊆Γ-mid Γ ∙ = keep Γˢ⊆Γ
+Γˢ⊆Γ-mid Γ ∙ = keep (Γˢ⊆Γ Γ)
 Γˢ⊆Γ-mid Γ (Γ′ , B now) = drop (Γˢ⊆Γ-mid Γ Γ′)
 Γˢ⊆Γ-mid Γ (Γ′ , B always) = keep (Γˢ⊆Γ-mid Γ Γ′)
 
@@ -129,10 +129,10 @@ infix 30 _⊆_
 ˢ-idemp (Γ , A always) rewrite ˢ-idemp Γ = refl
 
 -- Stabilisation preserves concatenation
-ˢ-preserves-⌊⌋ : ∀{Γ Γ′} -> (Γ ⌊⌋ Γ′) ˢ ≡ Γ ˢ ⌊⌋ Γ′ ˢ
-ˢ-preserves-⌊⌋ {Γ} {∙} = refl
-ˢ-preserves-⌊⌋ {Γ} {Γ′ , A now} = ˢ-preserves-⌊⌋ {Γ} {Γ′}
-ˢ-preserves-⌊⌋ {Γ} {Γ′ , A always} rewrite ˢ-preserves-⌊⌋ {Γ} {Γ′} = refl
+ˢ-preserves-⌊⌋ : ∀ (Γ Γ′ : Context) -> (Γ ⌊⌋ Γ′) ˢ ≡ Γ ˢ ⌊⌋ Γ′ ˢ
+ˢ-preserves-⌊⌋ Γ ∙ = refl
+ˢ-preserves-⌊⌋ Γ (Γ′ , A now) = ˢ-preserves-⌊⌋ Γ Γ′
+ˢ-preserves-⌊⌋ Γ (Γ′ , A always) rewrite ˢ-preserves-⌊⌋ Γ Γ′ = refl
 
 -- Stabilisation preserves subcontext relation
 ˢ-⊆-monotone : ∀{Γ Γ′} -> Γ ⊆ Γ′ -> Γ ˢ ⊆ Γ′ ˢ

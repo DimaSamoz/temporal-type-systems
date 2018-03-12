@@ -34,17 +34,17 @@ mutual
     substₚ Γ Γ′ M (svar x) | inj₁ refl = M
     substₚ Γ Γ′ M (svar x) | inj₂ y = svar y
     substₚ Γ Γ′ M (present A) = present (substₚ Γ Γ′ M A)
-    substₚ Γ Γ′ {C now} M (stable S) rewrite ˢ-preserves-⌊⌋ {Γ , C now} {Γ′}
-                                         | sym (ˢ-preserves-⌊⌋ {Γ} {Γ′})
+    substₚ Γ Γ′ {C now} M (stable S) rewrite ˢ-preserves-⌊⌋ (Γ , C now) Γ′
+                                         | sym (ˢ-preserves-⌊⌋ Γ Γ′)
                                          = stable S
     substₚ Γ Γ′ {C always} M (stable {A = A} S)
-        rewrite ˢ-preserves-⌊⌋ {Γ , C always} {Γ′}
+        rewrite ˢ-preserves-⌊⌋ (Γ , C always) Γ′
             = stable S′
         where
         M′ : Γ ˢ ⌊⌋ Γ′ ˢ ⊢ C always
-        M′ rewrite sym (ˢ-preserves-⌊⌋ {Γ} {Γ′}) = ˢ-always M
+        M′ rewrite sym (ˢ-preserves-⌊⌋ Γ Γ′) = ˢ-always M
         S′ : (Γ ⌊⌋ Γ′) ˢ ⊢ A now
-        S′ rewrite ˢ-preserves-⌊⌋ {Γ} {Γ′} = substₚ (Γ ˢ) (Γ′ ˢ) M′ S
+        S′ rewrite ˢ-preserves-⌊⌋ Γ Γ′ = substₚ (Γ ˢ) (Γ′ ˢ) M′ S
 
     substₚ Γ Γ′ M (sig S) = sig (substₚ Γ Γ′ M S)
     substₚ Γ Γ′ M (letSig_In_ {A = A} S B) = letSig (substₚ Γ Γ′ M S)
@@ -64,13 +64,13 @@ mutual
         rewrite ˢ-filter {Γ} {Γ′} {D}
           = letEvt substₚ Γ Γ′ M E In C
     substₚᶜ Γ Γ′ {D always} M (letEvt_In_ {A = A} {B} E C)
-        rewrite ˢ-preserves-⌊⌋ {Γ , D always} {Γ′}
+        rewrite ˢ-preserves-⌊⌋ (Γ , D always) Γ′
             = letEvt substₚ Γ Γ′ M E In C′
         where
         M′ : Γ ˢ ⌊⌋ Γ′ ˢ ⊢ D always
-        M′ rewrite sym (ˢ-preserves-⌊⌋ {Γ} {Γ′}) = ˢ-always M
+        M′ rewrite sym (ˢ-preserves-⌊⌋ Γ Γ′) = ˢ-always M
         C′ : (Γ ⌊⌋ Γ′) ˢ , A now ⊨ B now
-        C′ rewrite ˢ-preserves-⌊⌋ {Γ} {Γ′}
+        C′ rewrite ˢ-preserves-⌊⌋ Γ Γ′
             = substₚᶜ (Γ ˢ) (Γ′ ˢ , A now) (weaken-top M′) C
 
     substₚᶜ Γ Γ′ {D now} M (select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃)
@@ -85,15 +85,15 @@ mutual
                -> (Γ ⌊ A always ⌋ Γ′) ˢ ⌊⌋ Δ ⊨ B
                -> (Γ ⌊⌋ Γ′) ˢ ⌊⌋ Δ ⊨ B
         ˢ-subst Γ Γ′ Δ {A} {B} M N
-            rewrite ˢ-preserves-⌊⌋ {Γ , A always} {Γ′}
+            rewrite ˢ-preserves-⌊⌋ (Γ , A always) Γ′
                   | ⌊⌋-assoc (Γ ˢ , A always) (Γ′ ˢ) Δ
-                  | ˢ-preserves-⌊⌋ {Γ} {Γ′}
+                  | ˢ-preserves-⌊⌋ Γ Γ′
                   | ⌊⌋-assoc (Γ ˢ) (Γ′ ˢ) Δ
             = substₚᶜ (Γ ˢ) (Γ′ ˢ ⌊⌋ Δ) M′ N
             where
             M′ : Γ ˢ ⌊⌋ (Γ′ ˢ ⌊⌋ Δ) ⊢ A always
             M′ rewrite sym (⌊⌋-assoc (Γ ˢ) (Γ′ ˢ) Δ)
-                  | sym (ˢ-preserves-⌊⌋ {Γ} {Γ′})
+                  | sym (ˢ-preserves-⌊⌋ Γ Γ′)
                 = weaken (Γ⊆Γ⌊⌋Δ ((Γ ⌊⌋ Γ′) ˢ) Δ) (ˢ-always M)
 
     -- Substitution of computational terms into computational terms
@@ -109,7 +109,7 @@ mutual
         C-idemp : Γ ˢ ˢ ⌊ D now ⌋ Γ′ ˢ ˢ ⊨ F now
         C-idemp rewrite ˢ-idemp Γ | ˢ-idemp Γ′ = C
         C′ : (Γ ⌊⌋ Γ′) ˢ , A now ⊨ F now
-        C′ rewrite ˢ-preserves-⌊⌋ {Γ} {Γ′} = substᶜ (Γ ˢ) (Γ′ ˢ , A now) M C-idemp
+        C′ rewrite ˢ-preserves-⌊⌋ Γ Γ′ = substᶜ (Γ ˢ) (Γ′ ˢ , A now) M C-idemp
     substᶜ Γ Γ′ {D}{F} (select_↦_||_↦_||both↦_ {A = A} {B} E₁ M₁ E₂ M₂ M₃) C
         = select E₁ ↦ C′ (Event B) A M₁
               || E₂ ↦ C′ (Event A) B M₂
@@ -119,5 +119,5 @@ mutual
         C-idemp rewrite ˢ-idemp Γ | ˢ-idemp Γ′ = C
         C′ : ∀ (A B : Type) -> (Γ ⌊⌋ Γ′) ˢ , A now , B now ⊨ D now
                            -> (Γ ⌊⌋ Γ′) ˢ , A now , B now ⊨ F now
-        C′ A B M rewrite ˢ-preserves-⌊⌋ {Γ} {Γ′} =
+        C′ A B M rewrite ˢ-preserves-⌊⌋ Γ Γ′ =
             substᶜ (Γ ˢ) (Γ′ ˢ , A now , B now) M C-idemp
