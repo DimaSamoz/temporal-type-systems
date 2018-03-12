@@ -116,6 +116,12 @@ infix 30 _⊆_
 Γˢ⊆Γ {Γ , A now} = drop Γˢ⊆Γ
 Γˢ⊆Γ {Γ , A always} = keep Γˢ⊆Γ
 
+-- Stabilised spliced context is subset of full spliced context
+Γˢ⊆Γ-mid : ∀ (Γ Γ′ : Context) {A} -> Γ ˢ ⌊ A ⌋ Γ′ ˢ ⊆ Γ ⌊ A ⌋ Γ′
+Γˢ⊆Γ-mid Γ ∙ = keep Γˢ⊆Γ
+Γˢ⊆Γ-mid Γ (Γ′ , B now) = drop (Γˢ⊆Γ-mid Γ Γ′)
+Γˢ⊆Γ-mid Γ (Γ′ , B always) = keep (Γˢ⊆Γ-mid Γ Γ′)
+
 -- Stabilisation is idempotent
 ˢ-idemp : ∀ Γ -> Γ ˢ ˢ ≡ Γ ˢ
 ˢ-idemp ∙ = refl
