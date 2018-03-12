@@ -88,17 +88,17 @@ mutual
     ˢ-exchange : ∀(Γ Γ′ : Context) {A B C} -> (Γ , A , B ⌊⌋ Γ′) ˢ ⊢ C
                                           -> (Γ , B , A ⌊⌋ Γ′) ˢ ⊢ C
     ˢ-exchange Γ Γ′ {A now} {B now} M
-        rewrite ˢ-preserves-⌊⌋ (Γ , A now , B now) Γ′
-              | ˢ-preserves-⌊⌋ (Γ , B now , A now) Γ′ = M
+        rewrite ˢ-pres-⌊⌋ (Γ , A now , B now) Γ′
+              | ˢ-pres-⌊⌋ (Γ , B now , A now) Γ′ = M
     ˢ-exchange Γ Γ′ {A now} {B always} M
-        rewrite ˢ-preserves-⌊⌋ (Γ , A now , B always) Γ′
-              | ˢ-preserves-⌊⌋ (Γ , B always , A now) Γ′ = M
+        rewrite ˢ-pres-⌊⌋ (Γ , A now , B always) Γ′
+              | ˢ-pres-⌊⌋ (Γ , B always , A now) Γ′ = M
     ˢ-exchange Γ Γ′ {A always} {B now} M
-        rewrite ˢ-preserves-⌊⌋ (Γ , A always , B now) Γ′
-              | ˢ-preserves-⌊⌋ (Γ , B now , A always) Γ′ = M
+        rewrite ˢ-pres-⌊⌋ (Γ , A always , B now) Γ′
+              | ˢ-pres-⌊⌋ (Γ , B now , A always) Γ′ = M
     ˢ-exchange Γ Γ′ {A always} {B always} M
-        rewrite ˢ-preserves-⌊⌋ (Γ , A always , B always) Γ′
-              | ˢ-preserves-⌊⌋ (Γ , B always , A always) Γ′ = exchange (Γ ˢ) (Γ′ ˢ) M
+        rewrite ˢ-pres-⌊⌋ (Γ , A always , B always) Γ′
+              | ˢ-pres-⌊⌋ (Γ , B always , A always) Γ′ = exchange (Γ ˢ) (Γ′ ˢ) M
 
     -- Exchange for computational terms
     exchange′ : ∀(Γ Γ′ : Context){A B C}
@@ -117,17 +117,17 @@ mutual
     ˢ-exchange′ : ∀(Γ Γ′ Δ : Context) {A B C} -> (Γ , A , B ⌊⌋ Γ′) ˢ ⌊⌋ Δ ⊨ C
                                             -> (Γ , B , A ⌊⌋ Γ′) ˢ ⌊⌋ Δ ⊨ C
     ˢ-exchange′ Γ Γ′ Δ {A now} {B now} M
-        rewrite ˢ-preserves-⌊⌋ (Γ , A now , B now) Γ′
-              | ˢ-preserves-⌊⌋ (Γ , B now , A now) Γ′ = M
+        rewrite ˢ-pres-⌊⌋ (Γ , A now , B now) Γ′
+              | ˢ-pres-⌊⌋ (Γ , B now , A now) Γ′ = M
     ˢ-exchange′ Γ Γ′ Δ {A now} {B always} M
-        rewrite ˢ-preserves-⌊⌋ (Γ , A now , B always) Γ′
-              | ˢ-preserves-⌊⌋ (Γ , B always , A now) Γ′ = M
+        rewrite ˢ-pres-⌊⌋ (Γ , A now , B always) Γ′
+              | ˢ-pres-⌊⌋ (Γ , B always , A now) Γ′ = M
     ˢ-exchange′ Γ Γ′ Δ {A always} {B now} M
-        rewrite ˢ-preserves-⌊⌋ (Γ , A always , B now) Γ′
-              | ˢ-preserves-⌊⌋ (Γ , B now , A always) Γ′ = M
+        rewrite ˢ-pres-⌊⌋ (Γ , A always , B now) Γ′
+              | ˢ-pres-⌊⌋ (Γ , B now , A always) Γ′ = M
     ˢ-exchange′ Γ Γ′ Δ {A always} {B always} M
-        rewrite ˢ-preserves-⌊⌋ (Γ , A always , B always) Γ′
-              | ˢ-preserves-⌊⌋ (Γ , B always , A always) Γ′
+        rewrite ˢ-pres-⌊⌋ (Γ , A always , B always) Γ′
+              | ˢ-pres-⌊⌋ (Γ , B always , A always) Γ′
               | ⌊⌋-assoc (Γ ˢ , B always , A always) (Γ′ ˢ) Δ
               | ⌊⌋-assoc (Γ ˢ , A always , B always) (Γ′ ˢ) Δ = exchange′ (Γ ˢ) (Γ′ ˢ ⌊⌋ Δ) M
 
@@ -149,4 +149,4 @@ mutual
 
 -- Stabilisation filters out reactive types from the middle of a context
 ˢ-filter : ∀{Γ Γ′ A} -> (Γ ⌊ A now ⌋ Γ′) ˢ ≡ (Γ ⌊⌋ Γ′) ˢ
-ˢ-filter {Γ} {Γ′} {A} rewrite ˢ-preserves-⌊⌋ (Γ , A now) Γ′ = sym (ˢ-preserves-⌊⌋ Γ Γ′)
+ˢ-filter {Γ} {Γ′} {A} rewrite ˢ-pres-⌊⌋ (Γ , A now) Γ′ = sym (ˢ-pres-⌊⌋ Γ Γ′)

@@ -129,10 +129,10 @@ infix 30 _⊆_
 ˢ-idemp (Γ , A always) rewrite ˢ-idemp Γ = refl
 
 -- Stabilisation preserves concatenation
-ˢ-preserves-⌊⌋ : ∀ (Γ Γ′ : Context) -> (Γ ⌊⌋ Γ′) ˢ ≡ Γ ˢ ⌊⌋ Γ′ ˢ
-ˢ-preserves-⌊⌋ Γ ∙ = refl
-ˢ-preserves-⌊⌋ Γ (Γ′ , A now) = ˢ-preserves-⌊⌋ Γ Γ′
-ˢ-preserves-⌊⌋ Γ (Γ′ , A always) rewrite ˢ-preserves-⌊⌋ Γ Γ′ = refl
+ˢ-pres-⌊⌋ : ∀ (Γ Γ′ : Context) -> (Γ ⌊⌋ Γ′) ˢ ≡ Γ ˢ ⌊⌋ Γ′ ˢ
+ˢ-pres-⌊⌋ Γ ∙ = refl
+ˢ-pres-⌊⌋ Γ (Γ′ , A now) = ˢ-pres-⌊⌋ Γ Γ′
+ˢ-pres-⌊⌋ Γ (Γ′ , A always) rewrite ˢ-pres-⌊⌋ Γ Γ′ = refl
 
 -- Stabilisation preserves subcontext relation
 ˢ-⊆-monotone : ∀{Γ Γ′} -> Γ ⊆ Γ′ -> Γ ˢ ⊆ Γ′ ˢ
