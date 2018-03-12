@@ -14,9 +14,9 @@ open import Data.Sum
 -- Weakening lemmas
 mutual
     -- Weakening for pure terms
-    weaken : ∀{Γ Γ′ M}   ->     Γ ⊆ Γ′   ->   Γ ⊢ M
+    weaken : ∀{Γ Γ′ A}   ->     Γ ⊆ Γ′   ->   Γ ⊢ A
                                --------------------
-                        ->            Γ′ ⊢ M
+                        ->            Γ′ ⊢ A
 
     weaken s (var x) = var (∈-⊆-monotone s x)
     weaken s (lam M) = lam (weaken (keep s) M)
@@ -48,6 +48,9 @@ mutual
                 || weaken s E₂ ↦ weaken′ (keep (keep (ˢ-⊆-monotone s))) C₂
                 ||both↦ weaken′ ((keep (keep (ˢ-⊆-monotone s)))) C₃
 
+-- Shorthand for weakening by a single variable
+weaken-top :  ∀{Γ A B}   ->  Γ ⊢ A -> Γ , B ⊢ A
+weaken-top = weaken (drop refl)
 
 -- Exchange lemmas
 mutual
@@ -59,7 +62,7 @@ mutual
     exchange Γ ∙ (var top) = var (pop top)
     exchange Γ ∙ (var (pop x)) = weaken (keep (drop refl)) (var x)
     exchange Γ (Γ′ , .(_ now)) (var top) = var top
-    exchange Γ (Γ′ , y) (var (pop x)) = weaken (drop refl) (exchange Γ Γ′ (var x))
+    exchange Γ (Γ′ , y) (var (pop x)) = weaken-top (exchange Γ Γ′ (var x))
     exchange Γ Γ′ (lam {A = A} M) = lam (exchange Γ (Γ′ , A now) M)
     exchange Γ Γ′ (F $ A) = exchange Γ Γ′ F $ exchange Γ Γ′ A
     exchange Γ Γ′ unit = unit
@@ -75,7 +78,7 @@ mutual
     exchange Γ ∙ (svar top) = svar (pop top)
     exchange Γ ∙ (svar (pop x)) = weaken (keep (drop refl)) (svar x)
     exchange Γ (Γ′ , .(_ always)) (svar top) = svar top
-    exchange Γ (Γ′ , y) (svar (pop x)) = weaken (drop refl) (exchange Γ Γ′ (svar x))
+    exchange Γ (Γ′ , y) (svar (pop x)) = weaken-top (exchange Γ Γ′ (svar x))
     exchange Γ Γ′ (stable S) = stable (ˢ-exchange Γ Γ′ S)
     exchange Γ Γ′ (sig S) = sig (exchange Γ Γ′ S)
     exchange Γ Γ′ (letSig_In_ {A = A} S B) = letSig exchange Γ Γ′ S In exchange Γ (Γ′ , A always) B
@@ -138,7 +141,7 @@ mutual
 ˢ-always {Γ , B now} (stable M) = ˢ-always {Γ} (stable M)
 ˢ-always {Γ , B always} (svar {A = A} x) with var-disjoint Γ ∙ x
 ˢ-always {Γ , B always} (svar {A = .B} x) | inj₁ refl = svar top
-ˢ-always {Γ , B always} (svar {A = A} x) | inj₂ y = weaken (drop refl) (svar (ˢ-∈-always y))
+ˢ-always {Γ , B always} (svar {A = A} x) | inj₂ y = weaken-top (svar (ˢ-∈-always y))
 ˢ-always {Γ , B always} (stable {A = A} M) = stable M′
     where
     M′ : Γ ˢ ˢ , B always ⊢ A now

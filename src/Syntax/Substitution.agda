@@ -18,7 +18,7 @@ mutual
     substₚ Γ Γ′ M (var x) with var-disjoint Γ Γ′ x
     substₚ Γ Γ′ M (var x) | inj₁ refl = M
     substₚ Γ Γ′ M (var x) | inj₂ y = var y
-    substₚ Γ Γ′ M (lam {A = A} B) = lam (substₚ Γ (Γ′ , A now) (weaken (drop refl) M) B)
+    substₚ Γ Γ′ M (lam {A = A} B) = lam (substₚ Γ (Γ′ , A now) (weaken-top M) B)
     substₚ Γ Γ′ M (F $ A) = substₚ Γ Γ′ M F $ substₚ Γ Γ′ M A
     substₚ Γ Γ′ M unit = unit
     substₚ Γ Γ′ M [ A ,, B ] = [ substₚ Γ Γ′ M A ,, substₚ Γ Γ′ M B ]
@@ -28,8 +28,8 @@ mutual
     substₚ Γ Γ′ M (inr A) = inr (substₚ Γ Γ′ M A)
     substₚ Γ Γ′ M (case_inl↦_||inr↦_ {A = A} {B} S B₁ B₂) =
         case substₚ Γ Γ′ M S
-           inl↦ substₚ Γ (Γ′ , A now) (weaken (drop refl) M) B₁
-         ||inr↦ substₚ Γ (Γ′ , B now) (weaken (drop refl) M) B₂
+           inl↦ substₚ Γ (Γ′ , A now) (weaken-top M) B₁
+         ||inr↦ substₚ Γ (Γ′ , B now) (weaken-top M) B₂
     substₚ Γ Γ′ M (svar x) with var-disjoint Γ Γ′ x
     substₚ Γ Γ′ M (svar x) | inj₁ refl = M
     substₚ Γ Γ′ M (svar x) | inj₂ y = svar y
@@ -48,7 +48,7 @@ mutual
 
     substₚ Γ Γ′ M (sig S) = sig (substₚ Γ Γ′ M S)
     substₚ Γ Γ′ M (letSig_In_ {A = A} S B) = letSig (substₚ Γ Γ′ M S)
-                                               In (substₚ Γ (Γ′ , A always) (weaken (drop refl) M) B)
+                                               In (substₚ Γ (Γ′ , A always) (weaken-top M) B)
     substₚ Γ Γ′ M (event E) = event (substₚᶜ Γ Γ′ M E)
 
     -- Substitution of pure terms into computational terms
@@ -59,7 +59,7 @@ mutual
     substₚᶜ Γ Γ′ M (pure A) = pure (substₚ Γ Γ′ M A)
     substₚᶜ Γ Γ′ M (letSig_InC_ {A = A} S C) =
         letSig substₚ Γ Γ′ M S
-           InC substₚᶜ Γ (Γ′ , A now) (weaken (drop refl) M) C
+           InC substₚᶜ Γ (Γ′ , A now) (weaken-top M) C
     substₚᶜ Γ Γ′ {D now} M (letEvt E In C)
         rewrite ˢ-filter {Γ} {Γ′} {D}
           = letEvt substₚ Γ Γ′ M E In C
@@ -71,7 +71,7 @@ mutual
         M′ rewrite sym (ˢ-preserves-⌊⌋ {Γ} {Γ′}) = ˢ-always M
         C′ : (Γ ⌊⌋ Γ′) ˢ , A now ⊨ B now
         C′ rewrite ˢ-preserves-⌊⌋ {Γ} {Γ′}
-            = substₚᶜ (Γ ˢ) (Γ′ ˢ , A now) (weaken (drop refl) M′) C
+            = substₚᶜ (Γ ˢ) (Γ′ ˢ , A now) (weaken-top M′) C
 
     substₚᶜ Γ Γ′ {D now} M (select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃)
         rewrite ˢ-filter {Γ} {Γ′} {D}
