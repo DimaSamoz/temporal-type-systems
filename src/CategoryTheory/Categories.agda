@@ -85,31 +85,17 @@ record Category (n : Level) : Set (lsuc (lsuc n)) where
     ≈-cong-left e = ≈-cong r≈ e
     ≈-cong-right : ∀{A B C : obj} {g : B ~> C} {f f′ : A ~> B}
             -> f ≈ f′ -> g ∘ f ≈ g ∘ f′
-
-
-
--- -- || Cartesian, cocartesian, exponential structure
---
--- -- Final object
--- ⊤ : τ
--- ⊤ n = top
---
--- -- Products
--- _⊗_ : τ -> τ -> τ
--- (A ⊗ B) n = A n × B n
--- infixl 60 _⊗_
---
--- -- Initial object
--- ⊥ : τ
--- ⊥ n = bot
---
--- -- Products
--- _⊕_ : τ -> τ -> τ
--- (A ⊕ B) n = A n ∨ B n
--- infixl 55 _⊕_
---
--- -- Exponentials
--- _⇒_ : τ -> τ -> τ
--- (A ⇒ B) n = A n -> B n
--- infixr 50 _⇒_
     ≈-cong-right e = ≈-cong e r≈
+
+    -- Isomorphism of two objects
+    record _<~>_  (A B : obj) : Set (lsuc n) where
+        field
+            -- | Data
+            -- Arrow in one direction
+            iso~> : A ~> B
+            -- Arrow in other direction
+            iso<~ : B ~> A
+
+            -- | Laws
+            iso-id₁ : iso<~ ∘ iso~> ≈ id {A}
+            iso-id₂ : iso~> ∘ iso<~ ≈ id {B}
