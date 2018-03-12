@@ -55,7 +55,7 @@ module _ {n} (ℂ : Category n) where
         -- η-expansion of function pairs (via morphisms)
         ⊗-η-exp : ∀{P} -> {m : P ~> A⊗B}
                -> ⟨ π₁ ∘ m , π₂ ∘ m ⟩ ≈ m
-        ⊗-η-exp = unique (IsEquivalence.refl ≈-equiv) (IsEquivalence.refl ≈-equiv)
+        ⊗-η-exp = unique r≈ r≈
 
         -- Pairing of projection functions is the identity
         ⊗-η-id : ⟨ π₁ , π₂ ⟩ ≈ id

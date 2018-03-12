@@ -67,6 +67,9 @@ record Category (n : Level) : Set (lsuc (lsuc n)) where
     _∎ : ∀{A B : obj} (x : A ~> B) → x ≈ x
     _∎ _ = IsEquivalence.refl ≈-equiv
 
+    r≈ : ∀{A B : obj} {x : A ~> B} → x ≈ x
+    r≈ = IsEquivalence.refl ≈-equiv
+
     _[sym] : ∀{A B : obj} {x y : A ~> B} → x ≈ y → y ≈ x
     p [sym] = IsEquivalence.sym ≈-equiv p
 
@@ -79,10 +82,9 @@ record Category (n : Level) : Set (lsuc (lsuc n)) where
     -- Derived congruence properties
     ≈-cong-left : ∀{A B C : obj} {f : A ~> B} {g g′ : B ~> C}
             -> g ≈ g′ -> g ∘ f ≈ g′ ∘ f
-    ≈-cong-left e = ≈-cong (IsEquivalence.refl ≈-equiv) e
+    ≈-cong-left e = ≈-cong r≈ e
     ≈-cong-right : ∀{A B C : obj} {g : B ~> C} {f f′ : A ~> B}
             -> f ≈ f′ -> g ∘ f ≈ g ∘ f′
-    ≈-cong-right e = ≈-cong e (IsEquivalence.refl ≈-equiv)
 
 
 
@@ -110,3 +112,4 @@ record Category (n : Level) : Set (lsuc (lsuc n)) where
 -- _⇒_ : τ -> τ -> τ
 -- (A ⇒ B) n = A n -> B n
 -- infixr 50 _⇒_
+    ≈-cong-right e = ≈-cong e r≈
