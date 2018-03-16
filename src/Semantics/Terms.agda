@@ -29,8 +29,7 @@ mutual
     -- Denotation of pure terms as morphisms from contexts to types.
     ⟦_⟧ₘ : ∀{Γ A} -> Γ ⊢ A -> (⟦ Γ ⟧ₓ ⇴ ⟦ A ⟧ⱼ)
     ⟦ var _∈_.top ⟧ₘ n (⟦Γ⟧ , ⟦A⟧) = ⟦A⟧
-    ⟦ (var (pop {B = B now}    x)) ⟧ₘ n (⟦Γ⟧ , _) = ⟦ var x ⟧ₘ n ⟦Γ⟧
-    ⟦ (var (pop {B = B always} x)) ⟧ₘ n (⟦Γ⟧ , _) = ⟦ var x ⟧ₘ n ⟦Γ⟧
+    ⟦ var (pop x) ⟧ₘ n (⟦Γ⟧ , _) = ⟦ var x ⟧ₘ n ⟦Γ⟧
     ⟦ lam M ⟧ₘ n env = λ ⟦A⟧ → ⟦ M ⟧ₘ n (env , ⟦A⟧)
     ⟦ F $ M ⟧ₘ n env = ⟦ F ⟧ₘ n env (⟦ M ⟧ₘ n env)
     ⟦ unit ⟧ₘ n env = top.tt
@@ -43,8 +42,7 @@ mutual
     ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ n env | inj₁ x = ⟦ lam B₁ ⟧ₘ n env x
     ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ n env | inj₂ y = ⟦ lam B₂ ⟧ₘ n env y
     ⟦ svar _∈_.top ⟧ₘ n (⟦Γ⟧ , ⟦A⟧) = ⟦A⟧
-    ⟦ svar (pop {B = B now} x) ⟧ₘ n (⟦Γ⟧ , ⟦A⟧) = ⟦ svar x ⟧ₘ n ⟦Γ⟧
-    ⟦ svar (pop {B = B always} x) ⟧ₘ n (⟦Γ⟧ , ⟦A⟧) = ⟦ svar x ⟧ₘ n ⟦Γ⟧
+    ⟦ svar (pop x) ⟧ₘ n (⟦Γ⟧ , _) = ⟦ svar x ⟧ₘ n ⟦Γ⟧
     ⟦ present S ⟧ₘ n env = ⟦ S ⟧ₘ n env n
     ⟦_⟧ₘ {Γ} (stable S) n env = λ k → ⟦ S ⟧ₘ k (⟦ Γ ⟧ˢₓ n env k)
     ⟦ sig S ⟧ₘ n env = ⟦ S ⟧ₘ n env
