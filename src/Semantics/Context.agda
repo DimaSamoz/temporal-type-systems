@@ -36,3 +36,17 @@ infix 50 ⟦_⟧ₓ
 ⟦ refl ⟧⊆ n ⟦Δ⟧ = ⟦Δ⟧
 ⟦ keep s ⟧⊆ n (⟦Δ⟧ ,, ⟦A⟧) = ⟦ s ⟧⊆ n ⟦Δ⟧ ,, ⟦A⟧
 ⟦ drop s ⟧⊆ n (⟦Δ⟧ ,, ⟦A⟧) = ⟦ s ⟧⊆ n ⟦Δ⟧
+
+-- | Other properties
+
+-- Denotation of an OPE and stabilisation of context denotation can be commuted
+⟦⟧ˢₓ-⟦⟧⊆-comm : ∀{Γ Δ} -> (n k : ℕ) -> (s : Γ ⊆ Δ) -> (⟦Δ⟧ : ⟦ Δ ⟧ₓ n)
+           -> ⟦ ˢ-⊆-monotone s ⟧⊆ k (⟦ Δ ⟧ˢₓ n ⟦Δ⟧ k)
+            ≡ ⟦ Γ ⟧ˢₓ n (⟦ s ⟧⊆ n ⟦Δ⟧) k
+⟦⟧ˢₓ-⟦⟧⊆-comm {Γ} n k refl ⟦Δ⟧ = refl
+⟦⟧ˢₓ-⟦⟧⊆-comm {Γ , A now} n k (keep s) (⟦Δ⟧ ,, ⟦A⟧) = ⟦⟧ˢₓ-⟦⟧⊆-comm n k s ⟦Δ⟧
+⟦⟧ˢₓ-⟦⟧⊆-comm {Γ , A always} n k (keep s) (⟦Δ⟧ ,, ⟦A⟧)
+    rewrite ⟦⟧ˢₓ-⟦⟧⊆-comm {Γ} n k s ⟦Δ⟧ = refl
+⟦⟧ˢₓ-⟦⟧⊆-comm {∙} n k (drop s) ⟦Δ⟧ = refl
+⟦⟧ˢₓ-⟦⟧⊆-comm {Γ , A} n k (drop {A = B now} s) (⟦Δ⟧ ,, ⟦A⟧) = ⟦⟧ˢₓ-⟦⟧⊆-comm n k s ⟦Δ⟧
+⟦⟧ˢₓ-⟦⟧⊆-comm {Γ , A} n k (drop {A = B always} s) (⟦Δ⟧ ,, ⟦A⟧) = ⟦⟧ˢₓ-⟦⟧⊆-comm n k s ⟦Δ⟧
