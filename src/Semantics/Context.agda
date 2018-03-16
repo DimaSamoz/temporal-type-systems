@@ -10,16 +10,19 @@ open import Semantics.Types
 
 open import Data.Product renaming (_,_ to _,,_)
 
--- Denotation of contexts as a finite product of temporal types.
-⟦_⟧ₓ : Context -> τ
-⟦ ∙ ⟧ₓ = ⊤
-⟦ Γ , A now ⟧ₓ = ⟦ Γ ⟧ₓ ⊗ ⟦ A ⟧ₜ
-⟦ Γ , A always ⟧ₓ = ⟦ Γ ⟧ₓ ⊗ (□ ⟦ A ⟧ₜ)
+-- | Denotation of judgements and contexts
 
 -- Denotation of judgements
 ⟦_⟧ⱼ : Judgement -> τ
 ⟦ A now ⟧ⱼ = ⟦ A ⟧ₜ
 ⟦ A always ⟧ⱼ = □ ⟦ A ⟧ₜ
+infix 50 ⟦_⟧ⱼ
+
+-- Denotation of contexts as a finite product of temporal types.
+⟦_⟧ₓ : Context -> τ
+⟦ ∙ ⟧ₓ = ⊤
+⟦ Γ , A ⟧ₓ = ⟦ Γ ⟧ₓ ⊗ ⟦ A ⟧ⱼ
+infix 50 ⟦_⟧ₓ
 
 -- Transform the denotation of a context to the denotation of a stabilised context
 ⟦_⟧ˢₓ : ∀ Γ -> ⟦ Γ ⟧ₓ ⇴ (□ ⟦ Γ ˢ ⟧ₓ)
