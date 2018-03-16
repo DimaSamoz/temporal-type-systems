@@ -31,6 +31,7 @@ mutual
                                                 inl↦ weaken (keep s) B₁
                                               ||inr↦ weaken (keep s) B₂
     weaken s (svar x) = svar (∈-⊆-monotone s x)
+    weaken s (present M) = present (weaken s M)
     weaken s (stable M) = stable (weaken (ˢ-⊆-monotone s) M)
     weaken s (sig M) = sig (weaken s M)
     weaken s (letSig S In B) = letSig weaken s S In weaken (keep s) B
