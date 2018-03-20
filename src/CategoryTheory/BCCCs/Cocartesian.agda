@@ -55,7 +55,7 @@ module _ {n} (ℂ : Category n) where
         -- η-expansion of function sums (via morphisms)
         ⊕-η-exp : ∀{S} -> {m : A⊕B ~> S}
                -> [ m ∘ ι₁ , m ∘ ι₂ ] ≈ m
-        ⊕-η-exp = unique (IsEquivalence.refl ≈-equiv) (IsEquivalence.refl ≈-equiv)
+        ⊕-η-exp = unique r≈ r≈
 
         -- Summing of injection functions is the identity
         ⊕-η-id : [ ι₁ , ι₂ ] ≈ id

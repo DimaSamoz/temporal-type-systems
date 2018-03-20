@@ -67,6 +67,9 @@ record Category (n : Level) : Set (lsuc (lsuc n)) where
     _∎ : ∀{A B : obj} (x : A ~> B) → x ≈ x
     _∎ _ = IsEquivalence.refl ≈-equiv
 
+    r≈ : ∀{A B : obj} {x : A ~> B} → x ≈ x
+    r≈ = IsEquivalence.refl ≈-equiv
+
     _[sym] : ∀{A B : obj} {x y : A ~> B} → x ≈ y → y ≈ x
     p [sym] = IsEquivalence.sym ≈-equiv p
 
@@ -79,34 +82,20 @@ record Category (n : Level) : Set (lsuc (lsuc n)) where
     -- Derived congruence properties
     ≈-cong-left : ∀{A B C : obj} {f : A ~> B} {g g′ : B ~> C}
             -> g ≈ g′ -> g ∘ f ≈ g′ ∘ f
-    ≈-cong-left e = ≈-cong (IsEquivalence.refl ≈-equiv) e
+    ≈-cong-left e = ≈-cong r≈ e
     ≈-cong-right : ∀{A B C : obj} {g : B ~> C} {f f′ : A ~> B}
             -> f ≈ f′ -> g ∘ f ≈ g ∘ f′
-    ≈-cong-right e = ≈-cong e (IsEquivalence.refl ≈-equiv)
+    ≈-cong-right e = ≈-cong e r≈
 
+    -- Isomorphism of two objects
+    record _<~>_  (A B : obj) : Set (lsuc n) where
+        field
+            -- | Data
+            -- Arrow in one direction
+            iso~> : A ~> B
+            -- Arrow in other direction
+            iso<~ : B ~> A
 
-
--- -- || Cartesian, cocartesian, exponential structure
---
--- -- Final object
--- ⊤ : τ
--- ⊤ n = top
---
--- -- Products
--- _⊗_ : τ -> τ -> τ
--- (A ⊗ B) n = A n × B n
--- infixl 60 _⊗_
---
--- -- Initial object
--- ⊥ : τ
--- ⊥ n = bot
---
--- -- Products
--- _⊕_ : τ -> τ -> τ
--- (A ⊕ B) n = A n ∨ B n
--- infixl 55 _⊕_
---
--- -- Exponentials
--- _⇒_ : τ -> τ -> τ
--- (A ⇒ B) n = A n -> B n
--- infixr 50 _⇒_
+            -- | Laws
+            iso-id₁ : iso<~ ∘ iso~> ≈ id {A}
+            iso-id₂ : iso~> ∘ iso<~ ≈ id {B}

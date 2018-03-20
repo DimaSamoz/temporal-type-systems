@@ -55,7 +55,7 @@ module _ {n} (ℂ : Category n) where
         -- η-expansion of function pairs (via morphisms)
         ⊗-η-exp : ∀{P} -> {m : P ~> A⊗B}
                -> ⟨ π₁ ∘ m , π₂ ∘ m ⟩ ≈ m
-        ⊗-η-exp = unique (IsEquivalence.refl ≈-equiv) (IsEquivalence.refl ≈-equiv)
+        ⊗-η-exp = unique r≈ r≈
 
         -- Pairing of projection functions is the identity
         ⊗-η-id : ⟨ π₁ , π₂ ⟩ ≈ id
@@ -67,10 +67,14 @@ module _ {n} (ℂ : Category n) where
                -> ⟨ p₁ , p₂ ⟩ ≈ ⟨ q₁ , q₂ ⟩
         ⟨,⟩-cong pr1 pr2 = unique (comm-π₁ ≈> pr1 [sym]) (comm-π₂ ≈> pr2 [sym])
 
+        ⟨,⟩-distrib : ∀{P Q} -> {h : P ~> Q} {f : Q ~> A} {g : Q ~> B}
+                  -> ⟨ f , g ⟩ ∘ h ≈ ⟨ f ∘ h , g ∘ h ⟩
+        ⟨,⟩-distrib = unique (∘-assoc [sym] ≈> ≈-cong-left comm-π₁)
+                            (∘-assoc [sym] ≈> ≈-cong-left comm-π₂) [sym]
+
 -- Type class for Cartesian categories
 record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
     open Category ℂ
-    open Product hiding (⟨_,_⟩)
     field
         -- | Data
         -- Terminal object
@@ -85,11 +89,66 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
     -- Shorthand for product object
     infixr 70 _⊗_
     _⊗_ : (A B : obj) -> obj
-    _⊗_ A B = A⊗B (prod A B)
+    _⊗_ A B = Product.A⊗B (prod A B)
 
     -- Parallel product of morphisms
     _*_ : {A B P Q : obj} -> (A ~> P) -> (B ~> Q)
        -> (A ⊗ B ~> P ⊗ Q)
-    _*_ {A} {B} {P} {Q} f g = ⟨ f ∘ π₁ (prod A B) , g ∘ π₂ (prod A B) ⟩
+    _*_ {A} {B} {P} {Q} f g = ⟨ f ∘ Product.π₁ (prod A B) , g ∘ Product.π₂ (prod A B) ⟩
         where
         open Product (prod P Q) using (⟨_,_⟩)
+
+    -- The terminal object is the unit for product
+    ⊤-left-cancel : ∀{A} -> ⊤ ⊗ A <~> A
+    ⊤-left-cancel {A} = record
+        { iso~> = π₂
+        ; iso<~ = ⟨ ! , id ⟩
+        ; iso-id₁ = iso-id₁-⊤
+        ; iso-id₂ = comm-π₂
+        }
+        where
+        open Product (prod ⊤ A)
+        open TerminalObj term
+
+        iso-id₁-⊤ : ⟨ ! , id ⟩ ∘ π₂ ≈ id
+        iso-id₁-⊤ =
+            begin
+                ⟨ ! , id ⟩ ∘ π₂
+            ≈⟨ ⟨,⟩-distrib ⟩
+                ⟨ ! ∘ π₂ , id ∘ π₂ ⟩
+            ≈⟨ ⟨,⟩-cong r≈ id-left ⟩
+                ⟨ ! ∘ π₂ , π₂ ⟩
+            ≈⟨ ⟨,⟩-cong (TerminalObj.unique term (! ∘ π₂)) r≈ ⟩
+                ⟨ ! , π₂ ⟩
+            ≈⟨ ⟨,⟩-cong ((TerminalObj.unique term π₁) [sym]) r≈ ⟩
+                ⟨ π₁ , π₂ ⟩
+            ≈⟨ ⊗-η-id ⟩
+                id
+            ∎
+
+    ⊤-right-cancel : ∀{A} -> A ⊗ ⊤ <~> A
+    ⊤-right-cancel {A} = record
+        { iso~> = π₁
+        ; iso<~ = ⟨ id , ! ⟩
+        ; iso-id₁ = iso-id₁-⊤
+        ; iso-id₂ = comm-π₁
+        }
+        where
+        open Product (prod A ⊤)
+        open TerminalObj term using (!)
+
+        iso-id₁-⊤ : ⟨ id , ! ⟩ ∘ π₁ ≈ id
+        iso-id₁-⊤ =
+            begin
+                ⟨ id , ! ⟩ ∘ π₁
+            ≈⟨ ⟨,⟩-distrib ⟩
+                ⟨ id ∘ π₁ , ! ∘ π₁ ⟩
+            ≈⟨ ⟨,⟩-cong id-left r≈ ⟩
+                ⟨ π₁ , ! ∘ π₁ ⟩
+            ≈⟨ ⟨,⟩-cong r≈ (TerminalObj.unique term (! ∘ π₁)) ⟩
+                ⟨ π₁ , ! ⟩
+            ≈⟨ ⟨,⟩-cong r≈ ((TerminalObj.unique term π₂) [sym]) ⟩
+                ⟨ π₁ , π₂ ⟩
+            ≈⟨ ⊗-η-id ⟩
+                id
+            ∎

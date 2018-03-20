@@ -134,6 +134,10 @@ _⊗_ : τ -> τ -> τ
 A ⊗ B = Product.A⊗B (Cartesian.prod cart A B)
 infixl 25 _⊗_
 
+-- Product of two morphisms
+⟨_,_⟩ : ∀{P A B : τ} -> (P ⇴ A) -> (P ⇴ B) -> (P ⇴ (A ⊗ B))
+⟨_,_⟩ {P} {A} {B} = Product.⟨_,_⟩ (Cartesian.prod cart A B)
+
 -- Sum object: pairwise sum of types
 _⊕_ : τ -> τ -> τ
 A ⊕ B = Sum.A⊕B (Cocartesian.sum cocart A B)
