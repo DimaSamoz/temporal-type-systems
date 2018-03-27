@@ -75,3 +75,12 @@ sound (cong-sig eq) {n} {a} rewrite sound eq {n} {a} = refl
 sound (cong-letSig eq N) {n} {a} rewrite sound eq {n} {a} = refl
 sound (cong-sample eq) {n} {a} rewrite sound eq {n} {a} = refl
 sound (cong-stable eq) = ext λ k → sound eq
+
+-- Soundness of computational term equality: equal terms have equal denotations
+sound′ : ∀{A Γ} {M₁ M₂ : Γ ⊨ A}
+         -- -> (n : ℕ) (⟦Γ⟧ : ⟦ Γ ⟧ₓ n)
+         -> Γ ⊨ M₁ ≡ M₂ ∷ A
+         -> ⟦ M₁ ⟧ᵐ ≈ ⟦ M₂ ⟧ᵐ
+sound′ (refl M) = refl
+sound′ (Eq′.sym eq) = ≡.sym (sound′ eq)
+sound′ (Eq′.trans eq₁ eq₂) = ≡.trans (sound′ eq₁) (sound′ eq₂)

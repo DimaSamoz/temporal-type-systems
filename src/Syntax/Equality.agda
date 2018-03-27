@@ -31,8 +31,11 @@ s₃ = svar (pop (pop top))
 
 
 -- β-η equality of terms
-data Eq (Γ : Context) : (A : Judgement) -> Γ ⊢ A -> (Γ ⊢ A) -> Set
+data Eq (Γ : Context) : (A : Judgement) -> Γ ⊢ A -> Γ ⊢ A -> Set
+data Eq′ (Γ : Context) : (A : Judgement) -> Γ ⊨ A -> Γ ⊨ A -> Set
 syntax Eq Γ A M N = Γ ⊢ M ≡ N ∷ A
+syntax Eq′ Γ A M N = Γ ⊨ M ≡ N ∷ A
+
 data Eq Γ where
     -- | Equivalence relation
     -- Reflexivity
@@ -190,3 +193,23 @@ data Eq Γ where
                             ->                 Γ ˢ ⊢ M₁ ≡ M₂ ∷ A now
                                       -------------------------------------
                             ->         Γ ⊢ stable M₁ ≡ stable M₂ ∷ A always
+
+data Eq′ (Γ : Context) where
+    -- | Equivalence relation
+    -- Reflexivity
+    refl  : ∀{A}            ->            (M : Γ ⊨ A)
+                                        ---------------
+                            ->           Γ ⊨ M ≡ M ∷ A
+
+    -- Symmetry
+    sym   : ∀{A}{M₁ M₂ : Γ ⊨ A}
+                            ->   Γ ⊨ M₁ ≡ M₂ ∷ A
+                                -----------------
+                            ->   Γ ⊨ M₂ ≡ M₁ ∷ A
+
+    -- Transitivity
+    trans : ∀{A}{M₁ M₂ M₃ : Γ ⊨ A}
+                            ->   Γ ⊨ M₁ ≡ M₂ ∷ A   ->   Γ ⊨ M₂ ≡ M₃ ∷ A
+                                -----------------------------------------
+                            ->               Γ ⊨ M₁ ≡ M₃ ∷ A
+
