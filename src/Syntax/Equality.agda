@@ -172,9 +172,21 @@ data Eq Γ where
                                       ------------------------------------
                             ->         Γ ⊢ sig M₁ ≡ sig M₂ ∷ Signal A now
 
-    -- Congruence in signal constructor
+    -- Congruence in signal binding
     cong-letSig : ∀{A B}{S₁ S₂ : Γ ⊢ Signal A now}
                             ->          Γ ⊢ S₁ ≡ S₂ ∷ Signal A now
                             ->          (N : Γ , A always ⊢ B now)
                                 ---------------------------------------------
                             ->   Γ ⊢ letSig S₁ In N ≡ letSig S₂ In N ∷ B now
+
+    -- Congruence in sampling
+    cong-pres : ∀{A}{M₁ M₂ : Γ ⊢ A always}
+                            ->              Γ ⊢ M₁ ≡ M₂ ∷ A always
+                                      -------------------------------------
+                            ->         Γ ⊢ present M₁ ≡ present M₂ ∷ A now
+
+    -- Congruence in stabilisation
+    cong-stable : ∀{A}{M₁ M₂ : Γ ˢ ⊢ A now}
+                            ->                 Γ ˢ ⊢ M₁ ≡ M₂ ∷ A now
+                                      -------------------------------------
+                            ->         Γ ⊢ stable M₁ ≡ stable M₂ ∷ A always
