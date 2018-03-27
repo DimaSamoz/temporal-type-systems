@@ -103,8 +103,8 @@ mutual
                                 ->                   Γ ⊨ A
 
         -- Computational signal destructor
-        letSig_InC_ : ∀{Γ A B}  ->   Γ ⊢ Signal A now   ->   Γ , A now ⊨ B now
-                                    -------------------------------------------
+        letSig_InC_ : ∀{Γ A B}  ->   Γ ⊢ Signal A now   ->   Γ , A always ⊨ B now
+                                    ----------------------------------------------
                                 ->                 Γ ⊨ B now
 
         -- Event destructor

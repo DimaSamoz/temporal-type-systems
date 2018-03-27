@@ -56,7 +56,7 @@ mutual
     -- Denotation of computational terms as Kleisli morphisms from contexts to types.
     ⟦_⟧ᵐ : ∀{Γ A} -> Γ ⊨ A -> (⟦ Γ ⟧ₓ ⇴ ◇ ⟦ A ⟧ⱼ)
     ⟦_⟧ᵐ {A = A} (pure M) n env = η.at ⟦ A ⟧ⱼ n (⟦ M ⟧ₘ n env)
-    ⟦ letSig S InC C ⟧ᵐ n env = ⟦ C ⟧ᵐ n (env , (⟦ S ⟧ₘ n env n))
+    ⟦ letSig S InC C ⟧ᵐ n env = ⟦ C ⟧ᵐ n (env , (⟦ S ⟧ₘ n env))
     ⟦ letEvt_In_ {Γ} {A} E C ⟧ᵐ n env =
         ⟦ E ⟧ₘ n env >>= λ k ⟦A⟧ → ⟦ C ⟧ᵐ k (⟦ Γ ⟧ˢₓ n env k , ⟦A⟧)
     ⟦ select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ n env =

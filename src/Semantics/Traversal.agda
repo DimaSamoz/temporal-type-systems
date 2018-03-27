@@ -96,8 +96,8 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
         traverse-sound′ σ (pure M) n ⟦Δ⟧ rewrite traverse-sound σ M n ⟦Δ⟧ = refl
         traverse-sound′ σ (letSig_InC_ {A = A} S C) n ⟦Δ⟧
             rewrite traverse-sound σ S n ⟦Δ⟧
-                  | traverse-sound′ (σ ↑ k) C n (⟦Δ⟧ , ⟦ S ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧) n)
-                  | ⟦↑⟧ (A now) σ n ⟦Δ⟧ (⟦ S ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧) n) = refl
+                  | traverse-sound′ (σ ↑ k) C n (⟦Δ⟧ , ⟦ S ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧))
+                  | ⟦↑⟧ (A always) σ n ⟦Δ⟧ (⟦ S ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)) = refl
         traverse-sound′ {Γ} {Δ} σ (letEvt_In_ {A = A} E C) n ⟦Δ⟧ =
             begin
                 ⟦ traverse′ σ (letEvt E In C) ⟧ᵐ n ⟦Δ⟧
