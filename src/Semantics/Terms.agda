@@ -42,12 +42,12 @@ mutual
     ⟦ inl M ⟧ₘ n env = inj₁ (⟦ M ⟧ₘ n env)
     ⟦ inr M ⟧ₘ n env = inj₂ (⟦ M ⟧ₘ n env)
     ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ n env with ⟦ M ⟧ₘ n env
-    ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ n env | inj₁ x = ⟦ lam B₁ ⟧ₘ n env x
-    ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ n env | inj₂ y = ⟦ lam B₂ ⟧ₘ n env y
+    ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ n env | inj₁ x = ⟦ B₁ ⟧ₘ n (env , x)
+    ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ n env | inj₂ y = ⟦ B₂ ⟧ₘ n (env , y)
     ⟦ svar _∈_.top ⟧ₘ n (⟦Γ⟧ , ⟦A⟧) = ⟦A⟧
     ⟦ svar (pop x) ⟧ₘ n (⟦Γ⟧ , _) = ⟦ svar x ⟧ₘ n ⟦Γ⟧
     ⟦ present S ⟧ₘ n env = ⟦ S ⟧ₘ n env n
-    ⟦_⟧ₘ {Γ} (stable S) n env = λ k → ⟦ S ⟧ₘ k (⟦ Γ ⟧ˢₓ n env k)
+    ⟦ stable {Γ} S ⟧ₘ n env = λ k → ⟦ S ⟧ₘ k (⟦ Γ ⟧ˢₓ n env k)
     ⟦ sig S ⟧ₘ n env = ⟦ S ⟧ₘ n env
     ⟦ letSig S In B ⟧ₘ n env = ⟦ B ⟧ₘ n (env , ⟦ S ⟧ₘ n env)
     ⟦ event E ⟧ₘ n env = ⟦ E ⟧ᵐ n env
@@ -57,12 +57,8 @@ mutual
     ⟦_⟧ᵐ : ∀{Γ A} -> Γ ⊨ A -> (⟦ Γ ⟧ₓ ⇴ ◇ ⟦ A ⟧ⱼ)
     ⟦_⟧ᵐ {A = A} (pure M) n env = η.at ⟦ A ⟧ⱼ n (⟦ M ⟧ₘ n env)
     ⟦ letSig S InC C ⟧ᵐ n env = ⟦ C ⟧ᵐ n (env , (⟦ S ⟧ₘ n env n))
-    ⟦_⟧ᵐ {Γ} (letEvt_In_ {A = A} {B} E C) n env = ⟦◇A⟧ >>= ⟦A=>◇B⟧
-            where
-            ⟦◇A⟧ : (◇ ⟦ A ⟧ₜ) n
-            ⟦◇A⟧ = ⟦ E ⟧ₘ n env
-            ⟦A=>◇B⟧ : ⟦ A ⟧ₜ ⇴ (◇ ⟦ B ⟧ₜ)
-            ⟦A=>◇B⟧ k ⟦A⟧ = ⟦ C ⟧ᵐ k (⟦ Γ ⟧ˢₓ n env k , ⟦A⟧)
-    ⟦_⟧ᵐ {Γ} (select_↦_||_↦_||both↦_ {A = A} {B} {C} E₁ C₁ E₂ C₂ C₃) n env =
+    ⟦ letEvt_In_ {Γ} {A} E C ⟧ᵐ n env =
+        ⟦ E ⟧ₘ n env >>= λ k ⟦A⟧ → ⟦ C ⟧ᵐ k (⟦ Γ ⟧ˢₓ n env k , ⟦A⟧)
+    ⟦ select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ n env =
         ◇-select n (⟦ E₁ ⟧ₘ n env , ⟦ E₂ ⟧ₘ n env)
         >>= ⟦select⟧ Γ A B C n env ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ
