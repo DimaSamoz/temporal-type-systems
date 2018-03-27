@@ -72,7 +72,7 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
         traverse-sound ● (svar ()) n ⟦Δ⟧
         traverse-sound (σ ▸ T) (svar top) n ⟦Δ⟧ = ⟦𝓉⟧ T n ⟦Δ⟧
         traverse-sound (σ ▸ T) (svar (pop x)) n ⟦Δ⟧ = traverse-sound σ (svar x) n ⟦Δ⟧
-        traverse-sound σ (present M) n ⟦Δ⟧ rewrite traverse-sound σ M n ⟦Δ⟧ = refl
+        traverse-sound σ (sample M) n ⟦Δ⟧ rewrite traverse-sound σ M n ⟦Δ⟧ = refl
         traverse-sound {Γ} {Δ} {A} σ (stable M) n ⟦Δ⟧ = ext λ l ->
             begin
                 ⟦ traverse {Γ} {Δ} {A} σ (stable M) ⟧ₘ n ⟦Δ⟧ l

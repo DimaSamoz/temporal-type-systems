@@ -73,5 +73,5 @@ sound (cong-inr eq) {n} {a} rewrite sound eq {n} {a} = refl
 sound (cong-case eq N₁ N₂) {n} {a} rewrite sound eq {n} {a} = refl
 sound (cong-sig eq) {n} {a} rewrite sound eq {n} {a} = refl
 sound (cong-letSig eq N) {n} {a} rewrite sound eq {n} {a} = refl
-sound (cong-pres eq) {n} {a} rewrite sound eq {n} {a} = refl
+sound (cong-sample eq) {n} {a} rewrite sound eq {n} {a} = refl
 sound (cong-stable eq) = ext λ k → sound eq

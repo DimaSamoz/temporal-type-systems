@@ -69,8 +69,8 @@ mutual
                                                   --------------
                                 ->                 Γ ⊢ A always
 
-        -- A stable type is available now
-        present : ∀{Γ A}        ->                 Γ ⊢ A always
+        -- A stable type can be sampled now
+        sample : ∀{Γ A}         ->                 Γ ⊢ A always
                                                   --------------
                                 ->                   Γ ⊢ A now
 

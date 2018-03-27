@@ -46,7 +46,7 @@ mutual
     ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ n env | inj₂ y = ⟦ B₂ ⟧ₘ n (env , y)
     ⟦ svar _∈_.top ⟧ₘ n (⟦Γ⟧ , ⟦A⟧) = ⟦A⟧
     ⟦ svar (pop x) ⟧ₘ n (⟦Γ⟧ , _) = ⟦ svar x ⟧ₘ n ⟦Γ⟧
-    ⟦ present S ⟧ₘ n env = ⟦ S ⟧ₘ n env n
+    ⟦ sample S ⟧ₘ n env = ⟦ S ⟧ₘ n env n
     ⟦ stable {Γ} S ⟧ₘ n env = λ k → ⟦ S ⟧ₘ k (⟦ Γ ⟧ˢₓ n env k)
     ⟦ sig S ⟧ₘ n env = ⟦ S ⟧ₘ n env
     ⟦ letSig S In B ⟧ₘ n env = ⟦ B ⟧ₘ n (env , ⟦ S ⟧ₘ n env)

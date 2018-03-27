@@ -180,10 +180,10 @@ data Eq Γ where
                             ->   Γ ⊢ letSig S₁ In N ≡ letSig S₂ In N ∷ B now
 
     -- Congruence in sampling
-    cong-pres : ∀{A}{M₁ M₂ : Γ ⊢ A always}
+    cong-sample : ∀{A}{M₁ M₂ : Γ ⊢ A always}
                             ->              Γ ⊢ M₁ ≡ M₂ ∷ A always
                                       -------------------------------------
-                            ->         Γ ⊢ present M₁ ≡ present M₂ ∷ A now
+                            ->         Γ ⊢ sample M₁ ≡ sample M₂ ∷ A now
 
     -- Congruence in stabilisation
     cong-stable : ∀{A}{M₁ M₂ : Γ ˢ ⊢ A now}

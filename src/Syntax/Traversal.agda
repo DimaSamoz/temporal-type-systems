@@ -81,7 +81,7 @@ module K {𝒮 : Schema} (k : Kit 𝒮) where
                                    inl↦ traverse (σ ↑ k) N₁
                                  ||inr↦ traverse (σ ↑ k) N₂
         traverse σ (svar x)    = 𝓉 (subst-var σ x)
-        traverse σ (present M) = present (traverse σ M)
+        traverse σ (sample M) = sample (traverse σ M)
         traverse σ (stable M)  = stable (traverse (σ ↓ˢ k) M)
         traverse σ (sig M)     = sig (traverse σ M)
         traverse σ (letSig S In M) = letSig traverse σ S
