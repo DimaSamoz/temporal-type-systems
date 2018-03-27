@@ -40,7 +40,7 @@ infixl 45 _⌊⌋_
 -- Type in the middle of a context
 _⌊_⌋_ : Context -> Judgement -> Context -> Context
 Γ ⌊ A ⌋ Γ′ = Γ , A ⌊⌋ Γ′
-infix 40 _⌊_⌋_
+infixl 45 _⌊_⌋_
 
 -- Stabilise the context by filtering out the stable types
 _ˢ : Context -> Context
@@ -102,10 +102,15 @@ infix 30 _⊆_
 Γ⊆Γ⌊⌋Δ Γ ∙       = refl
 Γ⊆Γ⌊⌋Δ Γ (Δ , x) = drop (Γ⊆Γ⌊⌋Δ Γ Δ)
 
--- Context of two contexts is associative
+-- Concatenation of two contexts is associative
 ⌊⌋-assoc : ∀(Γ Δ Ξ : Context) -> (Γ ⌊⌋ Δ) ⌊⌋ Ξ ≡ Γ ⌊⌋ (Δ ⌊⌋ Ξ)
 ⌊⌋-assoc Γ Δ ∙ = refl
 ⌊⌋-assoc Γ Δ (Ξ , C) = cong (_, C) (⌊⌋-assoc Γ Δ Ξ)
+
+-- Concatenation of two spliced contexts is associative
+⌊A⌋-assoc : ∀(Γ Δ Ξ : Context) A B -> (Γ ⌊ A ⌋ Δ) ⌊ B ⌋ Ξ ≡ Γ ⌊ A ⌋ (Δ ⌊ B ⌋ Ξ)
+⌊A⌋-assoc Γ Δ ∙ A B = refl
+⌊A⌋-assoc Γ Δ (Ξ , C) A B = cong (_, C) (⌊A⌋-assoc Γ Δ Ξ A B)
 
 
 -- | Stabilisation

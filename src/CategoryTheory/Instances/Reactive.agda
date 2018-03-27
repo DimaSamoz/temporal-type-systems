@@ -138,6 +138,14 @@ infixl 25 _⊗_
 ⟨_,_⟩ : ∀{P A B : τ} -> (P ⇴ A) -> (P ⇴ B) -> (P ⇴ (A ⊗ B))
 ⟨_,_⟩ {P} {A} {B} = Product.⟨_,_⟩ (Cartesian.prod cart A B)
 
+-- First projection morphism
+π₁ : ∀{A B : τ} -> (A ⊗ B ⇴ A)
+π₁ {A} {B} = Product.π₁ (Cartesian.prod cart A B)
+
+-- Second projection morphism
+π₂ : ∀{A B : τ} -> (A ⊗ B ⇴ B)
+π₂ {A} {B} = Product.π₂ (Cartesian.prod cart A B)
+
 -- Sum object: pairwise sum of types
 _⊕_ : τ -> τ -> τ
 A ⊕ B = Sum.A⊕B (Cocartesian.sum cocart A B)
