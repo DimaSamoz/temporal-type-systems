@@ -37,19 +37,26 @@ open K 𝒯erm
 
 -- Soundness of term equality: equal terms have equal denotations
 sound : ∀{A Γ} {M₁ M₂ : Γ ⊢ A}
+         -- -> (n : ℕ) (⟦Γ⟧ : ⟦ Γ ⟧ₓ n)
          -> Γ ⊢ M₁ ≡ M₂ ∷ A
          -> ⟦ M₁ ⟧ₘ ≈ ⟦ M₂ ⟧ₘ
 sound (refl M) = refl
 sound (Eq.sym eq) = ≡.sym (sound eq)
 sound (Eq.trans eq₁ eq₂) = ≡.trans (sound eq₁) (sound eq₂)
+
 sound (β-lam N M) {n} {⟦Γ⟧} rewrite subst-sound M N {n} {⟦Γ⟧} = refl
 sound (β-fst M N) = refl
 sound (β-snd M N) = refl
+sound (β-inl M N₁ N₂) {n} {⟦Γ⟧} rewrite subst-sound M N₁ {n} {⟦Γ⟧} = refl
+sound (β-inr M N₁ N₂) {n} {⟦Γ⟧} rewrite subst-sound M N₂ {n} {⟦Γ⟧} = refl
 sound (η-lam {A} M) {n} {⟦Γ⟧} = ext λ ⟦A⟧ →
                     cong (λ x → x ⟦A⟧) (≡.sym (⟦𝓌⟧ (A now) M n ⟦Γ⟧ ⟦A⟧))
 sound (η-pair M) {n} {⟦Γ⟧} with ⟦ M ⟧ₘ n ⟦Γ⟧
-sound (η-pair M) {n} {a} | _ , _ = refl
+sound (η-pair M) {n} {⟦Γ⟧} | _ , _ = refl
 sound (η-unit M) = refl
+sound (η-sum M) {n} {⟦Γ⟧} with ⟦ M ⟧ₘ n ⟦Γ⟧
+sound (η-sum M) {n} {a} | inj₁ _ = refl
+sound (η-sum M) {n} {a} | inj₂ _ = refl
 sound (cong-pair eq₁ eq₂) {n} {a} rewrite sound eq₁ {n} {a}
                                         | sound eq₂ {n} {a} = refl
 sound (cong-fst eq) {n} {a} rewrite sound eq {n} {a} = refl
@@ -57,3 +64,6 @@ sound (cong-snd eq) {n} {a} rewrite sound eq {n} {a} = refl
 sound (cong-lam eq) {n} {a} = ext λ ⟦A⟧ → sound eq
 sound (cong-app eq₁ eq₂) {n} {a} rewrite sound eq₁ {n} {a}
                                        | sound eq₂ {n} {a} = refl
+sound (cong-inl eq) {n} {a} rewrite sound eq {n} {a} = refl
+sound (cong-inr eq) {n} {a} rewrite sound eq {n} {a} = refl
+sound (cong-case eq N₁ N₂) {n} {a} rewrite sound eq {n} {a} = refl

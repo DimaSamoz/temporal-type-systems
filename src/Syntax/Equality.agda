@@ -58,7 +58,6 @@ data Eq Γ where
                                -------------------------------------------
                             ->      Γ ⊢ lam N $ M ≡ [ M /] N ∷ B now
 
-
     -- β-reduction for first projection
 
     β-fst : ∀{A B}          ->        (M : Γ ⊢ A now)   (N : Γ ⊢ B now)
@@ -69,6 +68,20 @@ data Eq Γ where
     β-snd : ∀{A B}          ->        (M : Γ ⊢ A now)   (N : Γ ⊢ B now)
                                      -----------------------------------
                             ->          Γ ⊢ snd [ M ,, N ] ≡ N ∷ B now
+
+    -- β-reduction for case split on first injection
+    β-inl : ∀{A B C}        ->                    (M : Γ ⊢ A now)
+                                 (N₁ : Γ , A now ⊢ C now) (N₂ : Γ , B now ⊢ C now)
+                                ---------------------------------------------------
+                            ->       Γ ⊢ case (inl M) inl↦ N₁
+                                                    ||inr↦ N₂ ≡ [ M /] N₁ ∷ C now
+
+    -- β-reduction for case split on first injection
+    β-inr : ∀{A B C}        ->                    (M : Γ ⊢ B now)
+                                 (N₁ : Γ , A now ⊢ C now) (N₂ : Γ , B now ⊢ C now)
+                                ---------------------------------------------------
+                            ->       Γ ⊢ case (inr M) inl↦ N₁
+                                                    ||inr↦ N₂ ≡ [ M /] N₂ ∷ C now
 
     -- | η-equality
     -- η-expansion for functions
@@ -85,6 +98,12 @@ data Eq Γ where
     η-unit :                                 (M : Γ ⊢ Unit now)
                                           -------------------------
                             ->             Γ ⊢ M ≡ unit ∷ Unit now
+
+    -- η-expansion for sums
+    η-sum : ∀{A B}          ->                (M : Γ ⊢ A + B now)
+                                    ------------------------------------------
+                            ->        Γ ⊢ M ≡ case M inl↦ inl x₁
+                                                   ||inr↦ inr x₁ ∷ A + B now
 
     -- | Congruence rules
     -- Congruence in pairs
@@ -116,3 +135,24 @@ data Eq Γ where
                             ->   Γ ⊢ N₁ ≡ N₂ ∷ A => B now  ->  Γ ⊢ M₁ ≡ M₂ ∷ A now
                                 ---------------------------------------------------
                             ->            Γ ⊢ N₁ $ M₁ ≡ N₂ $ M₂ ∷ B now
+
+    -- Congruence in case split
+    cong-case : ∀{A B C}{M₁ M₂ : Γ ⊢ A + B now}
+                            ->               Γ ⊢ M₁ ≡ M₂ ∷ A + B now
+                            ->   (N₁ : Γ , A now ⊢ C now) (N₂ : Γ , B now ⊢ C now)
+                                ---------------------------------------------------
+                            ->          Γ ⊢ case M₁ inl↦ N₁ ||inr↦ N₂
+                                          ≡ case M₂ inl↦ N₁ ||inr↦ N₂ ∷ C now
+
+    -- Congruence in first injection
+    cong-inl : ∀{A B}{M₁ M₂ : Γ ⊢ A now}
+                            ->              Γ ⊢ M₁ ≡ M₂ ∷ A now
+                                      ------------------------------------
+                            ->         Γ ⊢ inl M₁ ≡ inl M₂ ∷ A + B now
+
+    -- Congruence in second injection
+    cong-inr : ∀{A B}{M₁ M₂ : Γ ⊢ B now}
+                            ->              Γ ⊢ M₁ ≡ M₂ ∷ B now
+                                      ------------------------------------
+                            ->         Γ ⊢ inr M₁ ≡ inr M₂ ∷ A + B now
+
