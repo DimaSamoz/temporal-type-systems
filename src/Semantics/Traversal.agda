@@ -333,3 +333,9 @@ subst-sound : ∀{Γ A B} (M : Γ ⊢ A) (N : Γ ,, A ⊢ B)
            -> ⟦ [ M /] N ⟧ₘ ≈ ⟦ N ⟧ₘ ∘ ⟨ id , ⟦ M ⟧ₘ ⟩
 subst-sound M N {n} {a} rewrite ⟦sub-topₛ⟧ M n a =
     substitute-sound (sub-topₛ 𝒯ermₛ M) N
+
+-- Top substitution is sound (full categorical proof)
+subst-sound′ : ∀{Γ A B} (M : Γ ⊢ A) (N : Γ ,, A ⊨ B)
+           -> ⟦ [ M /′] N ⟧ᵐ ≈ ⟦ N ⟧ᵐ ∘ ⟨ id , ⟦ M ⟧ₘ ⟩
+subst-sound′ M N {n} {a} rewrite ⟦sub-topₛ⟧ M n a =
+    traverse-sound′ ⟦𝒯erm⟧ (sub-topₛ 𝒯ermₛ M) N n a
