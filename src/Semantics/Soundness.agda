@@ -49,6 +49,8 @@ sound (β-fst M N) = refl
 sound (β-snd M N) = refl
 sound (β-inl M N₁ N₂) {n} {⟦Γ⟧} rewrite subst-sound M N₁ {n} {⟦Γ⟧} = refl
 sound (β-inr M N₁ N₂) {n} {⟦Γ⟧} rewrite subst-sound M N₂ {n} {⟦Γ⟧} = refl
+sound (β-sig N M) {n} {⟦Γ⟧} rewrite subst-sound M N {n} {⟦Γ⟧} = refl
+
 sound (η-lam {A} M) {n} {⟦Γ⟧} = ext λ ⟦A⟧ →
                     cong (λ x → x ⟦A⟧) (≡.sym (⟦𝓌⟧ (A now) M n ⟦Γ⟧ ⟦A⟧))
 sound (η-pair M) {n} {⟦Γ⟧} with ⟦ M ⟧ₘ n ⟦Γ⟧
@@ -57,6 +59,8 @@ sound (η-unit M) = refl
 sound (η-sum M) {n} {⟦Γ⟧} with ⟦ M ⟧ₘ n ⟦Γ⟧
 sound (η-sum M) {n} {a} | inj₁ _ = refl
 sound (η-sum M) {n} {a} | inj₂ _ = refl
+sound (η-sig M) = refl
+
 sound (cong-pair eq₁ eq₂) {n} {a} rewrite sound eq₁ {n} {a}
                                         | sound eq₂ {n} {a} = refl
 sound (cong-fst eq) {n} {a} rewrite sound eq {n} {a} = refl
@@ -67,3 +71,5 @@ sound (cong-app eq₁ eq₂) {n} {a} rewrite sound eq₁ {n} {a}
 sound (cong-inl eq) {n} {a} rewrite sound eq {n} {a} = refl
 sound (cong-inr eq) {n} {a} rewrite sound eq {n} {a} = refl
 sound (cong-case eq N₁ N₂) {n} {a} rewrite sound eq {n} {a} = refl
+sound (cong-sig eq) {n} {a} rewrite sound eq {n} {a} = refl
+sound (cong-letSig eq N) {n} {a} rewrite sound eq {n} {a} = refl

@@ -83,6 +83,11 @@ data Eq Γ where
                             ->       Γ ⊢ case (inr M) inl↦ N₁
                                                     ||inr↦ N₂ ≡ [ M /] N₂ ∷ C now
 
+    -- β-reduction for signal binding
+    β-sig : ∀{A B}          ->  (N : Γ , A always ⊢ B now)   (M : Γ ⊢ A always)
+                               --------------------------------------------------
+                            ->     Γ ⊢ letSig sig M In N ≡ [ M /] N ∷ B now
+
     -- | η-equality
     -- η-expansion for functions
     η-lam : ∀{A B}          ->              (M : Γ ⊢ A => B now)
@@ -104,6 +109,11 @@ data Eq Γ where
                                     ------------------------------------------
                             ->        Γ ⊢ M ≡ case M inl↦ inl x₁
                                                    ||inr↦ inr x₁ ∷ A + B now
+
+    -- η-expansion for signals
+    η-sig : ∀{A}            ->                (M : Γ ⊢ Signal A now)
+                                    -------------------------------------------
+                            ->       Γ ⊢ M ≡ letSig M In sig s₁ ∷ Signal A now
 
     -- | Congruence rules
     -- Congruence in pairs
@@ -156,3 +166,15 @@ data Eq Γ where
                                       ------------------------------------
                             ->         Γ ⊢ inr M₁ ≡ inr M₂ ∷ A + B now
 
+    -- Congruence in signal constructor
+    cong-sig : ∀{A}{M₁ M₂ : Γ ⊢ A always}
+                            ->              Γ ⊢ M₁ ≡ M₂ ∷ A always
+                                      ------------------------------------
+                            ->         Γ ⊢ sig M₁ ≡ sig M₂ ∷ Signal A now
+
+    -- Congruence in signal constructor
+    cong-letSig : ∀{A B}{S₁ S₂ : Γ ⊢ Signal A now}
+                            ->          Γ ⊢ S₁ ≡ S₂ ∷ Signal A now
+                            ->          (N : Γ , A always ⊢ B now)
+                                ---------------------------------------------
+                            ->   Γ ⊢ letSig S₁ In N ≡ letSig S₂ In N ∷ B now
