@@ -59,7 +59,7 @@ data Eq Γ where
     -- β-reduction for function application
     β-lam : ∀{A B}          ->  (N : Γ , A now ⊢ B now)   (M : Γ ⊢ A now)
                                -------------------------------------------
-                            ->      Γ ⊢ lam N $ M ≡ [ M /] N ∷ B now
+                            ->      Γ ⊢ (lam N) $ M ≡ [ M /] N ∷ B now
 
     -- β-reduction for first projection
 
@@ -89,7 +89,7 @@ data Eq Γ where
     -- β-reduction for signal binding
     β-sig : ∀{A B}          ->  (N : Γ , A always ⊢ B now)   (M : Γ ⊢ A always)
                                --------------------------------------------------
-                            ->     Γ ⊢ letSig sig M In N ≡ [ M /] N ∷ B now
+                            ->     Γ ⊢ letSig (sig M) In N ≡ [ M /] N ∷ B now
 
     -- | η-equality
     -- η-expansion for functions
@@ -116,7 +116,7 @@ data Eq Γ where
     -- η-expansion for signals
     η-sig : ∀{A}            ->                (M : Γ ⊢ Signal A now)
                                     -------------------------------------------
-                            ->       Γ ⊢ M ≡ letSig M In sig s₁ ∷ Signal A now
+                            ->       Γ ⊢ M ≡ letSig M In (sig s₁) ∷ Signal A now
 
     -- | Congruence rules
     -- Congruence in pairs
@@ -217,13 +217,13 @@ data Eq′ (Γ : Context) where
     -- β-reduction for signal binding in computational terms
     β-sig′ : ∀{A B}         ->  (C : Γ , A always ⊨ B now)   (M : Γ ⊢ A always)
                                --------------------------------------------------
-                            ->     Γ ⊨ letSig sig M InC C ≡ [ M /′] C ∷ B now
+                            ->     Γ ⊨ letSig (sig M) InC C ≡ [ M /′] C ∷ B now
 
     -- | η-equality
     -- η-expansion for signals in computational terms
     η-sig′ : ∀{A}           ->                  (M : Γ ⊢ Signal A now)
                                --------------------------------------------------------
-                            ->  Γ ⊨ pure M ≡ letSig M InC pure (sig s₁) ∷ Signal A now
+                            ->  Γ ⊨ pure M ≡ letSig M InC (pure (sig s₁)) ∷ Signal A now
 
     -- | Congruence rules
     -- Congruence in pure computational term
