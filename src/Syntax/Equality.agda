@@ -39,15 +39,15 @@ syntax Eq′ Γ A M N = Γ ⊨ M ≡ N ∷ A
 data Eq Γ where
     -- | Equivalence relation
     -- Reflexivity
-    refl  : ∀{A}            ->            (M : Γ ⊢ A)
-                                        ---------------
-                            ->           Γ ⊢ M ≡ M ∷ A
+    refl  : ∀{A}            ->               (M : Γ ⊢ A)
+                                           ---------------
+                            ->              Γ ⊢ M ≡ M ∷ A
 
     -- Symmetry
     sym   : ∀{A}{M₁ M₂ : Γ ⊢ A}
-                            ->   Γ ⊢ M₁ ≡ M₂ ∷ A
-                                -----------------
-                            ->   Γ ⊢ M₂ ≡ M₁ ∷ A
+                            ->              Γ ⊢ M₁ ≡ M₂ ∷ A
+                                           -----------------
+                            ->              Γ ⊢ M₂ ≡ M₁ ∷ A
 
     -- Transitivity
     trans : ∀{A}{M₁ M₂ M₃ : Γ ⊢ A}
@@ -197,15 +197,15 @@ data Eq Γ where
 data Eq′ (Γ : Context) where
     -- | Equivalence relation
     -- Reflexivity
-    refl  : ∀{A}            ->            (M : Γ ⊨ A)
-                                        ---------------
-                            ->           Γ ⊨ M ≡ M ∷ A
+    refl  : ∀{A}            ->                (M : Γ ⊨ A)
+                                            ---------------
+                            ->               Γ ⊨ M ≡ M ∷ A
 
     -- Symmetry
     sym   : ∀{A}{M₁ M₂ : Γ ⊨ A}
-                            ->   Γ ⊨ M₁ ≡ M₂ ∷ A
-                                -----------------
-                            ->   Γ ⊨ M₂ ≡ M₁ ∷ A
+                            ->              Γ ⊨ M₁ ≡ M₂ ∷ A
+                                           -----------------
+                            ->              Γ ⊨ M₂ ≡ M₁ ∷ A
 
     -- Transitivity
     trans : ∀{A}{M₁ M₂ M₃ : Γ ⊨ A}
@@ -213,3 +213,28 @@ data Eq′ (Γ : Context) where
                                 -----------------------------------------
                             ->               Γ ⊨ M₁ ≡ M₃ ∷ A
 
+    -- | β-equality
+    -- β-reduction for signal binding in computational terms
+    β-sig′ : ∀{A B}         ->  (C : Γ , A always ⊨ B now)   (M : Γ ⊢ A always)
+                               --------------------------------------------------
+                            ->     Γ ⊨ letSig sig M InC C ≡ [ M /′] C ∷ B now
+
+    -- | η-equality
+    -- η-expansion for signals in computational terms
+    η-sig′ : ∀{A}           ->                  (M : Γ ⊢ Signal A now)
+                               --------------------------------------------------------
+                            ->  Γ ⊨ pure M ≡ letSig M InC pure (sig s₁) ∷ Signal A now
+
+    -- | Congruence rules
+    -- Congruence in pure computational term
+    cong-pure′ : ∀{A}{M₁ M₂ : Γ ⊢ A}
+                            ->                Γ ⊢ M₁ ≡ M₂ ∷ A
+                                         ---------------------------
+                            ->            Γ ⊨ pure M₁ ≡ pure M₂ ∷ A
+
+    -- Congruence in signal binding
+    cong-letSig′ : ∀{A B}{S₁ S₂ : Γ ⊢ Signal A now}
+                            ->            Γ ⊢ S₁ ≡ S₂ ∷ Signal A now
+                            ->            (N : Γ , A always ⊨ B now)
+                                -----------------------------------------------
+                            ->   Γ ⊨ letSig S₁ InC N ≡ letSig S₂ InC N ∷ B now

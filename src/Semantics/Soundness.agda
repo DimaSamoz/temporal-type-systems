@@ -84,3 +84,7 @@ sound′ : ∀{A Γ} {M₁ M₂ : Γ ⊨ A}
 sound′ (refl M) = refl
 sound′ (Eq′.sym eq) = ≡.sym (sound′ eq)
 sound′ (Eq′.trans eq₁ eq₂) = ≡.trans (sound′ eq₁) (sound′ eq₂)
+sound′ (β-sig′ C M) {n} {⟦Γ⟧} rewrite subst-sound′ M C {n} {⟦Γ⟧} = refl
+sound′ (η-sig′ M) = refl
+sound′ (cong-pure′ eq) {n} {⟦Γ⟧} rewrite sound eq {n} {⟦Γ⟧} = refl
+sound′ (cong-letSig′ eq B) {n} {⟦Γ⟧} rewrite sound eq {n} {⟦Γ⟧} = refl
