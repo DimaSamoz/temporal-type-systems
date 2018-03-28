@@ -197,3 +197,15 @@ substitution′ Γ Γ′ M = substitute′ (sub-midₛ 𝒯ermₛ Γ Γ′ M)
                         --------------------------
                      ->           Γ ⊨ B
 [_/′] M = substitute′ (sub-topₛ 𝒯ermₛ M)
+
+-- Top substitution of computation into a computation
+⟨_/⟩ : ∀ {Γ A B}      ->  Γ ⊨ A now  ->   Γ ˢ , A now ⊨ B now
+                        ------------------------------------
+                     ->              Γ ⊨ B now
+⟨ pure M               /⟩ D = substitute′ (sub-topˢₛ 𝒯ermₛ M) D
+⟨ letSig S InC C       /⟩ D = letSig S InC ⟨ C /⟩ (substitute′ ((idₛ 𝒯erm) ⁺ 𝒯erm ↑ 𝒯erm) D)
+⟨ (letEvt_In_ {Γ} E C) /⟩ D = letEvt E In  ⟨ C /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D)
+⟨ select_↦_||_↦_||both↦_ {Γ} E₁ C₁ E₂ C₂ C₃ /⟩ D
+                            = select E₁ ↦ ⟨ C₁ /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D)
+                                   || E₂ ↦ ⟨ C₂ /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D)
+                                   ||both↦ ⟨ C₃ /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D)

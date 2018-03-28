@@ -88,8 +88,15 @@ refl ⊆ₛ k     = idₛ k
 (keep s) ⊆ₛ k = (s ⊆ₛ k) ↑ k
 (drop s) ⊆ₛ k = (s ⊆ₛ k) ⁺ k
 
+-- Substitution from propositional equality of contexts
 _≡ₛ_ : ∀ {𝒮 Γ Δ} -> Γ ≡ Δ -> Kit 𝒮 -> Subst 𝒮 Γ Δ
 refl ≡ₛ k = idₛ k
+
+-- Substitution from idempotence of stabilisation
+_ˢˢₛ_ : ∀ {𝒮} -> (Γ : Context) -> Kit 𝒮 -> Subst 𝒮 (Γ ˢ) (Γ ˢ ˢ)
+∙ ˢˢₛ k = ●
+(Γ , A now) ˢˢₛ k = Γ ˢˢₛ k
+(Γ , A always) ˢˢₛ k = (Γ ˢˢₛ k) ↑ k
 
 -- | Standard substitutions
 -- | Common transformations between contexts
@@ -169,6 +176,10 @@ module _ {𝒮 : Schema} (sk : SubstKit 𝒮) where
     -- Substitution for the top of the context
     sub-topₛ : ∀{A Γ} -> 𝒮 Γ A -> Subst 𝒮 (Γ , A) Γ
     sub-topₛ T = (idₛ 𝓀) ▸ T
+
+    -- Substitution for the top of a stabilised context
+    sub-topˢₛ : ∀{Γ A} -> 𝒮 Γ A -> Subst 𝒮 (Γ ˢ , A) Γ
+    sub-topˢₛ {Γ} T = (Γˢ⊆Γ Γ ⊆ₛ 𝓀) ▸ T
 
     -- Substitution for the middle of the context
     sub-midₛ : ∀{A} Γ Γ′ -> 𝒮 (Γ ⌊⌋ Γ′) A -> Subst 𝒮 (Γ ⌊ A ⌋ Γ′) (Γ ⌊⌋ Γ′)
