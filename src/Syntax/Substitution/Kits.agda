@@ -1,7 +1,7 @@
 
 -- Syntactic kits from Conor McBride's
 -- "Type-Preserving Renaming and Substitution"
-module Syntax.Kit where
+module Syntax.Substitution.Kits where
 
 open import Syntax.Types
 open import Syntax.Context

@@ -1,11 +1,11 @@
 
 -- Semantics of syntactic kits and explicit substitutions
-module Semantics.Kit where
+module Semantics.Substitution.Kits where
 
 open import Syntax.Types
 open import Syntax.Context renaming (_,_ to _,,_)
 open import Syntax.Terms
-open import Syntax.Kit
+open import Syntax.Substitution.Kits
 
 open import Semantics.Types
 open import Semantics.Context
@@ -16,7 +16,6 @@ open import CategoryTheory.Categories using (Category)
 open import CategoryTheory.Instances.Reactive renaming (top to ⊤)
 open Category ℝeactive hiding (begin_ ; _∎)
 open import TemporalOps.Diamond using (◇_)
-open import TemporalOps.Box using (□_)
 
 open import Data.Sum
 open import Data.Product
@@ -76,6 +75,7 @@ module ⟦K⟧ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
               | ⟦𝓌⟧ A T n ⟦Δ⟧ ⟦A⟧
               | ⟦𝓋⟧ A Δ n ⟦Δ⟧ ⟦A⟧ = refl
 
+    -- Denotation of stabilisation idempotence
     ⟦ˢˢ⟧ : ∀ Γ -> (m n l : ℕ) -> (⟦Γ⟧ : (⟦ Γ ⟧ₓ) l)
       -> ⟦subst⟧ (Γ ˢˢₛ k) n (⟦ Γ ˢ ⟧ˢₓ m (⟦ Γ ⟧ˢₓ l ⟦Γ⟧ m) n)
        ≡ ⟦ Γ ⟧ˢₓ l ⟦Γ⟧ n
