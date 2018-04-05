@@ -90,17 +90,17 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
             rewrite traverse-sound σ M n ⟦Δ⟧
                   | traverse-sound (σ ↑ k) N n (⟦Δ⟧ , ⟦ M ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧))
                   | ⟦↑⟧ (A always) σ n ⟦Δ⟧ (⟦ M ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)) = refl
-        traverse-sound σ (event E) n ⟦Δ⟧ rewrite traverse-sound′ σ E n ⟦Δ⟧ = refl
+        traverse-sound σ (event E) n ⟦Δ⟧ rewrite traverse′-sound σ E n ⟦Δ⟧ = refl
 
-        traverse-sound′ : ∀{Γ Δ A} -> (σ : Subst 𝒮 Γ Δ) -> (C : Γ ⊨ A)
+        traverse′-sound : ∀{Γ Δ A} -> (σ : Subst 𝒮 Γ Δ) -> (C : Γ ⊨ A)
                   -> (n : ℕ) -> (⟦Δ⟧ : ⟦ Δ ⟧ₓ n)
                   -> ⟦ traverse′ σ C ⟧ᵐ n ⟦Δ⟧ ≡ ⟦ C ⟧ᵐ n (⟦subst⟧ σ n ⟦Δ⟧)
-        traverse-sound′ σ (pure M) n ⟦Δ⟧ rewrite traverse-sound σ M n ⟦Δ⟧ = refl
-        traverse-sound′ σ (letSig_InC_ {A = A} S C) n ⟦Δ⟧
+        traverse′-sound σ (pure M) n ⟦Δ⟧ rewrite traverse-sound σ M n ⟦Δ⟧ = refl
+        traverse′-sound σ (letSig_InC_ {A = A} S C) n ⟦Δ⟧
             rewrite traverse-sound σ S n ⟦Δ⟧
-                  | traverse-sound′ (σ ↑ k) C n (⟦Δ⟧ , ⟦ S ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧))
+                  | traverse′-sound (σ ↑ k) C n (⟦Δ⟧ , ⟦ S ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧))
                   | ⟦↑⟧ (A always) σ n ⟦Δ⟧ (⟦ S ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)) = refl
-        traverse-sound′ {Γ} {Δ} σ (letEvt_In_ {A = A} E C) n ⟦Δ⟧ =
+        traverse′-sound {Γ} {Δ} σ (letEvt_In_ {A = A} E C) n ⟦Δ⟧ =
             begin
                 ⟦ traverse′ σ (letEvt E In C) ⟧ᵐ n ⟦Δ⟧
             ≡⟨⟩
@@ -112,7 +112,7 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
             ≡⟨ cong (λ x → ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧) >>= x) (ext λ l → ext λ ⟦A⟧ →
                 begin
                     ⟦ traverse′ (σ ↓ˢ k ↑ k) C ⟧ᵐ l (⟦ Δ ⟧ˢₓ n ⟦Δ⟧ l , ⟦A⟧)
-                ≡⟨ traverse-sound′ (σ ↓ˢ k ↑ k) C l (⟦ Δ ⟧ˢₓ n ⟦Δ⟧ l , ⟦A⟧) ⟩
+                ≡⟨ traverse′-sound (σ ↓ˢ k ↑ k) C l (⟦ Δ ⟧ˢₓ n ⟦Δ⟧ l , ⟦A⟧) ⟩
                     ⟦ C ⟧ᵐ l (⟦subst⟧ (_↑_ {A now} (σ ↓ˢ k) k) l (⟦ Δ ⟧ˢₓ n ⟦Δ⟧ l , ⟦A⟧))
                 ≡⟨ cong (⟦ C ⟧ᵐ l) (⟦↑⟧ (A now) (σ ↓ˢ k) l (⟦ Δ ⟧ˢₓ n ⟦Δ⟧ l) ⟦A⟧) ⟩
                     ⟦ C ⟧ᵐ l (⟦subst⟧ (σ ↓ˢ k) l (⟦ Δ ⟧ˢₓ n ⟦Δ⟧ l) , ⟦A⟧)
@@ -124,7 +124,7 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
             ≡⟨⟩
                 ⟦ letEvt E In C ⟧ᵐ n (⟦subst⟧ σ n ⟦Δ⟧)
             ∎
-        traverse-sound′ {_} {Δ} σ (select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃) n ⟦Δ⟧ =
+        traverse′-sound {_} {Δ} σ (select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃) n ⟦Δ⟧ =
             begin
                 ⟦ traverse′ σ (select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃) ⟧ᵐ n ⟦Δ⟧
             ≡⟨⟩
@@ -172,9 +172,9 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
                         (⟦ C₁ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {A now} (_↑_ {Event B now} (σ ↓ˢ k) k) k)))
                         (⟦ C₂ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {B now} (_↑_ {Event A now} (σ ↓ˢ k) k) k)))
                         (⟦ C₃ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {B now} (_↑_ {A now}       (σ ↓ˢ k) k) k))) l c
-            ind-hyp l c rewrite ext (λ n -> (ext λ ⟦Δ⟧ -> (traverse-sound′ (σ ↓ˢ k ↑ k ↑ k) C₁ n ⟦Δ⟧)))
-                              | ext (λ n -> (ext λ ⟦Δ⟧ -> (traverse-sound′ (σ ↓ˢ k ↑ k ↑ k) C₂ n ⟦Δ⟧)))
-                              | ext (λ n -> (ext λ ⟦Δ⟧ -> (traverse-sound′ (σ ↓ˢ k ↑ k ↑ k) C₃ n ⟦Δ⟧))) = refl
+            ind-hyp l c rewrite ext (λ n -> (ext λ ⟦Δ⟧ -> (traverse′-sound (σ ↓ˢ k ↑ k ↑ k) C₁ n ⟦Δ⟧)))
+                              | ext (λ n -> (ext λ ⟦Δ⟧ -> (traverse′-sound (σ ↓ˢ k ↑ k ↑ k) C₂ n ⟦Δ⟧)))
+                              | ext (λ n -> (ext λ ⟦Δ⟧ -> (traverse′-sound (σ ↓ˢ k ↑ k ↑ k) C₃ n ⟦Δ⟧))) = refl
 
 -- Denotation of variable kits
 ⟦𝒱ar⟧ : ⟦Kit⟧ 𝒱ar
@@ -305,9 +305,9 @@ substitute-sound : ∀{Γ Δ A} (σ : Subst Term Γ Δ) (M : Γ ⊢ A)
                 -> ⟦ substitute σ M ⟧ₘ ≈ ⟦ M ⟧ₘ ∘ ⟦ σ ⟧ₛ
 substitute-sound σ M {n} {⟦Δ⟧} = traverse-sound ⟦𝒯erm⟧ σ M n ⟦Δ⟧
 
-substitute-sound′ : ∀{Γ Δ A} (σ : Subst Term Γ Δ) (M : Γ ⊨ A)
+substitute′-sound : ∀{Γ Δ A} (σ : Subst Term Γ Δ) (M : Γ ⊨ A)
                 -> ⟦ substitute′ σ M ⟧ᵐ ≈ ⟦ M ⟧ᵐ ∘ ⟦ σ ⟧ₛ
-substitute-sound′ σ M {n} {⟦Δ⟧} = traverse-sound′ ⟦𝒯erm⟧ σ M n ⟦Δ⟧
+substitute′-sound σ M {n} {⟦Δ⟧} = traverse′-sound ⟦𝒯erm⟧ σ M n ⟦Δ⟧
 
 -- Weakening lemma is sound
 weakening-sound : ∀{Γ Δ A} (s : Γ ⊆ Δ) (M : Γ ⊢ A)
@@ -332,7 +332,7 @@ substitution-sound {Γ} {Γ′} M = substitute-sound (sub-midₛ 𝒯ermₛ Γ �
 -- Substitution lemma is sound
 substitution′-sound : ∀{Γ Γ′ A B} (M : Γ ⌊⌋ Γ′ ⊢ A) (N : Γ ⌊ A ⌋ Γ′ ⊨ B)
                  -> ⟦ substitution′ Γ Γ′ M N ⟧ᵐ ≈ ⟦ N ⟧ᵐ ∘ ⟦ Γ ⌊⌋ₛ Γ′ ⊢ₛ M ⟧
-substitution′-sound {Γ} {Γ′} M N {n} {⟦Δ⟧} = traverse-sound′ ⟦𝒯erm⟧ (sub-midₛ 𝒯ermₛ Γ Γ′ M) N n ⟦Δ⟧
+substitution′-sound {Γ} {Γ′} M N {n} {⟦Δ⟧} = traverse′-sound ⟦𝒯erm⟧ (sub-midₛ 𝒯ermₛ Γ Γ′ M) N n ⟦Δ⟧
 
 -- Top substitution is sound (full categorical proof)
 subst-sound : ∀{Γ A B} (M : Γ ⊢ A) (N : Γ ,, A ⊢ B)
@@ -341,10 +341,10 @@ subst-sound M N {n} {a} rewrite ⟦sub-topₛ⟧ M n a =
     substitute-sound (sub-topₛ 𝒯ermₛ M) N
 
 -- Top substitution is sound (full categorical proof)
-subst-sound′ : ∀{Γ A B} (M : Γ ⊢ A) (N : Γ ,, A ⊨ B)
+subst′-sound : ∀{Γ A B} (M : Γ ⊢ A) (N : Γ ,, A ⊨ B)
            -> ⟦ [ M /′] N ⟧ᵐ ≈ ⟦ N ⟧ᵐ ∘ ⟨ id , ⟦ M ⟧ₘ ⟩
-subst-sound′ M N {n} {a} rewrite ⟦sub-topₛ⟧ M n a =
-    traverse-sound′ ⟦𝒯erm⟧ (sub-topₛ 𝒯ermₛ M) N n a
+subst′-sound M N {n} {a} rewrite ⟦sub-topₛ⟧ M n a =
+    traverse′-sound ⟦𝒯erm⟧ (sub-topₛ 𝒯ermₛ M) N n a
 
 open K 𝒯erm
 open Monad M-◇
@@ -358,7 +358,7 @@ subst″-sound-lemma : ∀ Γ {A B} (n k l : ℕ)
 subst″-sound-lemma Γ {A} n k l D ⟦Γ⟧ ⟦A⟧ =
     begin
         ⟦ substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D ⟧ᵐ l (⟦ Γ ˢ ⟧ˢₓ k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k) l , ⟦A⟧)
-    ≡⟨ substitute-sound′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D {l} {⟦ Γ ˢ ⟧ˢₓ k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k) l , ⟦A⟧} ⟩
+    ≡⟨ substitute′-sound ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D {l} {⟦ Γ ˢ ⟧ˢₓ k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k) l , ⟦A⟧} ⟩
         ⟦ D ⟧ᵐ l (⟦ _↑_ {A now} (Γ ˢˢₛ 𝒯erm) 𝒯erm ⟧ₛ l (⟦ Γ ˢ ⟧ˢₓ k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k) l , ⟦A⟧))
     ≡⟨ cong (⟦ D ⟧ᵐ l) (⟦↑⟧ (A now) (Γ ˢˢₛ 𝒯erm) l (⟦ Γ ˢ ⟧ˢₓ k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k) l) ⟦A⟧) ⟩
         ⟦ D ⟧ᵐ l (⟦ Γ ˢˢₛ 𝒯erm ⟧ₛ l (⟦ Γ ˢ ⟧ˢₓ k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k) l) , ⟦A⟧)
@@ -367,16 +367,16 @@ subst″-sound-lemma Γ {A} n k l D ⟦Γ⟧ ⟦A⟧ =
     ∎
 
 -- Substitution of a computation into a computation is sound
-subst-sound″ : ∀{Γ A B} (C : Γ ⊨ A now) (D : Γ ˢ ,, A now ⊨ B now)
+subst″-sound : ∀{Γ A B} (C : Γ ⊨ A now) (D : Γ ˢ ,, A now ⊨ B now)
             -> (n : ℕ) (⟦Γ⟧ : ⟦ Γ ⟧ₓ n)
             -> ⟦ ⟨ C /⟩ D ⟧ᵐ n ⟦Γ⟧
              ≡ (⟦ C ⟧ᵐ n ⟦Γ⟧ >>= λ l ⟦A⟧ → ⟦ D ⟧ᵐ l ((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ l) , ⟦A⟧))
-subst-sound″ {Γ} (pure {A = A} M) D n ⟦Γ⟧ =
+subst″-sound {Γ} (pure {A = A} M) D n ⟦Γ⟧ =
     begin
         ⟦ ⟨ pure M /⟩ D ⟧ᵐ n ⟦Γ⟧
     ≡⟨⟩
         ⟦ traverse′ (sub-topˢₛ 𝒯ermₛ M) D ⟧ᵐ n ⟦Γ⟧
-    ≡⟨ traverse-sound′ ⟦𝒯erm⟧ (sub-topˢₛ 𝒯ermₛ M) D n ⟦Γ⟧ ⟩
+    ≡⟨ traverse′-sound ⟦𝒯erm⟧ (sub-topˢₛ 𝒯ermₛ M) D n ⟦Γ⟧ ⟩
         ⟦ D ⟧ᵐ n (⟦subst⟧ (Γˢ⊆Γ Γ ⊆ₛ 𝒯erm) n ⟦Γ⟧ , ⟦ M ⟧ₘ n ⟦Γ⟧)
     ≡⟨ cong (λ x -> ⟦ D ⟧ᵐ n (x , ⟦ M ⟧ₘ n ⟦Γ⟧))
         (begin
@@ -402,19 +402,19 @@ subst-sound″ {Γ} (pure {A = A} M) D n ⟦Γ⟧ =
             rewrite ⟦↑⟧ (B always) (Γˢ⊆Γ Γ ⊆ₛ 𝒯erm) n ⟦Γ⟧ ⟦B⟧
                   | lemma Γ n ⟦Γ⟧ = refl
 
-subst-sound″ {Γ} {A} (letSig_InC_ {A = B} S C) D n ⟦Γ⟧ =
+subst″-sound {Γ} {A} (letSig_InC_ {A = B} S C) D n ⟦Γ⟧ =
     begin
         ⟦ ⟨ letSig S InC C /⟩ D ⟧ᵐ n ⟦Γ⟧
     ≡⟨⟩
         ⟦ ⟨ C /⟩ (substitute′ (idₛ 𝒯erm ⁺ 𝒯erm ↑ 𝒯erm) D) ⟧ᵐ n (⟦Γ⟧ , ⟦ S ⟧ₘ n ⟦Γ⟧)
-    ≡⟨ subst-sound″ C (substitute′ (idₛ 𝒯erm ⁺ 𝒯erm ↑ 𝒯erm) D) n (⟦Γ⟧ , ⟦ S ⟧ₘ n ⟦Γ⟧) ⟩
+    ≡⟨ subst″-sound C (substitute′ (idₛ 𝒯erm ⁺ 𝒯erm ↑ 𝒯erm) D) n (⟦Γ⟧ , ⟦ S ⟧ₘ n ⟦Γ⟧) ⟩
         ⟦ C ⟧ᵐ n (⟦Γ⟧ , ⟦ S ⟧ₘ n ⟦Γ⟧)
         >>= (λ l ⟦A⟧ → ⟦ substitute′ (idₛ 𝒯erm ⁺ 𝒯erm ↑ 𝒯erm) D ⟧ᵐ l ((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ l , ⟦ S ⟧ₘ n ⟦Γ⟧) , ⟦A⟧))
     ≡⟨ cong (λ x → (⟦ C ⟧ᵐ n (⟦Γ⟧ , ⟦ S ⟧ₘ n ⟦Γ⟧) >>= x))
         (ext λ l → ext λ ⟦A⟧ →
             begin
                 ⟦ substitute′ (idₛ 𝒯erm ⁺ 𝒯erm ↑ 𝒯erm) D ⟧ᵐ l ((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ l , ⟦ S ⟧ₘ n ⟦Γ⟧) , ⟦A⟧)
-            ≡⟨ substitute-sound′ (_↑_ {A now} (_⁺_ {B always} (idₛ 𝒯erm) 𝒯erm) 𝒯erm) D {l} {((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ l , ⟦ S ⟧ₘ n ⟦Γ⟧) , ⟦A⟧)} ⟩
+            ≡⟨ substitute′-sound (_↑_ {A now} (_⁺_ {B always} (idₛ 𝒯erm) 𝒯erm) 𝒯erm) D {l} {((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ l , ⟦ S ⟧ₘ n ⟦Γ⟧) , ⟦A⟧)} ⟩
                 ⟦ D ⟧ᵐ l (⟦ (_↑_ {A now} {Γ = Γ ˢ} (_⁺_ {B always} (idₛ 𝒯erm) 𝒯erm) 𝒯erm) ⟧ₛ l ((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ l , ⟦ S ⟧ₘ n ⟦Γ⟧) , ⟦A⟧))
             ≡⟨ cong (⟦ D ⟧ᵐ l) (⟦↑⟧ (A now) (_⁺_ {B always} (idₛ 𝒯erm) 𝒯erm) l (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ l , ⟦ S ⟧ₘ n ⟦Γ⟧) ⟦A⟧) ⟩
                 ⟦ D ⟧ᵐ l (⟦ _⁺_ {B always} {Γ = Γ ˢ} (idₛ 𝒯erm) 𝒯erm ⟧ₛ l (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ l , ⟦ S ⟧ₘ n ⟦Γ⟧) , ⟦A⟧)
@@ -428,7 +428,7 @@ subst-sound″ {Γ} {A} (letSig_InC_ {A = B} S C) D n ⟦Γ⟧ =
         ⟦ letSig S InC C ⟧ᵐ n ⟦Γ⟧
         >>= (λ l ⟦A⟧ → ⟦ D ⟧ᵐ l (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ l , ⟦A⟧))
     ∎
-subst-sound″ {Γ} {A} {B} (letEvt E In C) D n ⟦Γ⟧ =
+subst″-sound {Γ} {A} {B} (letEvt E In C) D n ⟦Γ⟧ =
     begin
         ⟦ ⟨ letEvt E In C /⟩ D ⟧ᵐ n ⟦Γ⟧
     ≡⟨⟩
@@ -437,7 +437,7 @@ subst-sound″ {Γ} {A} {B} (letEvt E In C) D n ⟦Γ⟧ =
     ≡⟨ cong (λ x → ⟦ E ⟧ₘ n ⟦Γ⟧ >>= x)
         (ext λ k → ext λ ⟦A⟧ → (begin
             ⟦ ⟨ C /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D) ⟧ᵐ k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k , ⟦A⟧)
-        ≡⟨ subst-sound″ C (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D) k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k , ⟦A⟧) ⟩
+        ≡⟨ subst″-sound C (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D) k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k , ⟦A⟧) ⟩
             ⟦ C ⟧ᵐ k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k , ⟦A⟧)
             >>= (λ l ⟦A⟧₁ → ⟦ substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D ⟧ᵐ l (⟦ Γ ˢ ⟧ˢₓ k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k) l , ⟦A⟧₁))
         ≡⟨ cong (λ x → ⟦ C ⟧ᵐ k (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ k , ⟦A⟧) >>= x)
@@ -456,7 +456,7 @@ subst-sound″ {Γ} {A} {B} (letEvt E In C) D n ⟦Γ⟧ =
         (⟦ letEvt E In C ⟧ᵐ n ⟦Γ⟧
         >>= (λ l ⟦A⟧ → ⟦ D ⟧ᵐ l (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ l , ⟦A⟧)))
     ∎
-subst-sound″ {B = E} (select_↦_||_↦_||both↦_ {Γ}{A}{B}{C} E₁ C₁ E₂ C₂ C₃) D n ⟦Γ⟧ =
+subst″-sound {B = E} (select_↦_||_↦_||both↦_ {Γ}{A}{B}{C} E₁ C₁ E₂ C₂ C₃) D n ⟦Γ⟧ =
     begin
         ⟦ ⟨ select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃ /⟩ D ⟧ᵐ n ⟦Γ⟧
     ≡⟨⟩
@@ -501,15 +501,15 @@ subst-sound″ {B = E} (select_↦_||_↦_||both↦_ {Γ}{A}{B}{C} E₁ C₁ E�
             ≡ (⟦select⟧ Γ A B C n ⟦Γ⟧ ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ m c
                 >>= λ l ⟦A⟧ → ⟦ D ⟧ᵐ l (⟦ Γ ⟧ˢₓ n ⟦Γ⟧ l , ⟦A⟧))
     lemma m (inj₁ (inj₁ (⟦A⟧ , ⟦◇B⟧)))
-        rewrite subst-sound″ C₁ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D) m ((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ m , ⟦◇B⟧) , ⟦A⟧)
+        rewrite subst″-sound C₁ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D) m ((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ m , ⟦◇B⟧) , ⟦A⟧)
               | (ext λ l → ext λ ⟦C⟧ → subst″-sound-lemma Γ n m l D ⟦Γ⟧ ⟦C⟧)
         = refl
 
     lemma m (inj₁ (inj₂ (⟦◇A⟧ , ⟦B⟧)))
-        rewrite subst-sound″ C₂ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D) m ((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ m , ⟦◇A⟧) , ⟦B⟧)
+        rewrite subst″-sound C₂ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D) m ((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ m , ⟦◇A⟧) , ⟦B⟧)
               | (ext λ l → ext λ ⟦C⟧ → subst″-sound-lemma Γ n m l D ⟦Γ⟧ ⟦C⟧)
         = refl
     lemma m (inj₂ (⟦A⟧ , ⟦B⟧))
-        rewrite subst-sound″ C₃ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D) m ((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ m , ⟦A⟧) , ⟦B⟧)
+        rewrite subst″-sound C₃ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D) m ((⟦ Γ ⟧ˢₓ n ⟦Γ⟧ m , ⟦A⟧) , ⟦B⟧)
               | (ext λ l → ext λ ⟦C⟧ → subst″-sound-lemma Γ n m l D ⟦Γ⟧ ⟦C⟧)
         = refl
