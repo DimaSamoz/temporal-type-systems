@@ -33,57 +33,59 @@ open Kit 𝒯erm
 open ⟦K⟧ ⟦𝒯erm⟧
 open K 𝒯erm
 
--- Soundness of term equality: equal terms have equal denotations
-sound : ∀{A Γ} {M₁ M₂ : Γ ⊢ A}
-         -> Γ ⊢ M₁ ≡ M₂ ∷ A
-         -> ⟦ M₁ ⟧ₘ ≈ ⟦ M₂ ⟧ₘ
-sound (refl M) = refl
-sound (Eq.sym eq) = ≡.sym (sound eq)
-sound (Eq.trans eq₁ eq₂) = ≡.trans (sound eq₁) (sound eq₂)
+mutual
+    -- Soundness of term equality: equal terms have equal denotations
+    sound : ∀{A Γ} {M₁ M₂ : Γ ⊢ A}
+             -> Γ ⊢ M₁ ≡ M₂ ∷ A
+             -> ⟦ M₁ ⟧ₘ ≈ ⟦ M₂ ⟧ₘ
+    sound (refl M) = refl
+    sound (Eq.sym eq) = ≡.sym (sound eq)
+    sound (Eq.trans eq₁ eq₂) = ≡.trans (sound eq₁) (sound eq₂)
 
-sound (β-lam N M) {n} {⟦Γ⟧} rewrite subst-sound M N {n} {⟦Γ⟧} = refl
-sound (β-fst M N) = refl
-sound (β-snd M N) = refl
-sound (β-inl M N₁ N₂) {n} {⟦Γ⟧} rewrite subst-sound M N₁ {n} {⟦Γ⟧} = refl
-sound (β-inr M N₁ N₂) {n} {⟦Γ⟧} rewrite subst-sound M N₂ {n} {⟦Γ⟧} = refl
-sound (β-sig N M) {n} {⟦Γ⟧} rewrite subst-sound M N {n} {⟦Γ⟧} = refl
+    sound (β-lam N M) {n} {⟦Γ⟧} rewrite subst-sound M N {n} {⟦Γ⟧} = refl
+    sound (β-fst M N) = refl
+    sound (β-snd M N) = refl
+    sound (β-inl M N₁ N₂) {n} {⟦Γ⟧} rewrite subst-sound M N₁ {n} {⟦Γ⟧} = refl
+    sound (β-inr M N₁ N₂) {n} {⟦Γ⟧} rewrite subst-sound M N₂ {n} {⟦Γ⟧} = refl
+    sound (β-sig N M) {n} {⟦Γ⟧} rewrite subst-sound M N {n} {⟦Γ⟧} = refl
 
-sound (η-lam {A} M) {n} {⟦Γ⟧} = ext λ ⟦A⟧ →
-                    cong (λ x → x ⟦A⟧) (≡.sym (⟦𝓌⟧ (A now) M n ⟦Γ⟧ ⟦A⟧))
-sound (η-pair M) {n} {⟦Γ⟧} with ⟦ M ⟧ₘ n ⟦Γ⟧
-sound (η-pair M) {n} {⟦Γ⟧} | _ , _ = refl
-sound (η-unit M) = refl
-sound (η-sum M) {n} {⟦Γ⟧} with ⟦ M ⟧ₘ n ⟦Γ⟧
-sound (η-sum M) {n} {a} | inj₁ _ = refl
-sound (η-sum M) {n} {a} | inj₂ _ = refl
-sound (η-sig M) = refl
-sound (η-evt M) {n} {a} = ≡.sym (>>=-unit-right (⟦ M ⟧ₘ n a))
+    sound (η-lam {A} M) {n} {⟦Γ⟧} = ext λ ⟦A⟧ →
+                        cong (λ x → x ⟦A⟧) (≡.sym (⟦𝓌⟧ (A now) M n ⟦Γ⟧ ⟦A⟧))
+    sound (η-pair M) {n} {⟦Γ⟧} with ⟦ M ⟧ₘ n ⟦Γ⟧
+    sound (η-pair M) {n} {⟦Γ⟧} | _ , _ = refl
+    sound (η-unit M) = refl
+    sound (η-sum M) {n} {⟦Γ⟧} with ⟦ M ⟧ₘ n ⟦Γ⟧
+    sound (η-sum M) {n} {a} | inj₁ _ = refl
+    sound (η-sum M) {n} {a} | inj₂ _ = refl
+    sound (η-sig M) = refl
+    sound (η-evt M) {n} {a} = ≡.sym (>>=-unit-right (⟦ M ⟧ₘ n a))
 
-sound (cong-pair eq₁ eq₂) {n} {a} rewrite sound eq₁ {n} {a}
-                                        | sound eq₂ {n} {a} = refl
-sound (cong-fst eq) {n} {a} rewrite sound eq {n} {a} = refl
-sound (cong-snd eq) {n} {a} rewrite sound eq {n} {a} = refl
-sound (cong-lam eq) {n} {a} = ext λ ⟦A⟧ → sound eq
-sound (cong-app eq₁ eq₂) {n} {a} rewrite sound eq₁ {n} {a}
-                                       | sound eq₂ {n} {a} = refl
-sound (cong-inl eq) {n} {a} rewrite sound eq {n} {a} = refl
-sound (cong-inr eq) {n} {a} rewrite sound eq {n} {a} = refl
-sound (cong-case eq N₁ N₂) {n} {a} rewrite sound eq {n} {a} = refl
-sound (cong-sig eq) {n} {a} rewrite sound eq {n} {a} = refl
-sound (cong-letSig eq N) {n} {a} rewrite sound eq {n} {a} = refl
-sound (cong-sample eq) {n} {a} rewrite sound eq {n} {a} = refl
-sound (cong-stable eq) = ext λ k → sound eq
+    sound (cong-pair eq₁ eq₂) {n} {a} rewrite sound eq₁ {n} {a}
+                                            | sound eq₂ {n} {a} = refl
+    sound (cong-fst eq) {n} {a} rewrite sound eq {n} {a} = refl
+    sound (cong-snd eq) {n} {a} rewrite sound eq {n} {a} = refl
+    sound (cong-lam eq) {n} {a} = ext λ ⟦A⟧ → sound eq
+    sound (cong-app eq₁ eq₂) {n} {a} rewrite sound eq₁ {n} {a}
+                                           | sound eq₂ {n} {a} = refl
+    sound (cong-inl eq) {n} {a} rewrite sound eq {n} {a} = refl
+    sound (cong-inr eq) {n} {a} rewrite sound eq {n} {a} = refl
+    sound (cong-case eq N₁ N₂) {n} {a} rewrite sound eq {n} {a} = refl
+    sound (cong-sig eq) {n} {a} rewrite sound eq {n} {a} = refl
+    sound (cong-letSig eq N) {n} {a} rewrite sound eq {n} {a} = refl
+    sound (cong-sample eq) {n} {a} rewrite sound eq {n} {a} = refl
+    sound (cong-stable eq) = ext λ k → sound eq
+    sound (cong-event eq) {n} {a} rewrite sound′ eq {n} {a} = refl
 
--- Soundness of computational term equality: equal terms have equal denotations
-sound′ : ∀{A Γ} {M₁ M₂ : Γ ⊨ A}
-         -> Γ ⊨ M₁ ≡ M₂ ∷ A
-         -> ⟦ M₁ ⟧ᵐ ≈ ⟦ M₂ ⟧ᵐ
-sound′ (refl M) = refl
-sound′ (Eq′.sym eq) = ≡.sym (sound′ eq)
-sound′ (Eq′.trans eq₁ eq₂) = ≡.trans (sound′ eq₁) (sound′ eq₂)
-sound′ (β-sig′ C M) {n} {⟦Γ⟧} rewrite subst′-sound M C {n} {⟦Γ⟧} = refl
-sound′ (β-evt′ C D) {n} {⟦Γ⟧} rewrite subst″-sound D C n ⟦Γ⟧ = refl
-sound′ (η-sig′ M) = refl
-sound′ (cong-pure′ eq) {n} {⟦Γ⟧} rewrite sound eq {n} {⟦Γ⟧} = refl
-sound′ (cong-letSig′ eq B) {n} {⟦Γ⟧} rewrite sound eq {n} {⟦Γ⟧} = refl
-sound′ (cong-letEvt′ eq D) {n} {⟦Γ⟧} rewrite sound eq {n} {⟦Γ⟧} = refl
+    -- Soundness of computational term equality: equal terms have equal denotations
+    sound′ : ∀{A Γ} {M₁ M₂ : Γ ⊨ A}
+             -> Γ ⊨ M₁ ≡ M₂ ∷ A
+             -> ⟦ M₁ ⟧ᵐ ≈ ⟦ M₂ ⟧ᵐ
+    sound′ (refl M) = refl
+    sound′ (Eq′.sym eq) = ≡.sym (sound′ eq)
+    sound′ (Eq′.trans eq₁ eq₂) = ≡.trans (sound′ eq₁) (sound′ eq₂)
+    sound′ (β-sig′ C M) {n} {⟦Γ⟧} rewrite subst′-sound M C {n} {⟦Γ⟧} = refl
+    sound′ (β-evt′ C D) {n} {⟦Γ⟧} rewrite subst″-sound D C n ⟦Γ⟧ = refl
+    sound′ (η-sig′ M) = refl
+    sound′ (cong-pure′ eq) {n} {⟦Γ⟧} rewrite sound eq {n} {⟦Γ⟧} = refl
+    sound′ (cong-letSig′ eq B) {n} {⟦Γ⟧} rewrite sound eq {n} {⟦Γ⟧} = refl
+    sound′ (cong-letEvt′ eq D) {n} {⟦Γ⟧} rewrite sound eq {n} {⟦Γ⟧} = refl

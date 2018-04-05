@@ -200,6 +200,12 @@ data Eq Γ where
                                       -------------------------------------
                             ->         Γ ⊢ stable M₁ ≡ stable M₂ ∷ A always
 
+    -- Congruence in events
+    cong-event : ∀{A}{E₁ E₂ : Γ ⊨ A now}
+                            ->                 Γ ⊨ E₁ ≡ E₂ ∷ A now
+                                      -------------------------------------
+                            ->         Γ ⊢ event E₁ ≡ event E₂ ∷ Event A now
+
 data Eq′ (Γ : Context) where
     -- | Equivalence relation
     -- Reflexivity
