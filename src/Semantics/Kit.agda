@@ -16,6 +16,7 @@ open import CategoryTheory.Categories using (Category)
 open import CategoryTheory.Instances.Reactive renaming (top to ⊤)
 open Category ℝeactive hiding (begin_ ; _∎)
 open import TemporalOps.Diamond using (◇_)
+open import TemporalOps.Box using (□_)
 
 open import Data.Sum
 open import Data.Product
@@ -74,6 +75,16 @@ module ⟦K⟧ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
         rewrite ⟦⁺⟧ A σ n ⟦Δ⟧ ⟦A⟧
               | ⟦𝓌⟧ A T n ⟦Δ⟧ ⟦A⟧
               | ⟦𝓋⟧ A Δ n ⟦Δ⟧ ⟦A⟧ = refl
+
+    ⟦ˢˢ⟧ : ∀ Γ -> (m n l : ℕ) -> (⟦Γ⟧ : (⟦ Γ ⟧ₓ) l)
+      -> ⟦subst⟧ (Γ ˢˢₛ k) n (⟦ Γ ˢ ⟧ˢₓ m (⟦ Γ ⟧ˢₓ l ⟦Γ⟧ m) n)
+       ≡ ⟦ Γ ⟧ˢₓ l ⟦Γ⟧ n
+    ⟦ˢˢ⟧ ∙ m n l ⟦Γ⟧ = refl
+    ⟦ˢˢ⟧ (Γ ,, B now) m n l (⟦Γ⟧ , ⟦B⟧) = ⟦ˢˢ⟧ Γ m n l ⟦Γ⟧
+    ⟦ˢˢ⟧ (Γ ,, B always) m n l (⟦Γ⟧ , ⟦□B⟧)
+        rewrite ⟦𝓋⟧ (B always) (Γ ˢ ˢ) n (⟦ Γ ˢ ⟧ˢₓ m (⟦ Γ ⟧ˢₓ l ⟦Γ⟧ m) n) ⟦□B⟧
+              | ⟦⁺⟧ (B always) (Γ ˢˢₛ k) n (⟦ Γ ˢ ⟧ˢₓ m (⟦ Γ ⟧ˢₓ l ⟦Γ⟧ m) n) ⟦□B⟧
+        = ≡.cong (_, ⟦□B⟧) (⟦ˢˢ⟧ Γ m n l ⟦Γ⟧)
 
     -- Denotation of identity substitution
     ⟦idₛ⟧ : ∀{Γ} (n : ℕ) (⟦Γ⟧ : ⟦ Γ ⟧ₓ n)
