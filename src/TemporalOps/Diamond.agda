@@ -199,6 +199,7 @@ open ≡.≡-Reasoning
 _>>=_ : ∀{A B : τ}{n : ℕ} -> (◇ A) n -> (A ⇴ (◇ B)) -> (◇ B) n
 _>>=_ {A}{B} {n} a f = μ.at B n (fmap f n a)
 
+-- Bind is associative
 >>=-assoc : ∀{A B C : τ}{n : ℕ} -> (a : (◇ A) n) -> (f : (A ⇴ (◇ B))) -> (g : (B ⇴ (◇ C)))
          -> (a >>= f) >>= g ≡ a >>= (λ k x → (f k x) >>= g)
 >>=-assoc {A}{B}{C} {n} a f g =
@@ -221,6 +222,12 @@ _>>=_ {A}{B} {n} a f = μ.at B n (fmap f n a)
     lemma : (((μ.at C ∘ μ.at (◇ C)) ∘ fmap (fmap g)) ∘ fmap f) n a
           ≡ (((μ.at C ∘ fmap (μ.at C)) ∘ fmap (fmap g)) ∘ fmap f) n a
     lemma rewrite μ-assoc {C} {n} {((fmap (fmap g)) ∘ fmap f) n a} = refl
+
+-- Return is right unit to bind
+>>=-unit-right : ∀{A : τ}{n : ℕ} -> (a : (◇ A) n)
+         -> a >>= η.at A ≡ a
+>>=-unit-right a = η-unit2
+
 
 -- If we know that A and B eventually happens, then at a future point either
 --   * A happens and B still hasn't
