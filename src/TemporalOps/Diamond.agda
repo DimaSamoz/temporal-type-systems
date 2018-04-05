@@ -14,7 +14,7 @@ open import TemporalOps.Diamond.Functor public
 open import TemporalOps.Diamond.Join
 open import TemporalOps.Diamond.JoinLemmas
 
-import Relation.Binary.PropositionalEquality
+import Relation.Binary.PropositionalEquality as ≡
 open import Data.Product
 open import Relation.Binary.HeterogeneousEquality as ≅
             using (_≅_ ; ≅-to-≡ ; ≡-to-≅ ; cong₂)
@@ -40,7 +40,7 @@ M-◇ = record
     private module μ = _⟹_ μ-◇
     private module η = _⟹_ η-◇
     private module F-◇ = Functor F-◇
-    open Relation.Binary.PropositionalEquality.≡-Reasoning
+    open ≡.≡-Reasoning
 
     η-unit2-◇ : {A : obj} {n : ℕ} {a : ◇ A at n} → (μ.at A n (F-◇.fmap (η.at A) n a)) ≡ a
     η-unit2-◇ {A} {n} {k , v} with inspect (compareLeq k n)
@@ -190,14 +190,37 @@ M-◇ = record
 open Monad M-◇
 private module μ = _⟹_ μ
 private module η = _⟹_ η
-private module F-◇ = Functor F-◇
+open Functor F-◇
 open import Data.Nat
 open import Data.Sum
+open ≡.≡-Reasoning
 
 -- Bind operator
 _>>=_ : ∀{A B : τ}{n : ℕ} -> (◇ A) n -> (A ⇴ (◇ B)) -> (◇ B) n
-_>>=_ {A}{B} {n} a f = μ.at B n (F-◇.fmap f n a)
+_>>=_ {A}{B} {n} a f = μ.at B n (fmap f n a)
 
+>>=-assoc : ∀{A B C : τ}{n : ℕ} -> (a : (◇ A) n) -> (f : (A ⇴ (◇ B))) -> (g : (B ⇴ (◇ C)))
+         -> (a >>= f) >>= g ≡ a >>= (λ k x → (f k x) >>= g)
+>>=-assoc {A}{B}{C} {n} a f g =
+    begin
+        ((a >>= f) >>= g)
+    ≡⟨⟩
+        μ.at C n (((fmap g ∘ μ.at B) ∘ fmap f) n a)
+    ≡⟨ cong (μ.at C n) (≈-cong-left {f = fmap g} (μ.nat-cond {B} {◇ C} {g} {n} {fmap f n a}) {n} {a >>= f}) ⟩
+        (((μ.at C ∘ μ.at (◇ C)) ∘ fmap (fmap g)) ∘ fmap f) n a
+    ≡⟨ lemma ⟩
+        (((μ.at C ∘ fmap (μ.at C)) ∘ fmap (fmap g)) ∘ fmap f) n a
+    ≡⟨ cong (μ.at C n) (≈-cong-left {f = fmap g} (sym (fmap-∘ {a = fmap f n a})) {n} {a >>= f}) ⟩
+        μ.at C n ((fmap (μ.at C ∘ fmap g) ∘ fmap f) n a)
+    ≡⟨ cong (μ.at C n) (sym (fmap-∘ {a = a})) ⟩
+        μ.at C n (fmap ((μ.at C ∘ fmap g) ∘ f) n a)
+    ≡⟨⟩
+        (a >>= (λ k x → f k x >>= g))
+    ∎
+    where
+    lemma : (((μ.at C ∘ μ.at (◇ C)) ∘ fmap (fmap g)) ∘ fmap f) n a
+          ≡ (((μ.at C ∘ fmap (μ.at C)) ∘ fmap (fmap g)) ∘ fmap f) n a
+    lemma rewrite μ-assoc {C} {n} {((fmap (fmap g)) ∘ fmap f) n a} = refl
 
 -- If we know that A and B eventually happens, then at a future point either
 --   * A happens and B still hasn't
