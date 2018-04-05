@@ -5,8 +5,9 @@ module Syntax.Equality where
 open import Syntax.Types
 open import Syntax.Context
 open import Syntax.Terms
-open import Syntax.Kit
-open import Syntax.Traversal
+open import Syntax.Substitution.Kits
+open import Syntax.Substitution.Instances
+open import Syntax.Substitution.Lemmas
 
 open Kit 𝒯erm
 
@@ -118,6 +119,11 @@ data Eq Γ where
                                     -------------------------------------------
                             ->       Γ ⊢ M ≡ letSig M In (sig s₁) ∷ Signal A now
 
+    -- η-expansion for events in computational terms
+    η-evt : ∀{A}           ->                  (M : Γ ⊢ Event A now)
+                                  ----------------------------------------------------
+                            ->     Γ ⊢ M ≡ event (letEvt M In pure x₁) ∷ Event A now
+
     -- | Congruence rules
     -- Congruence in pairs
     cong-pair : ∀{A B}{M₁ M₂ : Γ ⊢ A now}{N₁ N₂ : Γ ⊢ B now}
@@ -219,6 +225,11 @@ data Eq′ (Γ : Context) where
                                --------------------------------------------------
                             ->     Γ ⊨ letSig (sig M) InC C ≡ [ M /′] C ∷ B now
 
+    -- β-reduction for event binding in computational terms
+    β-evt′ : ∀{A B}         ->     (C : Γ ˢ , A now ⊨ B now)   (D : Γ ⊨ A now)
+                                 ---------------------------------------------
+                            ->    Γ ⊨ letEvt (event D) In C ≡ ⟨ D /⟩ C ∷ B now
+
     -- | η-equality
     -- η-expansion for signals in computational terms
     η-sig′ : ∀{A}           ->                  (M : Γ ⊢ Signal A now)
@@ -238,3 +249,10 @@ data Eq′ (Γ : Context) where
                             ->            (N : Γ , A always ⊨ B now)
                                 -----------------------------------------------
                             ->   Γ ⊨ letSig S₁ InC N ≡ letSig S₂ InC N ∷ B now
+
+    -- Congruence in event binding
+    cong-letEvt′ : ∀{A B}{E₁ E₂ : Γ ⊢ Event A now}
+                            ->            Γ ⊢ E₁ ≡ E₂ ∷ Event A now
+                            ->            (D : Γ ˢ , A now ⊨ B now)
+                                -----------------------------------------------
+                            ->   Γ ⊨ letEvt E₁ In D ≡ letEvt E₂ In D ∷ B now
