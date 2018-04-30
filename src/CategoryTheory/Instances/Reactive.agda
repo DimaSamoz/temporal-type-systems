@@ -150,6 +150,7 @@ infixl 25 _⊗_
 _⊕_ : τ -> τ -> τ
 A ⊕ B = Sum.A⊕B (Cocartesian.sum cocart A B)
 infixl 22 _⊕_
+open Category ℝeactive hiding (begin_ ; _∎) public
 
 -- Exponential object: pointwise functions
 _⇒_ : τ -> τ -> τ

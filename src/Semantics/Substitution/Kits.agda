@@ -12,10 +12,9 @@ open import Semantics.Context
 open import Semantics.Select
 open import Semantics.Terms
 
-open import CategoryTheory.Categories using (Category)
 open import CategoryTheory.Instances.Reactive renaming (top to ⊤)
-open Category ℝeactive hiding (begin_ ; _∎)
 open import TemporalOps.Diamond using (◇_)
+open import CategoryTheory.Categories
 
 open import Data.Sum
 open import Data.Product

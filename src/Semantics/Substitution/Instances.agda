@@ -15,11 +15,10 @@ open import Semantics.Terms
 open import Semantics.Substitution.Kits
 open import Semantics.Substitution.Traversal
 
-open import CategoryTheory.Categories using (Category ; ext)
+open import CategoryTheory.Categories using (ext)
 open import CategoryTheory.NatTrans
 open import CategoryTheory.Monad
 open import CategoryTheory.Instances.Reactive renaming (top to ⊤)
-open Category ℝeactive hiding (begin_ ; _∎)
 open import TemporalOps.Diamond using (◇-select ; _>>=_ ; ◇_ ; M-◇ ; >>=-assoc)
 
 open import Data.Sum

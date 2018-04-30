@@ -9,9 +9,7 @@ open import Syntax.Types
 open import Semantics.Types
 open import Semantics.Context
 
-open import CategoryTheory.Categories
 open import CategoryTheory.Instances.Reactive
-open Category ℝeactive
 open import TemporalOps.Diamond using (◇-select ; ◇_)
 
 open import Data.Product
