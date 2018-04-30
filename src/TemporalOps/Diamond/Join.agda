@@ -51,7 +51,7 @@ private module F-◇ = Functor F-◇
     open ≡.≡-Reasoning
 
     -- The order of mapping and shifting of events can be interchanged
-    μ-shift-fmap : {A B : τ} {f : A ~> B} {k l : ℕ} {a : ◇ A at l}
+    μ-shift-fmap : {A B : τ} {f : A ⇴ B} {k l : ℕ} {a : ◇ A at l}
                 -> F-◇.fmap f (k + l) (μ-shift {A} k l a)
                  ≡ μ-shift {B} k l (F-◇.fmap f l a)
     μ-shift-fmap {A} {B} {f} {zero} {l} {j , y} = refl

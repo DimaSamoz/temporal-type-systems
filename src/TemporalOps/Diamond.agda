@@ -34,7 +34,7 @@ M-◇ = record
     where
     η-◇ : I ⟹ F-◇
     η-◇ = record
-        { at = λ A n x -> 0 , x
+        { at = λ A n x -> zero , x
         ; nat-cond = λ {A} {B} {f} {n} {a} → refl }
 
     private module μ = _⟹_ μ-◇
@@ -42,7 +42,7 @@ M-◇ = record
     private module F-◇ = Functor F-◇
     open ≡.≡-Reasoning
 
-    η-unit2-◇ : {A : obj} {n : ℕ} {a : ◇ A at n} → (μ.at A n (F-◇.fmap (η.at A) n a)) ≡ a
+    η-unit2-◇ : {A : τ} {n : ℕ} {a : ◇ A at n} → (μ.at A n (F-◇.fmap (η.at A) n a)) ≡ a
     η-unit2-◇ {A} {n} {k , v} with inspect (compareLeq k n)
     -- n = k + l
     η-unit2-◇ {A} {.(k + l)} {k , v} | snd==[ .k + l ] with≡ pf =
@@ -110,7 +110,7 @@ M-◇ = record
         eq zero l v = refl
         eq (suc n) l v = eq n l v
 
-    μ-assoc-◇ : {A : obj} {n : ℕ} {a : ◇ ◇ ◇ A at n}
+    μ-assoc-◇ : {A : τ} {n : ℕ} {a : ◇ ◇ ◇ A at n}
              -> (μ.at A n (μ.at (F-◇.omap A) n a))
               ≡ (μ.at A n (F-◇.fmap (μ.at A) n a))
     μ-assoc-◇ {A} {n} {k , v} with inspect (compareLeq k n)

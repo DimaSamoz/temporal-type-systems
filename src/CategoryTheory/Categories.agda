@@ -16,9 +16,9 @@ postulate
 -- Type class for categories.
 -- Based on https://github.com/UlfNorell/category-theory-experiments
 record Category (n : Level) : Set (lsuc (lsuc n)) where
-    infixr 50 _~>_
+    infixr 10 _~>_
     infixl 40 _≈_
-    infix 60 _∘_
+    infixr 60 _∘_
     field
         -- || Data
         -- Objects
