@@ -131,3 +131,33 @@ open Closed closed public
 ℝeactive-cart : Cartesian ℝeactive
 ℝeactive-cart = cart
 
+-- Sum of three morphisms
+[_⁏_⁏_] : ∀{S A B C : τ} -> (A ⇴ S) -> (B ⇴ S) -> (C ⇴ S) -> (A ⊕ B ⊕ C ⇴ S)
+[ f ⁏ g ⁏ h ] = [ [ f ⁏ g ] ⁏ h ]
+
+-- Non-canonical distribution morphism
+dist : ∀{A B C : τ} ->  A ⊗ (B ⊕ C) ⇴ (A ⊗ B) ⊕ (A ⊗ C)
+dist n (a , inj₁ b) = inj₁ (a , b)
+dist n (a , inj₂ c) = inj₂ (a , c)
+
+dist2 : ∀{A B C D : τ} ->  A ⊗ (B ⊕ C ⊕ D) ⇴ (A ⊗ B) ⊕ (A ⊗ C) ⊕ (A ⊗ D)
+dist2 n (a , inj₁ (inj₁ b)) = inj₁ (inj₁ (a , b))
+dist2 n (a , inj₁ (inj₂ c)) = inj₁ (inj₂ (a , c))
+dist2 n (a , inj₂ d) = inj₂ (a , d)
+
+-- ℝeactive is distributive
+dist-ℝ : ∀{A B C : τ} -> (A ⊗ B) ⊕ (A ⊗ C) <~> A ⊗ (B ⊕ C)
+dist-ℝ = record
+    { iso~> = [ id * ι₁ ⁏ id * ι₂ ]
+    ; iso<~ = dist
+    ; iso-id₁ = dist-iso-id₁
+    ; iso-id₂ = dist-iso-id₂
+    }
+    where
+    dist-iso-id₁ : ∀{A B C : τ} -> dist {A}{B}{C} ∘ [ id * ι₁ ⁏ id * ι₂ ] ≈ id
+    dist-iso-id₁ {n = n} {inj₁ (a , b)} = refl
+    dist-iso-id₁ {n = n} {inj₂ (a , c)} = refl
+
+    dist-iso-id₂ : ∀{A B C : τ} -> [ id * ι₁ ⁏ id * ι₂ ] ∘ dist {A}{B}{C} ≈ id
+    dist-iso-id₂ {n = n} {a , inj₁ b} = refl
+    dist-iso-id₂ {n = n} {a , inj₂ c} = refl

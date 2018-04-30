@@ -82,8 +82,8 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
         -- Binary products for all pairs of objects
         prod : ∀(A B : obj) -> Product ℂ A B
 
-    -- Shorthand for terminal object
-    ⊤ = TerminalObj.⊤ term
+    open TerminalObj term public
+    open module P {A} {B} = Product (prod A B) public
 
     -- Shorthand for sum object
     infixl 25 _⊗_
@@ -95,8 +95,38 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
     _*_ : {A B P Q : obj} -> (A ~> P) -> (B ~> Q)
        -> (A ⊗ B ~> P ⊗ Q)
     _*_ {A} {B} {P} {Q} f g = ⟨ f ∘ π₁ , g ∘ π₂ ⟩
+
+    -- Parallel product with an idempotent morphism distributes over ∘
+    *-idemp-dist-∘ : {A B C D : obj}{g : B ~> C}{f : A ~> B}{h : D ~> D}
+            -> h ∘ h ≈ h
+            -> g * h ∘ f * h ≈ (g ∘ f) * h
+    *-idemp-dist-∘ {g = g}{f}{h} idemp = ⊗-unique u₁ u₂ [sym]
         where
-        open Product (prod P Q) using (⟨_,_⟩)
+        u₁ : π₁ ∘ (g * h ∘ f * h) ≈ (g ∘ f) ∘ π₁
+        u₁ = ∘-assoc [sym] ≈> ≈-cong-left π₁-comm
+          ≈> ∘-assoc ≈> ≈-cong-right π₁-comm ≈> ∘-assoc [sym]
+        u₂ : π₂ ∘ (g * h ∘ f * h) ≈ h ∘ π₂
+        u₂ = ∘-assoc [sym] ≈> ≈-cong-left π₂-comm
+          ≈> ∘-assoc ≈> ≈-cong-right π₂-comm
+          ≈> ∘-assoc [sym] ≈> ≈-cong-left idemp
+
+    -- Commutativity of product
+    comm : {A B : obj} -> A ⊗ B ~> B ⊗ A
+    comm {A}{B} = ⟨ π₂ , π₁ ⟩
+
+    -- Associativity of product
+    assoc-left : {A B C : obj} -> A ⊗ (B ⊗ C) ~> (A ⊗ B) ⊗ C
+    assoc-left = ⟨ ⟨ π₁ , (π₁ ∘ π₂) ⟩ , π₂ ∘ π₂ ⟩
+
+    assoc-right : {A B C : obj} -> (A ⊗ B) ⊗ C ~> A ⊗ (B ⊗ C)
+    assoc-right = ⟨ π₁ ∘ π₁ , ⟨ (π₂ ∘ π₁) , π₂ ⟩ ⟩
+
+    -- Left and right unit for product
+    unit-left : {A : obj} -> ⊤ ⊗ A ~> A
+    unit-left = π₂
+
+    unit-right : {A : obj} -> A ⊗ ⊤ ~> A
+    unit-right = π₁
 
     -- The terminal object is the unit for product
     ⊤-left-cancel : ∀{A} -> ⊤ ⊗ A <~> A
@@ -131,8 +161,6 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
         ; iso-id₂ = π₁-comm
         }
         where
-        open TerminalObj term using (!)
-
         iso-id₁-⊤ : ⟨ id , ! ⟩ ∘ π₁ ≈ id
         iso-id₁-⊤ =
             begin
