@@ -77,6 +77,7 @@ open import Data.Sum
             ; Λ = λ f a b → f (a , b)
             ; Λ-comm = refl
             ; Λ-unique = λ pr → λ {a} ->  unique-closed (ext λ x → pr {x})
+            ; Λ-cong = λ pr → ext (λ _ → pr)
             }
         }
     }

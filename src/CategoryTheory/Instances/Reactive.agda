@@ -93,6 +93,7 @@ infixr 10 _⇴_
             ; Λ = λ  f n a b → f n (a , b)
             ; Λ-comm = refl
             ; Λ-unique = λ pr → unique-closed (ext λ n → ext λ a → pr {n} {a})
+            ; Λ-cong = λ pr → ext λ _ → pr
             }
         }
     }

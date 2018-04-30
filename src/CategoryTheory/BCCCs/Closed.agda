@@ -26,6 +26,22 @@ module _ {n} {ℂ : Category n} (Cℂ : Cartesian ℂ) where
                   -> eval ∘ (Λ e * id) ≈ e
             Λ-unique : ∀{E} -> {e : E ⊗ A ~> B} {m : E ~> A⇒B}
                   -> eval ∘ (m * id) ≈ e -> Λ e ≈ m
+            Λ-cong : ∀{E} {f g : E ⊗ A ~> B}
+                  -> f ≈ g -> Λ f ≈ Λ g
+
+        -- Currying identity
+        Λ-*id : ∀{D E} {f : E ⊗ A ~> B} {g : D ~> E}
+             -> Λ (f ∘ (g * id)) ≈ Λ f ∘ g
+        Λ-*id {D}{E}{f}{g} =
+            begin
+                Λ (f ∘ (g * id))
+            ≈⟨ Λ-cong (≈-cong-left (Λ-comm [sym]) ≈> ∘-assoc) ⟩
+                Λ (eval ∘ (Λ f * id) ∘ (g * id))
+            ≈⟨ Λ-cong (≈-cong-right (*-idemp-dist-∘ id-left)) ⟩
+                Λ (eval ∘ (Λ f ∘ g) * id)
+            ≈⟨ Λ-unique r≈ ⟩
+                Λ f ∘ g
+            ∎
 
 -- Type class for closed categories
 -- definition using exponentials
