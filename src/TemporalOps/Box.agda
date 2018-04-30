@@ -5,7 +5,9 @@ module TemporalOps.Box where
 open import CategoryTheory.Categories
 open import CategoryTheory.Instances.Sets
 open import CategoryTheory.Instances.Reactive
+open import CategoryTheory.BCCCs
 open import CategoryTheory.Functor
+open import CategoryTheory.CartesianFunctor
 open import CategoryTheory.NatTrans
 open import CategoryTheory.Adjunction
 open import CategoryTheory.Comonad
@@ -35,12 +37,12 @@ K⊣G : K ⊣ G
 K⊣G = record
     { η = record
         { at = λ A x n → x
-        ; nat-cond = λ {A} {B} {f} {a} → refl }
+        ; nat-cond = refl }
     ; ε = record
-        { at = λ A n z → z n
-        ; nat-cond = λ {A} {B} {f} {n} {a} → refl }
-    ; tri1 = λ {A} {n} {a} → refl
-    ; tri2 = λ {B} {a} → refl
+        { at = λ A n a → a n
+        ; nat-cond = refl }
+    ; tri1 = refl
+    ; tri2 = refl
     }
 
 -- | Box operator
@@ -56,3 +58,19 @@ F-□ = Comonad.W W-□
 -- Operator from functor
 □_ : τ -> τ
 □_ = Functor.omap (Comonad.W W-□)
+infixr 65 □_
+
+-- □ is a Cartesian functor
+F-cart-□ : CartesianFunctor F-□ ℝeactive-cart ℝeactive-cart
+F-cart-□ = record
+    { u = λ n a _ → a
+    ; m = m-□
+    ; associative = refl
+    ; unital-right = refl
+    ; unital-left = refl
+    }
+    where
+    m-□ : ∀(A B : τ) -> □ A ⊗ □ B ⇴ □ (A ⊗ B)
+    m-□ A B n (a , b) = λ k → a k , b k
+
+open CartesianFunctor F-cart-□ public
