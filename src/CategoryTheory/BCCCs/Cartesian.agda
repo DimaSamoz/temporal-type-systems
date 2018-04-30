@@ -83,18 +83,18 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
         prod : ∀(A B : obj) -> Product ℂ A B
 
     -- Shorthand for terminal object
-    ⊤ : obj
     ⊤ = TerminalObj.⊤ term
 
-    -- Shorthand for product object
-    infixr 70 _⊗_
+    -- Shorthand for sum object
+    infixl 25 _⊗_
     _⊗_ : (A B : obj) -> obj
-    _⊗_ A B = Product.A⊗B (prod A B)
+    A ⊗ B = A⊗B {A} {B}
 
     -- Parallel product of morphisms
+    infixl 65 _*_
     _*_ : {A B P Q : obj} -> (A ~> P) -> (B ~> Q)
        -> (A ⊗ B ~> P ⊗ Q)
-    _*_ {A} {B} {P} {Q} f g = ⟨ f ∘ Product.π₁ (prod A B) , g ∘ Product.π₂ (prod A B) ⟩
+    _*_ {A} {B} {P} {Q} f g = ⟨ f ∘ π₁ , g ∘ π₂ ⟩
         where
         open Product (prod P Q) using (⟨_,_⟩)
 
@@ -107,9 +107,6 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
         ; iso-id₂ = π₂-comm
         }
         where
-        open Product (prod ⊤ A)
-        open TerminalObj term
-
         iso-id₁-⊤ : ⟨ ! , id ⟩ ∘ π₂ ≈ id
         iso-id₁-⊤ =
             begin
@@ -134,7 +131,6 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
         ; iso-id₂ = π₁-comm
         }
         where
-        open Product (prod A ⊤)
         open TerminalObj term using (!)
 
         iso-id₁-⊤ : ⟨ id , ! ⟩ ∘ π₁ ≈ id

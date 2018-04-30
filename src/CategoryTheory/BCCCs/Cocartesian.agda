@@ -70,7 +70,6 @@ module _ {n} (ℂ : Category n) where
 -- Type class for cocartesian categories
 record Cocartesian {n} (ℂ : Category n) : Set (lsuc n) where
     open Category ℂ
-    open Sum hiding ([_,_])
     field
         -- | Data
         -- Initial object
@@ -78,18 +77,15 @@ record Cocartesian {n} (ℂ : Category n) : Set (lsuc n) where
         -- Binary sums for all pairs of objects
         sum : ∀(A B : obj) -> Sum ℂ A B
 
-    -- Shorthand for initial object
-    ⊥ : obj
-    ⊥ = InitialObj.⊥ init
+    open InitialObj init public
+    open module S {A} {B} = Sum (sum A B) public
 
     -- Shorthand for sum object
-    infixr 65 _⊕_
+    infixl 22 _⊕_
     _⊕_ : (A B : obj) -> obj
-    _⊕_ A B = Sum.A⊕B (sum A B)
+    A ⊕ B = A⊕B {A} {B}
 
     -- Parallel sum of morphisms
     _⊹_ : {A B P Q : obj} -> (A ~> P) -> (B ~> Q)
        -> (A ⊕ B ~> P ⊕ Q)
-    _⊹_ {A} {B} {P} {Q} f g = [ ι₁ (sum P Q) ∘ f , ι₂ (sum P Q) ∘ g ]
-        where
-        open Sum (sum A B) using ([_,_])
+    _⊹_ {A} {B} {P} {Q} f g = [ ι₁ ∘ f ⁏ ι₂ ∘ g ]

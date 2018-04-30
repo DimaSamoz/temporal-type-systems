@@ -47,12 +47,13 @@ module _ {n} {ℂ : Category n} (Cℂ : Cartesian ℂ) where
 -- definition using exponentials
 record Closed {n} {ℂ : Category n} (Cℂ : Cartesian ℂ) : Set (lsuc n) where
     open Category ℂ
-    open Exponential
     field
         -- Exponential object for each pair of objects
         exp : ∀(A B : obj) -> Exponential Cℂ A B
 
+    open module E {A} {B} = Exponential (exp A B) public
+
     -- Shorthand for exponential object
-    infixr 70 _⇒_
+    infixr 20 _⇒_
     _⇒_ : (A B : obj) -> obj
-    _⇒_ A B = A⇒B (exp A B)
+    A ⇒ B = A⇒B {A} {B}

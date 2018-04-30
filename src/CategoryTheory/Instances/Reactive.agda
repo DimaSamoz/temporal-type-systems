@@ -119,41 +119,15 @@ infixr 10 _⇴_
               -> ∀{n}{a : E n} -> (λ b → e n (a , b)) ≡ m n a
     unique-closed refl = refl
 
--- Top-level shorthands for distinguished BCCC objects
+
+-- | Top-level shorthands for distinguished BCCC objects and morphisms
 open BicartesianClosed ℝeactive-BCCC
-
--- Terminal object: the constant unit type
-⊤ : τ
-⊤ = TerminalObj.⊤ (Cartesian.term cart)
-
--- Initial object: the constant void type
-⊥ : τ
-⊥ = InitialObj.⊥ (Cocartesian.init cocart)
-
--- Product object: pairwise product of types
-_⊗_ : τ -> τ -> τ
-A ⊗ B = Product.A⊗B (Cartesian.prod cart A B)
-infixl 25 _⊗_
-
--- Product of two morphisms
-⟨_,_⟩ : ∀{P A B : τ} -> (P ⇴ A) -> (P ⇴ B) -> (P ⇴ (A ⊗ B))
-⟨_,_⟩ {P} {A} {B} = Product.⟨_,_⟩ (Cartesian.prod cart A B)
-
--- First projection morphism
-π₁ : ∀{A B : τ} -> (A ⊗ B ⇴ A)
-π₁ {A} {B} = Product.π₁ (Cartesian.prod cart A B)
-
--- Second projection morphism
-π₂ : ∀{A B : τ} -> (A ⊗ B ⇴ B)
-π₂ {A} {B} = Product.π₂ (Cartesian.prod cart A B)
-
--- Sum object: pairwise sum of types
-_⊕_ : τ -> τ -> τ
-A ⊕ B = Sum.A⊕B (Cocartesian.sum cocart A B)
-infixl 22 _⊕_
 open Category ℝeactive hiding (begin_ ; _∎) public
 
--- Exponential object: pointwise functions
-_⇒_ : τ -> τ -> τ
-A ⇒ B = Exponential.A⇒B (Closed.exp closed A B)
-infixl 20 _⇒_
+open Cartesian cart public
+open Cocartesian cocart public
+open Closed closed public
+
+ℝeactive-cart : Cartesian ℝeactive
+ℝeactive-cart = cart
+
