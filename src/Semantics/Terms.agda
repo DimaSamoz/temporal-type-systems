@@ -24,9 +24,6 @@ open import Data.Nat as N
 
 open W.Comonad W-□
 open M.Monad M-◇
-private module ε = _⟹_ ε
-private module η = _⟹_ η
-private module μ = _⟹_ μ
 
 mutual
     -- Denotation of pure terms as morphisms from contexts to types.
