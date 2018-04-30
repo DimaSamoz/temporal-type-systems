@@ -27,6 +27,47 @@ private module F-□ = Functor F-◇
 open ≡.≡-Reasoning
 
 
+-- | Natural transformations between modalities
+
+-- delay A by 1 is the same as ▹ A
+▹¹-to-▹ : F-delay 1 ⟺ F-▹
+▹¹-to-▹ = record
+    { to   = record { at = λ A n x → x ; nat-cond = refl }
+    ; from = record { at = λ A n x → x ; nat-cond = refl }
+    ; iso1 = refl
+    ; iso2 = refl
+    }
+
+-- □ A is always available, in particular, after a delay by k
+□-to-▹ᵏ : ∀(k : ℕ) -> F-□ ⟹ F-delay k
+□-to-▹ᵏ k = record
+    { at = at-□-▹ᵏ k
+    ; nat-cond = nat-cond-□-▹ᵏ k
+    }
+    where
+    at-□-▹ᵏ : ∀(k : ℕ)(A : τ) -> □ A ⇴ delay A by k
+    at-□-▹ᵏ zero A n a = a n
+    at-□-▹ᵏ (suc k) A zero a = top.tt
+    at-□-▹ᵏ (suc k) A (suc n) a = at-□-▹ᵏ k A n a
+
+    nat-cond-□-▹ᵏ : ∀(k : ℕ){A B : τ} {f : A ⇴ B} →
+      Functor.fmap (F-delay k) f ∘ at-□-▹ᵏ k A ≈
+      at-□-▹ᵏ k B ∘ Functor.fmap F-□ f
+    nat-cond-□-▹ᵏ zero {A} {B} {f} {n} {a} = refl
+    nat-cond-□-▹ᵏ (suc k) {A} {B} {f} {zero} {a} = refl
+    nat-cond-□-▹ᵏ (suc k) {A} {B} {f} {suc n} {a} = nat-cond-□-▹ᵏ k
+
+-- If A is delayed by k, then it is delayed
+▹ᵏ-to-◇ : ∀(k : ℕ) -> F-delay k ⟹ F-◇
+▹ᵏ-to-◇ k = record
+    { at = λ A n a → k , a
+    ; nat-cond = refl
+    }
+
+-- □ A is always available, in particular, after any delay
+□-to-◇ : ∀{k} -> F-□ ⟹ F-◇
+□-to-◇ {k} = ▹ᵏ-to-◇ k ⊚ □-to-▹ᵏ k
+
 
 -- | Monadic operations for ◇
 
