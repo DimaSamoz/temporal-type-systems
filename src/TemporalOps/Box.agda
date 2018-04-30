@@ -60,6 +60,12 @@ F-□ = Comonad.W W-□
 □_ = Functor.omap (Comonad.W W-□)
 infixr 65 □_
 
+-- Extensional equality for boxed values
+□-≡ : ∀{A} n l {v : (□ A) n}{w : (□ A) l}
+   -> v ≡ w
+   -> ∀ m -> v m ≡ w m
+□-≡ n l refl m = refl
+
 -- □ is a Cartesian functor
 F-cart-□ : CartesianFunctor F-□ ℝeactive-cart ℝeactive-cart
 F-cart-□ = record
