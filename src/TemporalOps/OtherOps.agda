@@ -73,6 +73,17 @@ _>>=_ {n = n} a f = (f ⋆) n a
          -> a >>= η.at A ≡ a
 >>=-unit-right a = η-unit2
 
+-- | Other properties of ◇
+
+-- ◇ is a □-strong monad
+◇-□-strong : ∀{A B : τ} -> □ A ⊗ ◇ B ⇴ ◇ (□ A ⊗ B)
+◇-□-strong {A} n (□A , (k , v)) =
+    k , (pair-delay k n (_⟹_.at (□-to-▹ᵏ k) (□ A) n (δ.at A n □A) , v))
+
+-- Sample a signal at an event
+◇-sample : ∀{A B : τ} -> □ A ⊗ ◇ B ⇴ ◇ (A ⊗ B)
+◇-sample {A} = F-□.fmap (ε.at A * id) ∘ ◇-□-strong
+
 -- If we know that A and B eventually happens, then at a future point either
 --   * A happens and B still hasn't
 --   * B happens but A still hasn't
