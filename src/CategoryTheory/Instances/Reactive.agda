@@ -55,16 +55,16 @@ infixr 10 _⇴_
         { term = record
             { ⊤ = λ n → top
             ; ! = λ n _ → top.tt
-            ; unique = λ m → refl
+            ; !-unique = λ m → refl
             }
         ; prod = λ A B → record
             { A⊗B = λ n → A n × B n
             ; π₁ = λ n → proj₁
             ; π₂ = λ n → proj₂
             ; ⟨_,_⟩ = λ f g n a → (f n a , g n a)
-            ; comm-π₁ = λ {P} {p₁} {p₂} {n} {a} → refl
-            ; comm-π₂ = λ {P} {p₁} {p₂} {n} {a} → refl
-            ; unique = λ pr1 pr2 → unique-cart (ext λ a → ext λ n → pr1 {a} {n})
+            ; π₁-comm = λ {P} {p₁} {p₂} {n} {a} → refl
+            ; π₂-comm = λ {P} {p₁} {p₂} {n} {a} → refl
+            ; ⊗-unique = λ pr1 pr2 → unique-cart (ext λ a → ext λ n → pr1 {a} {n})
                                                (ext λ a → ext λ n → pr2 {a} {n})
             }
         }
@@ -72,16 +72,16 @@ infixr 10 _⇴_
         { init = record
             { ⊥ = λ n → bot
             ; ¡ = λ {A} n → λ ()
-            ; unique = λ {A} m {n} → λ {}
+            ; ¡-unique = λ {A} m {n} → λ {}
             }
         ; sum = λ A B → record
             { A⊕B = λ n → A n ⊎ B n
             ; ι₁ = λ n → inj₁
             ; ι₂ = λ n → inj₂
-            ; [_,_] = sum
-            ; comm-ι₁ = λ {S} {i₁} {i₂} {n} {a} → refl
-            ; comm-ι₂ = λ {S} {i₁} {i₂} {n} {a} → refl
-            ; unique = λ {S} {i₁} {i₂} {m} pr1 pr2 →
+            ; [_⁏_] = sum
+            ; ι₁-comm = λ {S} {i₁} {i₂} {n} {a} → refl
+            ; ι₂-comm = λ {S} {i₁} {i₂} {n} {a} → refl
+            ; ⊕-unique = λ {S} {i₁} {i₂} {m} pr1 pr2 →
                         unique-cocart {m = m} (ext λ a → ext λ n → pr1 {a} {n})
                                       (ext λ a → ext λ n → pr2 {a} {n})
             }
@@ -90,9 +90,9 @@ infixr 10 _⇴_
         { exp = λ A B → record
             { A⇒B = λ n → A n -> B n
             ; eval = λ n z → proj₁ z (proj₂ z)
-            ; ƛ = λ {E} z n z₁ z₂ → z n (z₁ , z₂)
-            ; comm-ƛ = refl
-            ; unique = λ pr → unique-closed (ext λ n → ext λ a → pr {n} {a})
+            ; Λ = λ  f n a b → f n (a , b)
+            ; Λ-comm = refl
+            ; Λ-unique = λ pr → unique-closed (ext λ n → ext λ a → pr {n} {a})
             }
         }
     }

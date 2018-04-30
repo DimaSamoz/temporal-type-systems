@@ -19,13 +19,13 @@ module _ {n} {ℂ : Category n} (Cℂ : Cartesian ℂ) where
             -- Evaluation map
             eval : A⇒B ⊗ A ~> B
             -- Canonical transposition morphism (currying)
-            ƛ : ∀{E} -> (E ⊗ A ~> B) -> (E ~> A⇒B)
+            Λ : ∀{E} -> (E ⊗ A ~> B) -> (E ~> A⇒B)
 
             -- | Laws
-            comm-ƛ : ∀{E} -> {e : E ⊗ A ~> B}
-                  -> eval ∘ (ƛ e * id) ≈ e
-            unique : ∀{E} -> {e : E ⊗ A ~> B} {m : E ~> A⇒B}
-                  -> eval ∘ (m * id) ≈ e -> ƛ e ≈ m
+            Λ-comm : ∀{E} -> {e : E ⊗ A ~> B}
+                  -> eval ∘ (Λ e * id) ≈ e
+            Λ-unique : ∀{E} -> {e : E ⊗ A ~> B} {m : E ~> A⇒B}
+                  -> eval ∘ (m * id) ≈ e -> Λ e ≈ m
 
 -- Type class for closed categories
 -- definition using exponentials
