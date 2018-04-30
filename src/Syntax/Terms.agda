@@ -70,7 +70,7 @@ mutual
                                 ->                 Γ ⊢ A always
 
         -- A stable type can be sampled now
-        sample : ∀{Γ A}         ->                 Γ ⊢ A always
+        sample : ∀{A Γ}         ->                 Γ ⊢ A always
                                                   --------------
                                 ->                   Γ ⊢ A now
 
@@ -89,6 +89,11 @@ mutual
                                     ----------------------------------------
                                 ->                 Γ ⊢ B now
 
+        -- If a type is available always, it is available later
+        wait : ∀{A Γ}           ->                 Γ ⊢ A always
+                                                 -----------------
+                                ->                Γ ⊢ Event A now
+
         -- Event constructor
         event : ∀{Γ A}          ->                 Γ ⊨ A now
                                                ------------------
@@ -98,7 +103,7 @@ mutual
     infix 10 _⊨_
     data _⊨_ : Context -> Judgement -> Set where
         -- Pure term is a computational term
-        pure : ∀{Γ A}           ->                   Γ ⊢ A
+        pure : ∀{A Γ}           ->                   Γ ⊢ A
                                                     -------
                                 ->                   Γ ⊨ A
 

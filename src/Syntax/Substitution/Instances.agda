@@ -86,6 +86,7 @@ module K {𝒮 : Schema} (k : Kit 𝒮) where
         traverse σ (sig M)     = sig (traverse σ M)
         traverse σ (letSig S In M) = letSig traverse σ S
                                          In traverse (σ ↑ k) M
+        traverse σ (wait M)    = wait (traverse σ M)
         traverse σ (event E)   = event (traverse′ σ E)
 
         traverse′ : ∀{Γ Δ A} -> Subst 𝒮 Γ Δ -> Γ ⊨ A -> Δ ⊨ A
