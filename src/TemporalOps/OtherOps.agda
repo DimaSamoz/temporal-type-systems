@@ -26,7 +26,7 @@ open import Holes.Cong.Propositional
 open Monad M-◇
 open Comonad W-□
 private module F-◇ = Functor F-◇
-private module F-□ = Functor F-◇
+private module F-□ = Functor F-□
 open ≡.≡-Reasoning
 
 
