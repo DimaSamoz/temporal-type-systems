@@ -1,4 +1,4 @@
-
+{-# OPTIONS --allow-unsolved-metas #-}
 {- Denotational semantics of the terms in the category of temporal types. -}
 module Semantics.Terms where
 
@@ -48,12 +48,11 @@ mutual
     ⟦ stable {Γ} S  ⟧ₘ = F-□.fmap ⟦ S ⟧ₘ ∘ ⟦ Γ ⟧ˢₓ-□
     ⟦ sig S         ⟧ₘ = ⟦ S ⟧ₘ
     ⟦ letSig S In B ⟧ₘ = ⟦ B ⟧ₘ ∘ ⟨ id , ⟦ S ⟧ₘ ⟩
-    ⟦ wait {A} E    ⟧ₘ = ⟹.at (□-to-◇ {1}) ⟦ A ⟧ₜ ∘ ⟦ E ⟧ₘ
     ⟦ event E       ⟧ₘ = ⟦ E ⟧ᵐ
 
     -- Denotation of computational terms as Kleisli morphisms from contexts to types.
     ⟦_⟧ᵐ : ∀{Γ A} -> Γ ⊨ A -> (⟦ Γ ⟧ₓ ⇴ ◇ ⟦ A ⟧ⱼ)
-    ⟦ (pure {A} M)   ⟧ᵐ = η.at ⟦ A ⟧ⱼ ∘ ⟦ M ⟧ₘ
+    ⟦ pure {A} M     ⟧ᵐ = η.at ⟦ A ⟧ⱼ ∘ ⟦ M ⟧ₘ
     ⟦ letSig S InC C ⟧ᵐ = ⟦ C ⟧ᵐ ∘ ⟨ id , ⟦ S ⟧ₘ ⟩
     ⟦ letEvt_In_ {Γ} {A} E C ⟧ᵐ n env =
         ⟦ E ⟧ₘ n env >>= λ k ⟦A⟧ → ⟦ C ⟧ᵐ k (⟦ Γ ⟧ˢₓ-□ n env k , ⟦A⟧)

@@ -60,7 +60,6 @@ subst-var (σ ▸ T) (pop v) = subst-var σ v
 
 module K {𝒮 : Schema} (k : Kit 𝒮) where
     open Kit k
-    open SubstKit 𝒱arₛ
 
     -- | Type-preserving term traversal
     -- | Traverses the syntax tree of the term, applying
@@ -86,7 +85,6 @@ module K {𝒮 : Schema} (k : Kit 𝒮) where
         traverse σ (sig M)     = sig (traverse σ M)
         traverse σ (letSig S In M) = letSig traverse σ S
                                          In traverse (σ ↑ k) M
-        traverse σ (wait M)    = wait (traverse σ M)
         traverse σ (event E)   = event (traverse′ σ E)
 
         traverse′ : ∀{Γ Δ A} -> Subst 𝒮 Γ Δ -> Γ ⊨ A -> Δ ⊨ A
@@ -109,6 +107,10 @@ rename = traverse 𝒱ar
 -- Weakening is a renaming with a weakening substitution
 weaken-top : ∀{B Γ A} -> Γ ⊢ A → Γ , B ⊢ A
 weaken-top = rename (weak-topₛ 𝒱arₛ)
+
+-- Weakening is a renaming with a weakening substitution
+weaken′-top : ∀{B Γ A} -> Γ ⊨ A → Γ , B ⊨ A
+weaken′-top = traverse′ 𝒱ar (weak-topₛ 𝒱arₛ)
 
 
 -- | Term kit

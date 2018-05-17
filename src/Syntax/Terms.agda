@@ -89,11 +89,6 @@ mutual
                                     ----------------------------------------
                                 ->                 Γ ⊢ B now
 
-        -- If a type is available always, it is available later
-        wait : ∀{A Γ}           ->                 Γ ⊢ A always
-                                                 -----------------
-                                ->                Γ ⊢ Event A now
-
         -- Event constructor
         event : ∀{Γ A}          ->                 Γ ⊨ A now
                                                ------------------
@@ -114,7 +109,7 @@ mutual
 
         -- Event destructor
         letEvt_In_ : ∀{Γ A B}   ->   Γ ⊢ Event A now  ->   Γ ˢ , A now  ⊨ B now
-                                    ----------------------------------------
+                                    --------------------------------------------
                                 ->                 Γ ⊨ B now
 
         -- Select the event that happens first
