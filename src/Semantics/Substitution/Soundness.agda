@@ -33,6 +33,9 @@ open import Relation.Binary.PropositionalEquality as ≡
     using (_≡_ ; refl ; sym ; trans ; cong ; cong₂ ; subst)
 
 open ≡.≡-Reasoning
+open import Holes.Term using (⌞_⌟)
+open import Holes.Cong.Propositional
+
 
 open ⟦K⟧ ⟦𝒯erm⟧
 

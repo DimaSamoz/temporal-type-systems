@@ -113,7 +113,7 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
                 ⟦ C ⟧ᵐ l (⟦subst⟧ (_↑_ {A now} (σ ↓ˢ k) k) l (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , ⟦A⟧))
             ≡⟨ cong (⟦ C ⟧ᵐ l) (⟦↑⟧ (A now) (σ ↓ˢ k) {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , ⟦A⟧}) ⟩
                 ⟦ C ⟧ᵐ l (⟦subst⟧ (σ ↓ˢ k) l (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l) , ⟦A⟧)
-            ≡⟨ cong (λ x → ⟦ C ⟧ᵐ l (x , ⟦A⟧)) (□-≡ n l (⟦subst⟧-⟦⟧ˢₓ-□ σ) l) ⟩
+            ≡⟨ cong (λ x → ⟦ C ⟧ᵐ l (x , ⟦A⟧)) (□-≡ n l (⟦↓ˢ⟧ σ) l) ⟩
                 ⟦ C ⟧ᵐ l (⟦ Γ ⟧ˢₓ-□ n (⟦subst⟧ σ n ⟦Δ⟧) l , ⟦A⟧)
             ∎)
          ⟩

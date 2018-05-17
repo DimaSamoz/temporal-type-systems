@@ -149,15 +149,15 @@ module ⟦K⟧ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
     ⟦subst⟧-⟦select⟧ {Δ} A B σ n l (inj₁ (inj₁ (⟦A⟧ , ⟦◇B⟧))) ⟦Δ⟧
         rewrite ⟦↑⟧ (A now) (_↑_ {Event B now} (σ ↓ˢ k) k) {l} {(⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , ⟦◇B⟧) , ⟦A⟧}
               | ⟦↑⟧ (Event B now) (σ ↓ˢ k) {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , ⟦◇B⟧}
-              | □-≡ n l (⟦subst⟧-⟦⟧ˢₓ-□ σ {n} {⟦Δ⟧}) l = refl
+              | □-≡ n l (⟦↓ˢ⟧ σ {n} {⟦Δ⟧}) l = refl
     ⟦subst⟧-⟦select⟧ {Δ} A B σ n l (inj₁ (inj₂ (⟦◇A⟧ , ⟦B⟧))) ⟦Δ⟧
         rewrite ⟦↑⟧ (B now) (_↑_ {Event A now} (σ ↓ˢ k) k) {l} {(⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , ⟦◇A⟧) , ⟦B⟧}
               | ⟦↑⟧ (Event A now) (σ ↓ˢ k) {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , ⟦◇A⟧}
-              | □-≡ n l (⟦subst⟧-⟦⟧ˢₓ-□ σ {n} {⟦Δ⟧}) l = refl
+              | □-≡ n l (⟦↓ˢ⟧ σ {n} {⟦Δ⟧}) l = refl
     ⟦subst⟧-⟦select⟧ {Δ} A B σ n l (inj₂ (⟦A⟧ , ⟦B⟧)) ⟦Δ⟧
         rewrite ⟦↑⟧ (B now) (_↑_ {A now} (σ ↓ˢ k) k) {l} {(⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , ⟦A⟧) , ⟦B⟧}
               | ⟦↑⟧ (A now) (σ ↓ˢ k) {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , ⟦A⟧}
-              | □-≡ n l (⟦subst⟧-⟦⟧ˢₓ-□ σ {n} {⟦Δ⟧}) l = refl
+              | □-≡ n l (⟦↓ˢ⟧ σ {n} {⟦Δ⟧}) l = refl
 
     -- ⟦subst⟧-⟦select⟧ : ∀{Δ Γ C} A B -> (σ : Subst 𝒮 Γ Δ)
     --     -> {⟦C₁⟧ : ⟦ Γ ˢ ⟧ₓ ⊗ ◇ ⟦ B ⟧ₜ ⊗ ⟦ A ⟧ₜ ⇴ ◇ ⟦ C ⟧ₜ}
