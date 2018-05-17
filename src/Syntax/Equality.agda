@@ -21,6 +21,9 @@ x₂ = var (pop top)
 x₃ : ∀{Γ A B C} -> Γ , A now , B , C ⊢ A now
 x₃ = var (pop (pop top))
 
+x₄ : ∀{Γ A B C D} -> Γ , A now , B , C , D ⊢ A now
+x₄ = var (pop (pop (pop top)))
+
 s₁ : ∀{Γ A} -> Γ , A always ⊢ A always
 s₁ = svar top
 
@@ -29,6 +32,9 @@ s₂ = svar (pop top)
 
 s₃ : ∀{Γ A B C} -> Γ , A always , B , C ⊢ A always
 s₃ = svar (pop (pop top))
+
+s₄ : ∀{Γ A B C D} -> Γ , A always , B , C , D ⊢ A always
+s₄ = svar (pop (pop (pop top)))
 
 
 -- β-η equality of terms
@@ -262,3 +268,42 @@ data Eq′ (Γ : Context) where
                             ->            (D : Γ ˢ , A now ⊨ B now)
                                 -----------------------------------------------
                             ->   Γ ⊨ letEvt E₁ In D ≡ letEvt E₂ In D ∷ B now
+
+test : ∀{A} -> ∙ ⊢ (Signal A => A) now
+test = lam (letSig x₁ In sample s₁)
+
+tes : ∀{A} -> ∙ ⊢ (Signal A => Signal (Signal A)) now
+tes = lam (letSig x₁ In sig (stable (sig s₁)))
+
+te : ∀{A} -> ∙ ⊢ (A => Event A) now
+te = lam (event (pure x₁))
+
+t2 : ∀{A} -> ∙ ⊢ (Signal A) now -> ∙ ⊢ A always
+t2 M = stable (letSig M In sample s₁)
+
+t : ∀{A} -> ∙ ⊢ (Event (Event A) => Event A) now
+t = lam (event (letEvt x₁ In (letEvt x₁ In pure x₁)))
+
+t3 : ∀{A B} -> ∙ ⊢ (Event A => Signal (A => Event B) => Event B) now
+t3 = lam (lam
+        (letSig x₁ In (event
+        (letEvt x₃ In
+        (letEvt (sample s₂ $ x₁) In pure x₁)))))
+
+-- t4 : ∀{A B C} -> ∙ ⊢ (Event A => Event B => Signal (A => Event C) => Signal (B => Event C) => Event C) now
+-- t4 = lam (lam (lam (lam (
+--         letSig x₂ In (
+--         letSig x₂ In (event (
+--             select (var (pop (pop (pop (pop (pop top)))))) ↦ letEvt sample s₄ $ x₁ In pure x₁
+--                 || (var (pop (pop (pop (pop top))))) ↦ letEvt (sample s₃ $ x₁) In pure x₁
+--                 ||both↦ {!   !})))))))
+
+t5 : ∀{A B} -> ∙ , Signal A now , Event (A => B) now ⊨ B now
+t5 = letSig (var (pop top)) InC (letEvt (var (pop top)) In pure (x₁ $ sample s₂))
+
+t6 : ∀{A B} -> ∙ , Event (Signal A) now , Signal B now ⊢ Event (Signal (A & B)) now
+t6 = event (letSig x₁ InC (letEvt x₃ In (pure (letSig x₁ In (sig (stable [ sample (svar top) ,, sample (svar (pop top)) ]))))))
+-- t6 = event (letSig x₁ InC (letEvt x₃ In (letSig x₁ InC (pure [ sample s₁ ,, sample s₃ ]))))
+
+too : ∀{A B} -> ∙ ⊢ Signal (A => B) => (Event A => Event B) now
+too = lam (lam (letSig x₂ In event (letEvt x₂ In pure (sample s₂ $ x₁))))

@@ -7,6 +7,8 @@ open import Syntax.Types
 open import Syntax.Context
 open import Syntax.Terms
 
+open import CategoryTheory.Categories
+
 open import Relation.Binary.PropositionalEquality using (_≡_ ; refl ; sym)
 
 -- Type of entities that we can traverse
@@ -170,6 +172,13 @@ module _ {𝒮 : Schema} (sk : SubstKit 𝒮) where
         ∘[ sk ]ₛ ((weak-midₛ {A} Γ (Γ′ ⌊ A ⌋ Γ″))
         ∘[ sk ]ₛ (⌊⌋-assoc Γ (Γ′ , A) Γ″ ≡ₛ 𝓀)))
 
+    -- Moving a variable to the right in the stabilised context context
+    moveˢ-rₛ : ∀{A} Γ Γ′ Γ″ -> Subst 𝒮 (Γ ˢ ⌊ A ⌋ (Γ′ ⌊⌋ Γ″) ˢ) ((Γ ⌊⌋ Γ′) ˢ ⌊ A ⌋ Γ″ ˢ)
+    moveˢ-rₛ {A} Γ Γ′ Γ″
+        rewrite ˢ-pres-⌊⌋ Γ Γ′
+              | ˢ-pres-⌊⌋ Γ′ Γ″
+              | sym (⌊⌋-assoc (Γ ˢ , A) (Γ′ ˢ) (Γ″ ˢ))
+        = move-rₛ (Γ ˢ) (Γ′ ˢ) (Γ″ ˢ)
 
     -- | Substitution
 
