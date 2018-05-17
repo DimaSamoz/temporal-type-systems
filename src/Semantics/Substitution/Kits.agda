@@ -53,7 +53,7 @@ module ⟦K⟧ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
     open Kit k
     -- Denotation of substitutions as a map between contexts
     ⟦subst⟧ : ∀{Γ Δ} -> Subst 𝒮 Γ Δ -> ⟦ Δ ⟧ₓ ⇴ ⟦ Γ ⟧ₓ
-    ⟦subst⟧ ● = !
+    ⟦subst⟧ ●       = !
     ⟦subst⟧ (σ ▸ T) = ⟨ ⟦subst⟧ σ , ⟦ T ⟧ ⟩
 
     -- Denotation of weakening

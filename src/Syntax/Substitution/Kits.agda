@@ -78,7 +78,7 @@ idₛ {Γ , _} k = idₛ k ↑ k
 
 -- Composition of substitutions
 _∘[_]ₛ_ : ∀ {𝒮 Γ Δ Ξ} -> Subst 𝒮 Δ Ξ -> SubstKit 𝒮 -> Subst 𝒮 Γ Δ -> Subst 𝒮 Γ Ξ
-σ₂ ∘[ k ]ₛ ● = ●
+σ₂ ∘[ k ]ₛ ●        = ●
 σ₂ ∘[ k ]ₛ (σ₁ ▸ T) = (σ₂ ∘[ k ]ₛ σ₁) ▸ SubstKit.𝓈 k σ₂ T
 
 -- Substitution from an order-preserving embedding
