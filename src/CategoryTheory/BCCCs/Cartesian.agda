@@ -21,7 +21,7 @@ module _ {n} (ℂ : Category n) where
 
             -- | Laws
             -- Need to show that the canonical morphism ! is unique
-            unique : {A : obj} -> (m : A ~> ⊤)
+            !-unique : {A : obj} -> (m : A ~> ⊤)
                   -> m ≈ !
 
     -- Product of two objects
@@ -45,32 +45,32 @@ module _ {n} (ℂ : Category n) where
             -- from P to A⊗B. We need to check that this mediator makes
             -- the product diagram commute and is unique.
 
-            comm-π₁ : ∀{P} -> {p₁ : P ~> A} {p₂ : P ~> B}
+            π₁-comm : ∀{P} -> {p₁ : P ~> A} {p₂ : P ~> B}
                    -> π₁ ∘ ⟨ p₁ , p₂ ⟩ ≈ p₁
-            comm-π₂ : ∀{P} -> {p₁ : P ~> A} {p₂ : P ~> B}
+            π₂-comm : ∀{P} -> {p₁ : P ~> A} {p₂ : P ~> B}
                    -> π₂ ∘ ⟨ p₁ , p₂ ⟩ ≈ p₂
-            unique  : ∀{P} -> {p₁ : P ~> A} {p₂ : P ~> B} {m : P ~> A⊗B}
+            ⊗-unique  : ∀{P} -> {p₁ : P ~> A} {p₂ : P ~> B} {m : P ~> A⊗B}
                    -> π₁ ∘ m ≈ p₁ -> π₂ ∘ m ≈ p₂ -> ⟨ p₁ , p₂ ⟩ ≈ m
 
         -- η-expansion of function pairs (via morphisms)
         ⊗-η-exp : ∀{P} -> {m : P ~> A⊗B}
                -> ⟨ π₁ ∘ m , π₂ ∘ m ⟩ ≈ m
-        ⊗-η-exp = unique r≈ r≈
+        ⊗-η-exp = ⊗-unique r≈ r≈
 
         -- Pairing of projection functions is the identity
         ⊗-η-id : ⟨ π₁ , π₂ ⟩ ≈ id
-        ⊗-η-id = unique id-right id-right
+        ⊗-η-id = ⊗-unique id-right id-right
 
         -- Congruence over function pairing
         ⟨,⟩-cong : ∀{P} -> {p₁ q₁ : P ~> A} {p₂ q₂ : P ~> B}
                -> p₁ ≈ q₁ -> p₂ ≈ q₂
                -> ⟨ p₁ , p₂ ⟩ ≈ ⟨ q₁ , q₂ ⟩
-        ⟨,⟩-cong pr1 pr2 = unique (comm-π₁ ≈> pr1 [sym]) (comm-π₂ ≈> pr2 [sym])
+        ⟨,⟩-cong pr1 pr2 = ⊗-unique (π₁-comm ≈> pr1 [sym]) (π₂-comm ≈> pr2 [sym])
 
         ⟨,⟩-distrib : ∀{P Q} -> {h : P ~> Q} {f : Q ~> A} {g : Q ~> B}
                   -> ⟨ f , g ⟩ ∘ h ≈ ⟨ f ∘ h , g ∘ h ⟩
-        ⟨,⟩-distrib = unique (∘-assoc [sym] ≈> ≈-cong-left comm-π₁)
-                            (∘-assoc [sym] ≈> ≈-cong-left comm-π₂) [sym]
+        ⟨,⟩-distrib = ⊗-unique (∘-assoc [sym] ≈> ≈-cong-left π₁-comm)
+                            (∘-assoc [sym] ≈> ≈-cong-left π₂-comm) [sym]
 
 -- Type class for Cartesian categories
 record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
@@ -82,21 +82,51 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
         -- Binary products for all pairs of objects
         prod : ∀(A B : obj) -> Product ℂ A B
 
-    -- Shorthand for terminal object
-    ⊤ : obj
-    ⊤ = TerminalObj.⊤ term
+    open TerminalObj term public
+    open module P {A} {B} = Product (prod A B) public
 
-    -- Shorthand for product object
-    infixr 70 _⊗_
+    -- Shorthand for sum object
+    infixl 25 _⊗_
     _⊗_ : (A B : obj) -> obj
-    _⊗_ A B = Product.A⊗B (prod A B)
+    A ⊗ B = A⊗B {A} {B}
 
     -- Parallel product of morphisms
+    infixl 65 _*_
     _*_ : {A B P Q : obj} -> (A ~> P) -> (B ~> Q)
        -> (A ⊗ B ~> P ⊗ Q)
-    _*_ {A} {B} {P} {Q} f g = ⟨ f ∘ Product.π₁ (prod A B) , g ∘ Product.π₂ (prod A B) ⟩
+    _*_ {A} {B} {P} {Q} f g = ⟨ f ∘ π₁ , g ∘ π₂ ⟩
+
+    -- Parallel product with an idempotent morphism distributes over ∘
+    *-idemp-dist-∘ : {A B C D : obj}{g : B ~> C}{f : A ~> B}{h : D ~> D}
+            -> h ∘ h ≈ h
+            -> g * h ∘ f * h ≈ (g ∘ f) * h
+    *-idemp-dist-∘ {g = g}{f}{h} idemp = ⊗-unique u₁ u₂ [sym]
         where
-        open Product (prod P Q) using (⟨_,_⟩)
+        u₁ : π₁ ∘ (g * h ∘ f * h) ≈ (g ∘ f) ∘ π₁
+        u₁ = ∘-assoc [sym] ≈> ≈-cong-left π₁-comm
+          ≈> ∘-assoc ≈> ≈-cong-right π₁-comm ≈> ∘-assoc [sym]
+        u₂ : π₂ ∘ (g * h ∘ f * h) ≈ h ∘ π₂
+        u₂ = ∘-assoc [sym] ≈> ≈-cong-left π₂-comm
+          ≈> ∘-assoc ≈> ≈-cong-right π₂-comm
+          ≈> ∘-assoc [sym] ≈> ≈-cong-left idemp
+
+    -- Commutativity of product
+    comm : {A B : obj} -> A ⊗ B ~> B ⊗ A
+    comm {A}{B} = ⟨ π₂ , π₁ ⟩
+
+    -- Associativity of product
+    assoc-left : {A B C : obj} -> A ⊗ (B ⊗ C) ~> (A ⊗ B) ⊗ C
+    assoc-left = ⟨ ⟨ π₁ , (π₁ ∘ π₂) ⟩ , π₂ ∘ π₂ ⟩
+
+    assoc-right : {A B C : obj} -> (A ⊗ B) ⊗ C ~> A ⊗ (B ⊗ C)
+    assoc-right = ⟨ π₁ ∘ π₁ , ⟨ (π₂ ∘ π₁) , π₂ ⟩ ⟩
+
+    -- Left and right unit for product
+    unit-left : {A : obj} -> ⊤ ⊗ A ~> A
+    unit-left = π₂
+
+    unit-right : {A : obj} -> A ⊗ ⊤ ~> A
+    unit-right = π₁
 
     -- The terminal object is the unit for product
     ⊤-left-cancel : ∀{A} -> ⊤ ⊗ A <~> A
@@ -104,12 +134,9 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
         { iso~> = π₂
         ; iso<~ = ⟨ ! , id ⟩
         ; iso-id₁ = iso-id₁-⊤
-        ; iso-id₂ = comm-π₂
+        ; iso-id₂ = π₂-comm
         }
         where
-        open Product (prod ⊤ A)
-        open TerminalObj term
-
         iso-id₁-⊤ : ⟨ ! , id ⟩ ∘ π₂ ≈ id
         iso-id₁-⊤ =
             begin
@@ -118,9 +145,9 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
                 ⟨ ! ∘ π₂ , id ∘ π₂ ⟩
             ≈⟨ ⟨,⟩-cong r≈ id-left ⟩
                 ⟨ ! ∘ π₂ , π₂ ⟩
-            ≈⟨ ⟨,⟩-cong (TerminalObj.unique term (! ∘ π₂)) r≈ ⟩
+            ≈⟨ ⟨,⟩-cong (!-unique (! ∘ π₂)) r≈ ⟩
                 ⟨ ! , π₂ ⟩
-            ≈⟨ ⟨,⟩-cong ((TerminalObj.unique term π₁) [sym]) r≈ ⟩
+            ≈⟨ ⟨,⟩-cong ((!-unique π₁) [sym]) r≈ ⟩
                 ⟨ π₁ , π₂ ⟩
             ≈⟨ ⊗-η-id ⟩
                 id
@@ -131,12 +158,9 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
         { iso~> = π₁
         ; iso<~ = ⟨ id , ! ⟩
         ; iso-id₁ = iso-id₁-⊤
-        ; iso-id₂ = comm-π₁
+        ; iso-id₂ = π₁-comm
         }
         where
-        open Product (prod A ⊤)
-        open TerminalObj term using (!)
-
         iso-id₁-⊤ : ⟨ id , ! ⟩ ∘ π₁ ≈ id
         iso-id₁-⊤ =
             begin
@@ -145,9 +169,9 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
                 ⟨ id ∘ π₁ , ! ∘ π₁ ⟩
             ≈⟨ ⟨,⟩-cong id-left r≈ ⟩
                 ⟨ π₁ , ! ∘ π₁ ⟩
-            ≈⟨ ⟨,⟩-cong r≈ (TerminalObj.unique term (! ∘ π₁)) ⟩
+            ≈⟨ ⟨,⟩-cong r≈ (!-unique (! ∘ π₁)) ⟩
                 ⟨ π₁ , ! ⟩
-            ≈⟨ ⟨,⟩-cong r≈ ((TerminalObj.unique term π₂) [sym]) ⟩
+            ≈⟨ ⟨,⟩-cong r≈ ((!-unique π₂) [sym]) ⟩
                 ⟨ π₁ , π₂ ⟩
             ≈⟨ ⊗-η-id ⟩
                 id

@@ -21,8 +21,8 @@ record Comonad {n} (ℂ : Category n) : Set (lsuc n) where
         -- Comultiplication / duplicate
         δ : W ⟹ (W ²)
 
-    private module ε = _⟹_ ε
-    private module δ = _⟹_ δ
+    module ε = _⟹_ ε
+    module δ = _⟹_ δ
     field
         -- || Laws
         -- Duplication is cancelled by extraction on both sides (counit)

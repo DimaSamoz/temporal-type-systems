@@ -10,7 +10,6 @@ open import TemporalOps.Next
 open import TemporalOps.Delay
 open import Data.Product
 
-open Category ℝeactive hiding (begin_ ; _∎) public
 
 -- Arbitrary delay
 ◇_ : τ -> τ

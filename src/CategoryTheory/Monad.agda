@@ -19,10 +19,10 @@ record Monad {n} (ℂ : Category n) : Set (lsuc n) where
         -- Unit / return
         η : I ⟹ T
         -- Multiplication / join
-        μ : (T ²) ⟹ T    
+        μ : (T ²) ⟹ T
 
-    private module η = _⟹_ η
-    private module μ = _⟹_ μ
+    module η = _⟹_ η
+    module μ = _⟹_ μ
     field
         -- || Laws
         -- Unit on both sides is cancelled by multiplication (unit)

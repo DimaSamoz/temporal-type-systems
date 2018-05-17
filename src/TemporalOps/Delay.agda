@@ -14,7 +14,6 @@ import Relation.Binary.PropositionalEquality as ≡
 open import Data.Product
 open import Data.Sum
 
-open Category ℝeactive
 
 -- General iteration
 -- iter f n v = fⁿ(v)

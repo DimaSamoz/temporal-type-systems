@@ -19,24 +19,41 @@ module _ {n} {ℂ : Category n} (Cℂ : Cartesian ℂ) where
             -- Evaluation map
             eval : A⇒B ⊗ A ~> B
             -- Canonical transposition morphism (currying)
-            ƛ : ∀{E} -> (E ⊗ A ~> B) -> (E ~> A⇒B)
+            Λ : ∀{E} -> (E ⊗ A ~> B) -> (E ~> A⇒B)
 
             -- | Laws
-            comm-ƛ : ∀{E} -> {e : E ⊗ A ~> B}
-                  -> eval ∘ (ƛ e * id) ≈ e
-            unique : ∀{E} -> {e : E ⊗ A ~> B} {m : E ~> A⇒B}
-                  -> eval ∘ (m * id) ≈ e -> ƛ e ≈ m
+            Λ-comm : ∀{E} -> {e : E ⊗ A ~> B}
+                  -> eval ∘ (Λ e * id) ≈ e
+            Λ-unique : ∀{E} -> {e : E ⊗ A ~> B} {m : E ~> A⇒B}
+                  -> eval ∘ (m * id) ≈ e -> Λ e ≈ m
+            Λ-cong : ∀{E} {f g : E ⊗ A ~> B}
+                  -> f ≈ g -> Λ f ≈ Λ g
+
+        -- Currying identity
+        Λ-*id : ∀{D E} {f : E ⊗ A ~> B} {g : D ~> E}
+             -> Λ (f ∘ (g * id)) ≈ Λ f ∘ g
+        Λ-*id {D}{E}{f}{g} =
+            begin
+                Λ (f ∘ (g * id))
+            ≈⟨ Λ-cong (≈-cong-left (Λ-comm [sym]) ≈> ∘-assoc) ⟩
+                Λ (eval ∘ (Λ f * id) ∘ (g * id))
+            ≈⟨ Λ-cong (≈-cong-right (*-idemp-dist-∘ id-left)) ⟩
+                Λ (eval ∘ (Λ f ∘ g) * id)
+            ≈⟨ Λ-unique r≈ ⟩
+                Λ f ∘ g
+            ∎
 
 -- Type class for closed categories
 -- definition using exponentials
 record Closed {n} {ℂ : Category n} (Cℂ : Cartesian ℂ) : Set (lsuc n) where
     open Category ℂ
-    open Exponential
     field
         -- Exponential object for each pair of objects
         exp : ∀(A B : obj) -> Exponential Cℂ A B
 
+    open module E {A} {B} = Exponential (exp A B) public
+
     -- Shorthand for exponential object
-    infixr 70 _⇒_
+    infixr 20 _⇒_
     _⇒_ : (A B : obj) -> obj
-    _⇒_ A B = A⇒B (exp A B)
+    A ⇒ B = A⇒B {A} {B}

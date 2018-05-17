@@ -1,11 +1,11 @@
 
--- Generic term traversals
-module Syntax.Traversal where
+-- Kit instances and generic term traversals
+module Syntax.Substitution.Instances where
 
 open import Syntax.Types
 open import Syntax.Context
 open import Syntax.Terms
-open import Syntax.Kit
+open import Syntax.Substitution.Kits
 
 open import Data.Sum
 open import Relation.Binary.PropositionalEquality as ≡
@@ -60,7 +60,6 @@ subst-var (σ ▸ T) (pop v) = subst-var σ v
 
 module K {𝒮 : Schema} (k : Kit 𝒮) where
     open Kit k
-    open SubstKit 𝒱arₛ
 
     -- | Type-preserving term traversal
     -- | Traverses the syntax tree of the term, applying
@@ -81,7 +80,7 @@ module K {𝒮 : Schema} (k : Kit 𝒮) where
                                    inl↦ traverse (σ ↑ k) N₁
                                  ||inr↦ traverse (σ ↑ k) N₂
         traverse σ (svar x)    = 𝓉 (subst-var σ x)
-        traverse σ (present M) = present (traverse σ M)
+        traverse σ (sample M) = sample (traverse σ M)
         traverse σ (stable M)  = stable (traverse (σ ↓ˢ k) M)
         traverse σ (sig M)     = sig (traverse σ M)
         traverse σ (letSig S In M) = letSig traverse σ S
@@ -108,6 +107,10 @@ rename = traverse 𝒱ar
 -- Weakening is a renaming with a weakening substitution
 weaken-top : ∀{B Γ A} -> Γ ⊢ A → Γ , B ⊢ A
 weaken-top = rename (weak-topₛ 𝒱arₛ)
+
+-- Weakening is a renaming with a weakening substitution
+weaken′-top : ∀{B Γ A} -> Γ ⊨ A → Γ , B ⊨ A
+weaken′-top = traverse′ 𝒱ar (weak-topₛ 𝒱arₛ)
 
 
 -- | Term kit
@@ -145,55 +148,3 @@ substitute′ = traverse′ 𝒯erm
 -- Substitutable term kit
 𝒯ermₛ : SubstKit Term
 𝒯ermₛ = record { 𝓀 = 𝒯erm ; 𝓈 = substitute }
-
--- | Lemmas from substitutions
--- | Concrete instances of structural and substitution lemmas
--- | can be expressed as substituting traversals on terms
-
--- Weakening lemma
-weakening : ∀{Γ Δ A} ->     Γ ⊆ Δ   ->   Γ ⊢ A
-                           --------------------
-                     ->           Δ ⊢ A
-weakening s = substitute (weakₛ 𝒯ermₛ s)
-
--- Exchange lemma
-exchange : ∀ Γ Γ′ Γ″ {A B C}
-                     ->   Γ ⌊ A ⌋ Γ′ ⌊ B ⌋ Γ″ ⊢ C
-                         ----------------------
-                     ->   Γ ⌊ B ⌋ Γ′ ⌊ A ⌋ Γ″ ⊢ C
-exchange Γ Γ′ Γ″ = substitute (exₛ 𝒯ermₛ Γ Γ′ Γ″)
-
--- Contraction lemma
-contraction : ∀ Γ Γ′ Γ″ {A B}
-                     ->   Γ ⌊ A ⌋ Γ′ ⌊ A ⌋ Γ″ ⊢ B
-                         ----------------------
-                     ->   Γ ⌊ A ⌋ Γ′ ⌊⌋ Γ″ ⊢ B
-contraction Γ Γ′ Γ″ = substitute (contr-lₛ 𝒯ermₛ Γ Γ′ Γ″)
-
--- Substitution lemma
-substitution : ∀ Γ Γ′ {A B}
-                     ->  Γ ⌊⌋ Γ′ ⊢ A   ->   Γ ⌊ A ⌋ Γ′ ⊢ B
-                        --------------------------------
-                     ->           Γ ⌊⌋ Γ′ ⊢ B
-substitution Γ Γ′ M = substitute (sub-midₛ 𝒯ermₛ Γ Γ′ M)
-
--- Substitution lemma for computational terms
-substitution′ : ∀ Γ Γ′ {A B}
-                     ->  Γ ⌊⌋ Γ′ ⊢ A   ->   Γ ⌊ A ⌋ Γ′ ⊨ B
-                        --------------------------------
-                     ->           Γ ⌊⌋ Γ′ ⊨ B
-substitution′ Γ Γ′ M = substitute′ (sub-midₛ 𝒯ermₛ Γ Γ′ M)
-
--- Top substitution lemma
-[_/] : ∀ {Γ A B}
-                     ->  Γ ⊢ A   ->   Γ , A  ⊢ B
-                        --------------------------
-                     ->           Γ ⊢ B
-[_/] M = substitute (sub-topₛ 𝒯ermₛ M)
-
--- Top substitution lemma for computational terms
-[_/′] : ∀ {Γ A B}
-                     ->  Γ ⊢ A   ->   Γ , A  ⊨ B
-                        --------------------------
-                     ->           Γ ⊨ B
-[_/′] M = substitute′ (sub-topₛ 𝒯ermₛ M)

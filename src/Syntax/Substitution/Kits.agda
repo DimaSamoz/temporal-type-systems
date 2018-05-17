@@ -1,11 +1,13 @@
 
 -- Syntactic kits from Conor McBride's
 -- "Type-Preserving Renaming and Substitution"
-module Syntax.Kit where
+module Syntax.Substitution.Kits where
 
 open import Syntax.Types
 open import Syntax.Context
 open import Syntax.Terms
+
+open import CategoryTheory.Categories
 
 open import Relation.Binary.PropositionalEquality using (_≡_ ; refl ; sym)
 
@@ -78,7 +80,7 @@ idₛ {Γ , _} k = idₛ k ↑ k
 
 -- Composition of substitutions
 _∘[_]ₛ_ : ∀ {𝒮 Γ Δ Ξ} -> Subst 𝒮 Δ Ξ -> SubstKit 𝒮 -> Subst 𝒮 Γ Δ -> Subst 𝒮 Γ Ξ
-σ₂ ∘[ k ]ₛ ● = ●
+σ₂ ∘[ k ]ₛ ●        = ●
 σ₂ ∘[ k ]ₛ (σ₁ ▸ T) = (σ₂ ∘[ k ]ₛ σ₁) ▸ SubstKit.𝓈 k σ₂ T
 
 -- Substitution from an order-preserving embedding
@@ -88,8 +90,15 @@ refl ⊆ₛ k     = idₛ k
 (keep s) ⊆ₛ k = (s ⊆ₛ k) ↑ k
 (drop s) ⊆ₛ k = (s ⊆ₛ k) ⁺ k
 
+-- Substitution from propositional equality of contexts
 _≡ₛ_ : ∀ {𝒮 Γ Δ} -> Γ ≡ Δ -> Kit 𝒮 -> Subst 𝒮 Γ Δ
 refl ≡ₛ k = idₛ k
+
+-- Substitution from idempotence of stabilisation
+_ˢˢₛ_ : ∀ {𝒮} -> (Γ : Context) -> Kit 𝒮 -> Subst 𝒮 (Γ ˢ) (Γ ˢ ˢ)
+∙ ˢˢₛ k = ●
+(Γ , A now) ˢˢₛ k = Γ ˢˢₛ k
+(Γ , A always) ˢˢₛ k = (Γ ˢˢₛ k) ↑ k
 
 -- | Standard substitutions
 -- | Common transformations between contexts
@@ -163,12 +172,23 @@ module _ {𝒮 : Schema} (sk : SubstKit 𝒮) where
         ∘[ sk ]ₛ ((weak-midₛ {A} Γ (Γ′ ⌊ A ⌋ Γ″))
         ∘[ sk ]ₛ (⌊⌋-assoc Γ (Γ′ , A) Γ″ ≡ₛ 𝓀)))
 
+    -- Moving a variable to the right in the stabilised context context
+    moveˢ-rₛ : ∀{A} Γ Γ′ Γ″ -> Subst 𝒮 (Γ ˢ ⌊ A ⌋ (Γ′ ⌊⌋ Γ″) ˢ) ((Γ ⌊⌋ Γ′) ˢ ⌊ A ⌋ Γ″ ˢ)
+    moveˢ-rₛ {A} Γ Γ′ Γ″
+        rewrite ˢ-pres-⌊⌋ Γ Γ′
+              | ˢ-pres-⌊⌋ Γ′ Γ″
+              | sym (⌊⌋-assoc (Γ ˢ , A) (Γ′ ˢ) (Γ″ ˢ))
+        = move-rₛ (Γ ˢ) (Γ′ ˢ) (Γ″ ˢ)
 
     -- | Substitution
 
     -- Substitution for the top of the context
     sub-topₛ : ∀{A Γ} -> 𝒮 Γ A -> Subst 𝒮 (Γ , A) Γ
     sub-topₛ T = (idₛ 𝓀) ▸ T
+
+    -- Substitution for the top of a stabilised context
+    sub-topˢₛ : ∀{Γ A} -> 𝒮 Γ A -> Subst 𝒮 (Γ ˢ , A) Γ
+    sub-topˢₛ {Γ} T = (Γˢ⊆Γ Γ ⊆ₛ 𝓀) ▸ T
 
     -- Substitution for the middle of the context
     sub-midₛ : ∀{A} Γ Γ′ -> 𝒮 (Γ ⌊⌋ Γ′) A -> Subst 𝒮 (Γ ⌊ A ⌋ Γ′) (Γ ⌊⌋ Γ′)

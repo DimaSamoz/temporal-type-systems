@@ -9,7 +9,7 @@ import Function as F using (_∘_)
 open import Data.Unit using () renaming (⊤ to top) public
 open import Data.Product public
 open import Data.Empty using (⊥-elim) renaming (⊥ to bot) public
-open import Data.Sum renaming ([_,_] to ⟦_,_⟧)
+open import Data.Sum
 
 -- Category of sets.
 𝕊et : Category lzero
@@ -41,32 +41,32 @@ open import Data.Sum renaming ([_,_] to ⟦_,_⟧)
         { term = record
             { ⊤ = top
             ; ! = λ {A} _ → top.tt
-            ; unique = λ m → refl
+            ; !-unique = λ m → refl
             }
         ; prod = λ A B → record
             { A⊗B = A × B
             ; π₁ = proj₁
             ; π₂ = proj₂
             ; ⟨_,_⟩ = <_,_>
-            ; comm-π₁ = refl
-            ; comm-π₂ = refl
-            ; unique = λ pr1 pr2 → unique-cart (ext λ x → pr1 {x}) (ext λ x → pr2 {x})
+            ; π₁-comm = refl
+            ; π₂-comm = refl
+            ; ⊗-unique = λ pr1 pr2 → unique-cart (ext λ x → pr1 {x}) (ext λ x → pr2 {x})
             }
         }
     ; cocart = record
         { init = record
             { ⊥ = bot
             ; ¡ = ⊥-elim
-            ; unique = λ {A} m → λ {}
+            ; ¡-unique = λ {A} m → λ {}
             }
         ; sum = λ A B → record
             { A⊕B = A ⊎ B
             ; ι₁ = inj₁
             ; ι₂ = inj₂
-            ; [_,_] = ⟦_,_⟧
-            ; comm-ι₁ = λ {S} {i₁} {i₂} {a} → refl
-            ; comm-ι₂ = λ {S} {i₁} {i₂} {a} → refl
-            ; unique = λ {S} {i₁} {i₂} {m} pr1 pr2
+            ; [_⁏_] = [_,_]
+            ; ι₁-comm = λ {S} {i₁} {i₂} {a} → refl
+            ; ι₂-comm = λ {S} {i₁} {i₂} {a} → refl
+            ; ⊕-unique = λ {S} {i₁} {i₂} {m} pr1 pr2
                       -> unique-cocart {m = m} (ext λ x → pr1 {x}) (ext λ x → pr2 {x})
             }
         }
@@ -74,9 +74,10 @@ open import Data.Sum renaming ([_,_] to ⟦_,_⟧)
         { exp = λ A B → record
             { A⇒B = A -> B
             ; eval = λ fa → proj₁ fa (proj₂ fa)
-            ; ƛ = λ f a b → f (a , b)
-            ; comm-ƛ = refl
-            ; unique = λ pr → λ {a} ->  unique-closed (ext λ x → pr {x})
+            ; Λ = λ f a b → f (a , b)
+            ; Λ-comm = refl
+            ; Λ-unique = λ pr → λ {a} ->  unique-closed (ext λ x → pr {x})
+            ; Λ-cong = λ pr → ext (λ _ → pr)
             }
         }
     }
@@ -89,7 +90,7 @@ open import Data.Sum renaming ([_,_] to ⟦_,_⟧)
     unique-cocart : ∀{A B S : Set}{a}
               -> {i₁ : A -> S} {i₂ : B -> S} {m : A ⊎ B -> S}
               -> m F.∘ inj₁ ≡ i₁ -> m F.∘ inj₂ ≡ i₂
-              -> ⟦ i₁ , i₂ ⟧ a ≡ m a
+              -> [ i₁ , i₂ ] a ≡ m a
     unique-cocart {a = inj₁ x} refl refl = refl
     unique-cocart {a = inj₂ y} refl refl = refl
     open Category 𝕊et

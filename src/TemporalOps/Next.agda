@@ -10,8 +10,6 @@ open import TemporalOps.Common
 open import Data.Product
 open import Data.Sum
 
-open Category ℝeactive
-
 -- One-step delay operator.
 ▹_ : τ -> τ
 (▹ A) zero    = ⊤ zero

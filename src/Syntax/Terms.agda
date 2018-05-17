@@ -69,8 +69,8 @@ mutual
                                                   --------------
                                 ->                 Γ ⊢ A always
 
-        -- A stable type is available now
-        present : ∀{Γ A}        ->                 Γ ⊢ A always
+        -- A stable type can be sampled now
+        sample : ∀{A Γ}         ->                 Γ ⊢ A always
                                                   --------------
                                 ->                   Γ ⊢ A now
 
@@ -98,18 +98,18 @@ mutual
     infix 10 _⊨_
     data _⊨_ : Context -> Judgement -> Set where
         -- Pure term is a computational term
-        pure : ∀{Γ A}           ->                   Γ ⊢ A
+        pure : ∀{A Γ}           ->                   Γ ⊢ A
                                                     -------
                                 ->                   Γ ⊨ A
 
         -- Computational signal destructor
-        letSig_InC_ : ∀{Γ A B}  ->   Γ ⊢ Signal A now   ->   Γ , A now ⊨ B now
-                                    -------------------------------------------
+        letSig_InC_ : ∀{Γ A B}  ->   Γ ⊢ Signal A now   ->   Γ , A always ⊨ B now
+                                    ----------------------------------------------
                                 ->                 Γ ⊨ B now
 
         -- Event destructor
         letEvt_In_ : ∀{Γ A B}   ->   Γ ⊢ Event A now  ->   Γ ˢ , A now  ⊨ B now
-                                    ----------------------------------------
+                                    --------------------------------------------
                                 ->                 Γ ⊨ B now
 
         -- Select the event that happens first

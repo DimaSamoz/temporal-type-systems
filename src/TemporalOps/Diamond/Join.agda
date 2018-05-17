@@ -19,6 +19,8 @@ open import Relation.Binary.HeterogeneousEquality as ≅
 open import Data.Nat.Properties
             using (+-identityʳ ; +-comm ; +-suc ; +-assoc)
 
+open import Holes.Term using (⌞_⌟)
+open import Holes.Cong.Propositional
 
 -- | Auxiliary definitions for μ
 
@@ -51,7 +53,7 @@ private module F-◇ = Functor F-◇
     open ≡.≡-Reasoning
 
     -- The order of mapping and shifting of events can be interchanged
-    μ-shift-fmap : {A B : τ} {f : A ~> B} {k l : ℕ} {a : ◇ A at l}
+    μ-shift-fmap : {A B : τ} {f : A ⇴ B} {k l : ℕ} {a : ◇ A at l}
                 -> F-◇.fmap f (k + l) (μ-shift {A} k l a)
                  ≡ μ-shift {B} k l (F-◇.fmap f l a)
     μ-shift-fmap {A} {B} {f} {zero} {l} {j , y} = refl
@@ -73,18 +75,18 @@ private module F-◇ = Functor F-◇
         begin
             F-◇.fmap f (k + l) (μ-◇-at A (k + l) (k , v))
         ≡⟨⟩ -- Def. of μ-◇-at
-            F-◇.fmap f (k + l) (μ-compare A (k + l) k v (compareLeq k (k + l)))
-        ≡⟨ cong (λ x → F-◇.fmap f (k + l) (μ-compare A (k + l) k v x)) pf ⟩
+            F-◇.fmap f (k + l) (μ-compare A (k + l) k v ⌞ compareLeq k (k + l) ⌟)
+        ≡⟨ cong! pf ⟩
             F-◇.fmap f (k + l) (μ-shift k l (rew (delay-+-left0 k l) v))
         ≡⟨ μ-shift-fmap {_}{_}{_}{k}{l}{(rew (delay-+-left0 k l) v)} ⟩
-            μ-shift k l (F-◇.fmap f l (rew (delay-+-left0 k l) v))
-        ≡⟨ cong (λ x → μ-shift k l (F-◇.fmap f l x)) (delay-+-left0-eq k l v v′ v≅v′) ⟩
+            μ-shift k l (F-◇.fmap f l ⌞ rew (delay-+-left0 k l) v ⌟)
+        ≡⟨ cong! (delay-+-left0-eq k l v v′ v≅v′) ⟩
             μ-shift k l (F-◇.fmap f l (rew (delay-+ k 0 l) v′))
         ≡⟨⟩ -- Def. of (F-delay 0).fmap
             μ-shift k l ((Functor.fmap (F-delay 0) (F-◇.fmap f) at l) (rew (delay-+ k 0 l) v′))
         ≡⟨ cong (λ x → μ-shift k l x) (sym (fmap-delay-+-n+k k 0 l v′)) ⟩
-            μ-shift k l (rew (delay-+ k 0 l) ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′))
-        ≡⟨ cong (λ x → μ-shift k l x)
+            μ-shift k l ⌞ rew (delay-+ k 0 l) ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′) ⌟
+        ≡⟨ cong!
             (sym (delay-+-left0-eq k l ((Functor.fmap (F-delay k) (F-◇.fmap f) at (k + l)) v)
                                        ((Functor.fmap (F-delay (k + 0)) (F-◇.fmap f) at (k + l)) v′) pr))
          ⟩
@@ -111,8 +113,8 @@ private module F-◇ = Functor F-◇
         begin
             F-◇.fmap f n (μ-◇-at A n (n + suc l , v))
         ≡⟨⟩ -- Def. of μ-◇-at
-            F-◇.fmap f n (μ-compare A n (n + suc l) v (compareLeq (n + suc l) n))
-        ≡⟨ cong (λ x → F-◇.fmap f n (μ-compare A n (n + suc l) v x)) pf ⟩
+            F-◇.fmap f n (μ-compare A n (n + suc l) v ⌞ compareLeq (n + suc l) n ⌟)
+        ≡⟨ cong! pf ⟩
             F-◇.fmap f n (n + suc l , rew (delay-⊤ n l) top.tt)
         ≡⟨⟩ -- Def. of F-◇.fmap
             n + suc l , (Functor.fmap (F-delay (n + suc l)) f at n) (rew (delay-⊤ n l) top.tt)

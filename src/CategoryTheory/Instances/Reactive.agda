@@ -55,16 +55,16 @@ infixr 10 _⇴_
         { term = record
             { ⊤ = λ n → top
             ; ! = λ n _ → top.tt
-            ; unique = λ m → refl
+            ; !-unique = λ m → refl
             }
         ; prod = λ A B → record
             { A⊗B = λ n → A n × B n
             ; π₁ = λ n → proj₁
             ; π₂ = λ n → proj₂
             ; ⟨_,_⟩ = λ f g n a → (f n a , g n a)
-            ; comm-π₁ = λ {P} {p₁} {p₂} {n} {a} → refl
-            ; comm-π₂ = λ {P} {p₁} {p₂} {n} {a} → refl
-            ; unique = λ pr1 pr2 → unique-cart (ext λ a → ext λ n → pr1 {a} {n})
+            ; π₁-comm = λ {P} {p₁} {p₂} {n} {a} → refl
+            ; π₂-comm = λ {P} {p₁} {p₂} {n} {a} → refl
+            ; ⊗-unique = λ pr1 pr2 → unique-cart (ext λ a → ext λ n → pr1 {a} {n})
                                                (ext λ a → ext λ n → pr2 {a} {n})
             }
         }
@@ -72,16 +72,16 @@ infixr 10 _⇴_
         { init = record
             { ⊥ = λ n → bot
             ; ¡ = λ {A} n → λ ()
-            ; unique = λ {A} m {n} → λ {}
+            ; ¡-unique = λ {A} m {n} → λ {}
             }
         ; sum = λ A B → record
             { A⊕B = λ n → A n ⊎ B n
             ; ι₁ = λ n → inj₁
             ; ι₂ = λ n → inj₂
-            ; [_,_] = sum
-            ; comm-ι₁ = λ {S} {i₁} {i₂} {n} {a} → refl
-            ; comm-ι₂ = λ {S} {i₁} {i₂} {n} {a} → refl
-            ; unique = λ {S} {i₁} {i₂} {m} pr1 pr2 →
+            ; [_⁏_] = sum
+            ; ι₁-comm = λ {S} {i₁} {i₂} {n} {a} → refl
+            ; ι₂-comm = λ {S} {i₁} {i₂} {n} {a} → refl
+            ; ⊕-unique = λ {S} {i₁} {i₂} {m} pr1 pr2 →
                         unique-cocart {m = m} (ext λ a → ext λ n → pr1 {a} {n})
                                       (ext λ a → ext λ n → pr2 {a} {n})
             }
@@ -90,9 +90,10 @@ infixr 10 _⇴_
         { exp = λ A B → record
             { A⇒B = λ n → A n -> B n
             ; eval = λ n z → proj₁ z (proj₂ z)
-            ; ƛ = λ {E} z n z₁ z₂ → z n (z₁ , z₂)
-            ; comm-ƛ = refl
-            ; unique = λ pr → unique-closed (ext λ n → ext λ a → pr {n} {a})
+            ; Λ = λ  f n a b → f n (a , b)
+            ; Λ-comm = refl
+            ; Λ-unique = λ pr → unique-closed (ext λ n → ext λ a → pr {n} {a})
+            ; Λ-cong = λ pr → ext λ _ → pr
             }
         }
     }
@@ -118,40 +119,45 @@ infixr 10 _⇴_
               -> ∀{n}{a : E n} -> (λ b → e n (a , b)) ≡ m n a
     unique-closed refl = refl
 
--- Top-level shorthands for distinguished BCCC objects
+
+-- | Top-level shorthands for distinguished BCCC objects and morphisms
 open BicartesianClosed ℝeactive-BCCC
+open Category ℝeactive hiding (begin_ ; _∎) public
 
--- Terminal object: the constant unit type
-⊤ : τ
-⊤ = TerminalObj.⊤ (Cartesian.term cart)
+open Cartesian cart public
+open Cocartesian cocart public
+open Closed closed public
 
--- Initial object: the constant void type
-⊥ : τ
-⊥ = InitialObj.⊥ (Cocartesian.init cocart)
+ℝeactive-cart : Cartesian ℝeactive
+ℝeactive-cart = cart
 
--- Product object: pairwise product of types
-_⊗_ : τ -> τ -> τ
-A ⊗ B = Product.A⊗B (Cartesian.prod cart A B)
-infixl 25 _⊗_
+-- Sum of three morphisms
+[_⁏_⁏_] : ∀{S A B C : τ} -> (A ⇴ S) -> (B ⇴ S) -> (C ⇴ S) -> (A ⊕ B ⊕ C ⇴ S)
+[ f ⁏ g ⁏ h ] = [ [ f ⁏ g ] ⁏ h ]
 
--- Product of two morphisms
-⟨_,_⟩ : ∀{P A B : τ} -> (P ⇴ A) -> (P ⇴ B) -> (P ⇴ (A ⊗ B))
-⟨_,_⟩ {P} {A} {B} = Product.⟨_,_⟩ (Cartesian.prod cart A B)
+-- Non-canonical distribution morphism
+dist : ∀{A B C : τ} ->  A ⊗ (B ⊕ C) ⇴ (A ⊗ B) ⊕ (A ⊗ C)
+dist n (a , inj₁ b) = inj₁ (a , b)
+dist n (a , inj₂ c) = inj₂ (a , c)
 
--- First projection morphism
-π₁ : ∀{A B : τ} -> (A ⊗ B ⇴ A)
-π₁ {A} {B} = Product.π₁ (Cartesian.prod cart A B)
+dist2 : ∀{A B C D : τ} ->  A ⊗ (B ⊕ C ⊕ D) ⇴ (A ⊗ B) ⊕ (A ⊗ C) ⊕ (A ⊗ D)
+dist2 n (a , inj₁ (inj₁ b)) = inj₁ (inj₁ (a , b))
+dist2 n (a , inj₁ (inj₂ c)) = inj₁ (inj₂ (a , c))
+dist2 n (a , inj₂ d) = inj₂ (a , d)
 
--- Second projection morphism
-π₂ : ∀{A B : τ} -> (A ⊗ B ⇴ B)
-π₂ {A} {B} = Product.π₂ (Cartesian.prod cart A B)
+-- ℝeactive is distributive
+dist-ℝ : ∀{A B C : τ} -> (A ⊗ B) ⊕ (A ⊗ C) <~> A ⊗ (B ⊕ C)
+dist-ℝ = record
+    { iso~> = [ id * ι₁ ⁏ id * ι₂ ]
+    ; iso<~ = dist
+    ; iso-id₁ = dist-iso-id₁
+    ; iso-id₂ = dist-iso-id₂
+    }
+    where
+    dist-iso-id₁ : ∀{A B C : τ} -> dist {A}{B}{C} ∘ [ id * ι₁ ⁏ id * ι₂ ] ≈ id
+    dist-iso-id₁ {n = n} {inj₁ (a , b)} = refl
+    dist-iso-id₁ {n = n} {inj₂ (a , c)} = refl
 
--- Sum object: pairwise sum of types
-_⊕_ : τ -> τ -> τ
-A ⊕ B = Sum.A⊕B (Cocartesian.sum cocart A B)
-infixl 22 _⊕_
-
--- Exponential object: pointwise functions
-_⇒_ : τ -> τ -> τ
-A ⇒ B = Exponential.A⇒B (Closed.exp closed A B)
-infixl 20 _⇒_
+    dist-iso-id₂ : ∀{A B C : τ} -> [ id * ι₁ ⁏ id * ι₂ ] ∘ dist {A}{B}{C} ≈ id
+    dist-iso-id₂ {n = n} {a , inj₁ b} = refl
+    dist-iso-id₂ {n = n} {a , inj₂ c} = refl
