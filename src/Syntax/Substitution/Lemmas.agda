@@ -25,6 +25,12 @@ weakening : ∀{Γ Δ A} ->     Γ ⊆ Δ   ->   Γ ⊢ A
                      ->           Δ ⊢ A
 weakening s = substitute (weakₛ 𝒯ermₛ s)
 
+-- Weakening lemma for computations
+weakening′ : ∀{Γ Δ A} ->     Γ ⊆ Δ   ->   Γ ⊨ A
+                           --------------------
+                     ->           Δ ⊨ A
+weakening′ s = substitute′ (weakₛ 𝒯ermₛ s)
+
 -- Exchange lemma
 exchange : ∀ Γ Γ′ Γ″ {A B C}
                      ->   Γ ⌊ A ⌋ Γ′ ⌊ B ⌋ Γ″ ⊢ C
@@ -75,6 +81,6 @@ substitution′ Γ Γ′ M = substitute′ (sub-midₛ 𝒯ermₛ Γ Γ′ M)
 ⟨ letSig S InC C       /⟩ D = letSig S InC ⟨ C /⟩ (substitute′ ((idₛ 𝒯erm) ⁺ 𝒯erm ↑ 𝒯erm) D)
 ⟨ (letEvt_In_ {Γ} E C) /⟩ D = letEvt E In  ⟨ C /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D)
 ⟨ select_↦_||_↦_||both↦_ {Γ} E₁ C₁ E₂ C₂ C₃ /⟩ D
-                            = select E₁ ↦ ⟨ C₁ /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D)
-                                   || E₂ ↦ ⟨ C₂ /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D)
-                                   ||both↦ ⟨ C₃ /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D)
+                           = select E₁ ↦ ⟨ C₁ /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D)
+                                 || E₂ ↦ ⟨ C₂ /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D)
+                                 ||both↦ ⟨ C₃ /⟩ (substitute′ ((Γ ˢˢₛ 𝒯erm) ↑ 𝒯erm) D)

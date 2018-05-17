@@ -242,6 +242,18 @@ data Eq′ (Γ : Context) where
                                  ---------------------------------------------
                             ->    Γ ⊨ letEvt (event D) In C ≡ ⟨ D /⟩ C ∷ B now
 
+    -- β-reduction for event binding in computational terms
+    β-selectₚ : ∀{A B C}    ->      (C₁ : Γ ˢ , Event B now , A now ⊨ C now)
+                                    (C₂ : Γ ˢ , Event A now , B now ⊨ C now)
+                                       (C₃ : Γ ˢ , A now , B now ⊨ C now)
+                                      (M₁ : Γ ⊢ A now)   (M₂ : Γ ⊢ B now)
+                                 ---------------------------------------------
+                            ->    Γ ⊨ select event (pure M₁) ↦ C₁
+                                          || event (pure M₂) ↦ C₂
+                                          ||both↦ C₃
+                                    ≡ [ M₁ /′] ([ 𝓌 M₂ /′]
+                                        (weakening′ (keep (keep (Γˢ⊆Γ Γ))) C₃)) ∷ C now
+
     -- | η-equality
     -- η-expansion for signals in computational terms
     η-sig′ : ∀{A}           ->                  (M : Γ ⊢ Signal A now)
