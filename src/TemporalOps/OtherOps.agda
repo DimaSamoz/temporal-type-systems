@@ -112,9 +112,14 @@ _>>=_ {n = n} a f = (f ⋆) n a
           ≡ (((μ.at C ∘ fmap (μ.at C)) ∘ fmap (fmap g)) ∘ fmap f) n a
     lemma rewrite μ-assoc {C} {n} {((fmap (fmap g)) ∘ fmap f) n a} = refl
 
+-- Return is left unit to bind
+>>=-unit-left : ∀{A B : τ}{n : ℕ} -> (a : A n)(f : A ⇴ ◇ B)
+             -> (η.at A n a) >>= f ≡ f n a
+>>=-unit-left a f = η-unit1
+
 -- Return is right unit to bind
 >>=-unit-right : ∀{A : τ}{n : ℕ} -> (a : (◇ A) n)
-         -> a >>= η.at A ≡ a
+              -> a >>= η.at A ≡ a
 >>=-unit-right a = η-unit2
 
 -- | Other properties of ◇
@@ -126,7 +131,7 @@ _>>=_ {n = n} a f = (f ⋆) n a
 
 -- Sample a signal at an event
 ◇-sample : ∀{A B : τ} -> □ A ⊗ ◇ B ⇴ ◇ (A ⊗ B)
-◇-sample {A} = F-□.fmap (ε.at A * id) ∘ ◇-□-strong
+◇-sample {A} = F-◇.fmap (ε.at A * id) ∘ ◇-□-strong
 
 -- If we know that A and B eventually happens, then at a future point either
 --   * A happens and B still hasn't
