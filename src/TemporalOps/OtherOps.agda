@@ -20,6 +20,9 @@ open import Data.Nat hiding (_*_)
 open import Data.Nat.Properties
             using (+-identityʳ ; +-comm ; +-suc ; +-assoc)
 
+open import Holes.Term using (⌞_⌟)
+open import Holes.Cong.Propositional
+
 open Monad M-◇
 open Comonad W-□
 private module F-◇ = Functor F-◇
@@ -91,8 +94,8 @@ _>>=_ {n = n} a f = (f ⋆) n a
     begin
         ((a >>= f) >>= g)
     ≡⟨⟩
-        μ.at C n (((fmap g ∘ μ.at B) ∘ fmap f) n a)
-    ≡⟨ cong (μ.at C n) (≈-cong-left {f = fmap g} (μ.nat-cond {B} {◇ C} {g} {n} {fmap f n a}) {n} {a >>= f}) ⟩
+        μ.at C n ⌞ (((fmap g ∘ μ.at B) ∘ fmap f) n a) ⌟
+    ≡⟨ cong! (≈-cong-left {f = fmap g} (μ.nat-cond {B} {◇ C} {g} {n} {fmap f n a}) {n} {a >>= f}) ⟩
         (((μ.at C ∘ μ.at (◇ C)) ∘ fmap (fmap g)) ∘ fmap f) n a
     ≡⟨ lemma ⟩
         (((μ.at C ∘ fmap (μ.at C)) ∘ fmap (fmap g)) ∘ fmap f) n a

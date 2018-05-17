@@ -20,6 +20,9 @@ open import Relation.Binary.HeterogeneousEquality as ≅
 open import Data.Nat.Properties
             using (+-identityʳ ; +-comm ; +-suc ; +-assoc)
 
+open import Holes.Term using (⌞_⌟)
+open import Holes.Cong.Propositional
+
 -- | Auxiliary lemmas
 
 -- Equality of two delayed values
@@ -80,14 +83,14 @@ open ≅.≅-Reasoning
      ⟩
         μ-compare A ((k + l) + m) (k + l) v″ (snd==[ (k + l) + m ])
     ≡⟨⟩
-        μ-shift (k + l) m (rew (delay-+-left0 (k + l) m) v″)
-    ≡⟨ cong (λ x → μ-shift (k + l) m x) (pr k l m v″ v v″≅v) ⟩
+        μ-shift (k + l) m ⌞ rew (delay-+-left0 (k + l) m) v″ ⌟
+    ≡⟨ cong! (pr k l m v″ v v″≅v) ⟩
         μ-shift (k + l) m (rew (delay-+-left0 l m) v)
     ≅⟨ ≅.sym ( μ-shift-comp {A} {m} {l} {k} {(rew (delay-+-left0 l m) v)} ) ⟩
         μ-shift k (l + m) (μ-shift l m (rew (delay-+-left0 l m) v))
     ≡⟨⟩
-        μ-shift k (l + m) (μ-compare A (l + m) l v (snd==[ l + m ]))
-    ≡⟨ cong (λ x → μ-shift k (l + m) (μ-compare A (l + m) l v x)) (sym pf) ⟩
+        μ-shift k (l + m) (μ-compare A (l + m) l v ⌞ snd==[ l + m ] ⌟)
+    ≡⟨ cong! (sym pf) ⟩
         μ-shift k (l + m) (μ-compare A (l + m) l v (compareLeq l (l + m)))
     ≡⟨⟩
         μ-shift k (l + m) (μ.at A (l + m) (l , v))
@@ -130,8 +133,8 @@ open ≅.≅-Reasoning
     ≡⟨⟩
         μ-shift k n (n + suc l , rew (delay-⊤ n l) top.tt)
     ≡⟨⟩
-        μ-shift k n (μ-compare A n (n + suc l) v (fst==suc[ n + l ]))
-    ≡⟨ cong (λ x → μ-shift k n (μ-compare A n (n + suc l) v x)) (sym pf) ⟩
+        μ-shift k n (μ-compare A n (n + suc l) v ⌞ fst==suc[ n + l ] ⌟)
+    ≡⟨ cong! (sym pf) ⟩
         μ-shift k n (μ-compare A n (n + suc l) v (compareLeq (n + suc l) n))
     ≡⟨⟩
         μ-shift k n (μ.at A n (n + suc l , v))

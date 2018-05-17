@@ -21,6 +21,8 @@ open import Relation.Binary.HeterogeneousEquality as ≅
 open import Data.Nat.Properties
             using (+-identityʳ ; +-comm ; +-suc ; +-assoc)
 
+open import Holes.Term using (⌞_⌟)
+open import Holes.Cong.Propositional
 
 M-◇ : Monad ℝeactive
 M-◇ = record
@@ -55,8 +57,8 @@ M-◇ = record
         ≡⟨ cong (λ x → μ-compare A (k + l) k ((Functor.fmap (F-delay k) (η.at A) at (k + l)) v) x) pf ⟩
             μ-compare A (k + l) k ((Functor.fmap (F-delay k) (η.at A) at (k + l)) v) snd==[ k + l ]
         ≡⟨⟩
-            μ-shift k l (rew (delay-+-left0 k l) ((Functor.fmap (F-delay k) (η.at A) at (k + l)) v))
-        ≡⟨ cong (λ x → μ-shift k l x)
+            μ-shift k l ⌞ (rew (delay-+-left0 k l) ((Functor.fmap (F-delay k) (η.at A) at (k + l)) v)) ⌟
+        ≡⟨ cong!
             (delay-+-left0-eq k l ((Functor.fmap (F-delay k) (η.at A) at (k + l)) v)
                                           ((Functor.fmap (F-delay (k + 0)) (η.at A) at (k + l)) v′) pr)
          ⟩
@@ -119,20 +121,20 @@ M-◇ = record
         begin
             μ.at A (k + l) (μ.at (F-◇.omap A) (k + l) (k , v))
         ≡⟨⟩
-            μ.at A (k + l) (μ-compare (F-◇.omap A) (k + l) k v (compareLeq k (k + l)))
-        ≡⟨ cong (λ x → μ.at A (k + l) (μ-compare (F-◇.omap A) (k + l) k v (x))) pf ⟩
+            μ.at A (k + l) (μ-compare (F-◇.omap A) (k + l) k v ⌞ compareLeq k (k + l) ⌟)
+        ≡⟨ cong! pf ⟩
             μ.at A (k + l) (μ-compare (F-◇.omap A) (k + l) k v (snd==[ k + l ]))
         ≡⟨⟩
             μ.at A (k + l) (μ-shift k l (rew (delay-+-left0 k l) v))
         ≡⟨ ≅-to-≡ (μ-interchange {A} {l} {k} {rew (delay-+-left0 k l) v}) ⟩
-            μ-shift k l (μ.at A l (rew (delay-+-left0 k l) v))
-        ≡⟨ cong (λ x → μ-shift k l (μ.at A l x)) (v≡v′-rew k l v v′ v≅v′) ⟩
+            μ-shift k l (μ.at A l ⌞ rew (delay-+-left0 k l) v ⌟)
+        ≡⟨ cong! (v≡v′-rew k l v v′ v≅v′) ⟩
             μ-shift k l (μ.at A l (rew (delay-+ k 0 l) v′))
         ≡⟨⟩ -- Def. of (F-delay 0).fmap
             μ-shift k l ((Functor.fmap (F-delay 0) (μ.at A) at l) (rew (delay-+ k 0 l) v′))
         ≡⟨ cong (λ x → μ-shift k l x) (sym (fmap-delay-+-n+k k 0 l v′)) ⟩
-            μ-shift k l (rew (delay-+ k 0 l) ((Functor.fmap (F-delay (k + 0)) (μ.at A) at (k + l)) v′))
-        ≡⟨ cong (λ x → μ-shift k l x)
+            μ-shift k l ⌞ rew (delay-+ k 0 l) ((Functor.fmap (F-delay (k + 0)) (μ.at A) at (k + l)) v′) ⌟
+        ≡⟨ cong!
             (sym (delay-+-left0-eq k l ((Functor.fmap (F-delay k) (μ.at A) at (k + l)) v)
                                        ((Functor.fmap (F-delay (k + 0)) (μ.at A) at (k + l)) v′) pr))
          ⟩
@@ -144,7 +146,7 @@ M-◇ = record
         ≡⟨⟩
             μ.at A (k + l) (k , (Functor.fmap (F-delay k) (μ.at A) at (k + l)) v)
         ≡⟨⟩
-            μ.at A (k + l) (F-◇.fmap (μ.at A) (k + l) (k , v))
+            μ.at A (k + l) (F-◇.fmap (μ.at A) (k + l) (k , ?))
         ∎
         where
         v′ : delay (◇ ◇ A) by (k + 0) at (k + l)
@@ -164,14 +166,14 @@ M-◇ = record
         begin
             μ.at A n (μ.at (F-◇.omap A) n (n + suc l , v))
         ≡⟨⟩
-            μ.at A n (μ-compare (F-◇.omap A) n (n + suc l) v (compareLeq (n + suc l) n))
-        ≡⟨ cong (λ x → μ.at A n (μ-compare (F-◇.omap A) n (n + suc l) v x)) pf ⟩
+            μ.at A n (μ-compare (F-◇.omap A) n (n + suc l) v ⌞ compareLeq (n + suc l) n ⌟)
+        ≡⟨ cong! pf ⟩
             μ.at A n (μ-compare (F-◇.omap A) n (n + suc l) v (fst==suc[ n + l ]))
         ≡⟨⟩
             μ.at A n (n + suc l , rew (delay-⊤ n l) top.tt)
         ≡⟨⟩
-            μ-compare A n (n + suc l) (rew (delay-⊤ n l) top.tt) (compareLeq (n + suc l) n)
-        ≡⟨ cong (λ x → μ-compare A n (n + suc l) (rew (delay-⊤ n l) top.tt) x) pf ⟩
+            μ-compare A n (n + suc l) (rew (delay-⊤ n l) top.tt) ⌞ compareLeq (n + suc l) n ⌟
+        ≡⟨ cong! pf ⟩
             μ-compare A n (n + suc l) (rew (delay-⊤ n l) top.tt) (fst==suc[ n + l ])
         ≡⟨⟩
             n + suc l , rew (delay-⊤ n l) top.tt
