@@ -59,9 +59,9 @@ open ⟦K⟧ ⟦𝒯erm⟧
 ⟦ Γ ⌊⌋ₛ Γ′ ⊢ₛ M ⟧ = ⟦ sub-midₛ 𝒯ermₛ Γ Γ′ M ⟧ₛ
 
 -- Denotational soundness of top substitution
-⟦sub-topₛ⟧ : ∀ {Γ A} -> (M : Γ ⊢ A) -- (n : ℕ) (⟦Γ⟧ : ⟦ Γ ⟧ₓ n)
-        -> ⟨ id , ⟦ M ⟧ₘ ⟩ ≈ ⟦ sub-topₛ 𝒯ermₛ M ⟧ₛ
-⟦sub-topₛ⟧ {Γ} M {n} {⟦Γ⟧} = cong (λ x → x , ⟦ M ⟧ₘ n ⟦Γ⟧) (sym (⟦idₛ⟧ {Γ} {n} {⟦Γ⟧}))
+⟦sub-topₛ⟧ : ∀ {Γ A} -> (M : Γ ⊢ A)
+        -> ⟦ sub-topₛ 𝒯ermₛ M ⟧ₛ ≈ ⟨ id , ⟦ M ⟧ₘ ⟩
+⟦sub-topₛ⟧ {Γ} M {n} {⟦Γ⟧} rewrite ⟦idₛ⟧ {Γ} {n} {⟦Γ⟧} = refl
 
 -- | Soundness theorems
 -- | Concrete soundness theorems for structural lemmas and substitution
@@ -104,13 +104,13 @@ substitution′-sound {Γ} {Γ′} M N = traverse′-sound ⟦𝒯erm⟧ (sub-mi
 -- Top substitution is sound (full categorical proof)
 subst-sound : ∀{Γ A B} (M : Γ ⊢ A) (N : Γ ,, A ⊢ B)
            -> ⟦ [ M /] N ⟧ₘ ≈ ⟦ N ⟧ₘ ∘ ⟨ id , ⟦ M ⟧ₘ ⟩
-subst-sound M N {n} {a} rewrite ⟦sub-topₛ⟧ M {n} {a} =
+subst-sound M N {n} {a} rewrite sym (⟦sub-topₛ⟧ M {n} {a}) =
     substitute-sound (sub-topₛ 𝒯ermₛ M) N
 
 -- Top substitution is sound (full categorical proof)
 subst′-sound : ∀{Γ A B} (M : Γ ⊢ A) (N : Γ ,, A ⊨ B)
            -> ⟦ [ M /′] N ⟧ᵐ ≈ ⟦ N ⟧ᵐ ∘ ⟨ id , ⟦ M ⟧ₘ ⟩
-subst′-sound M N {n} {a} rewrite ⟦sub-topₛ⟧ M {n} {a} =
+subst′-sound M N {n} {a} rewrite sym (⟦sub-topₛ⟧ M {n} {a}) =
     traverse′-sound ⟦𝒯erm⟧ (sub-topₛ 𝒯ermₛ M) N
 
 open K 𝒯erm
@@ -141,8 +141,8 @@ subst″-sound {Γ} (pure {A = A} M) D n ⟦Γ⟧ =
     ≡⟨⟩
         ⟦ traverse′ (sub-topˢₛ 𝒯ermₛ M) D ⟧ᵐ n ⟦Γ⟧
     ≡⟨ traverse′-sound ⟦𝒯erm⟧ (sub-topˢₛ 𝒯ermₛ M) D {n} {⟦Γ⟧} ⟩
-        ⟦ D ⟧ᵐ n (⟦subst⟧ (Γˢ⊆Γ Γ ⊆ₛ 𝒯erm) n ⟦Γ⟧ , ⟦ M ⟧ₘ n ⟦Γ⟧)
-    ≡⟨ cong (λ x -> ⟦ D ⟧ᵐ n (x , ⟦ M ⟧ₘ n ⟦Γ⟧))
+        ⟦ D ⟧ᵐ n (⌞ ⟦subst⟧ (Γˢ⊆Γ Γ ⊆ₛ 𝒯erm) n ⟦Γ⟧ ⌟ , ⟦ M ⟧ₘ n ⟦Γ⟧)
+    ≡⟨ cong!
         (begin
             ⟦ Γˢ⊆Γ Γ ⟧⊆ n ⟦Γ⟧
         ≡⟨ lemma Γ n ⟦Γ⟧ ⟩
