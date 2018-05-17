@@ -88,13 +88,12 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
         lemma : ∀ l -> ⟦ traverse {Γ} σ (stable M) ⟧ₘ n ⟦Δ⟧ l
                      ≡ (⟦ stable {Γ} M ⟧ₘ ∘ ⟦subst⟧ σ) n ⟦Δ⟧ l
         lemma l rewrite traverse-sound (σ ↓ˢ k) M {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l}
-                      | □-≡ n l (⟦subst⟧-⟦⟧ˢₓ-□ σ {n} {⟦Δ⟧}) l = refl
+                      | □-≡ n l (⟦↓ˢ⟧ σ {n} {⟦Δ⟧}) l = refl
     traverse-sound σ (sig M) {n} {⟦Δ⟧} rewrite traverse-sound σ M {n} {⟦Δ⟧} = refl
     traverse-sound σ (letSig_In_ {A = A} M N) {n} {⟦Δ⟧}
         rewrite traverse-sound σ M {n} {⟦Δ⟧}
               | traverse-sound (σ ↑ k) N {n} {⟦Δ⟧ , ⟦ M ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)}
               | ⟦↑⟧ (A always) σ {n} {⟦Δ⟧ , (⟦ M ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧))} = refl
-    traverse-sound σ (wait M) {n} {⟦Δ⟧} rewrite traverse-sound σ M {n} {⟦Δ⟧} = refl
     traverse-sound σ (event E) = traverse′-sound σ E
 
     traverse′-sound σ (pure M) {n} {⟦Δ⟧} rewrite traverse-sound σ M {n} {⟦Δ⟧} = refl
