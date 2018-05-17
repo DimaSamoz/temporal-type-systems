@@ -50,9 +50,8 @@ mutual
     sound (β-sig N M) {n} {⟦Γ⟧} rewrite subst-sound M N {n} {⟦Γ⟧} = refl
 
     sound (η-lam {A} M) {n} {⟦Γ⟧} = ext λ ⟦A⟧ →
-                        cong (λ x → x ⟦A⟧) (≡.sym (⟦𝓌⟧ (A now) M n ⟦Γ⟧ ⟦A⟧))
-    sound (η-pair M) {n} {⟦Γ⟧} with ⟦ M ⟧ₘ n ⟦Γ⟧
-    sound (η-pair M) {n} {⟦Γ⟧} | _ , _ = refl
+                        cong (λ x → x ⟦A⟧) (≡.sym (⟦𝓌⟧ (A now) M {n} {⟦Γ⟧ , ⟦A⟧}))
+    sound (η-pair M) = ≡.sym (⊗-η-exp {m = ⟦ M ⟧ₘ})
     sound (η-unit M) = refl
     sound (η-sum M) {n} {⟦Γ⟧} with ⟦ M ⟧ₘ n ⟦Γ⟧
     sound (η-sum M) {n} {a} | inj₁ _ = refl
