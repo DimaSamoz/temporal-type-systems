@@ -51,10 +51,18 @@ record ⟦Kit⟧ {𝒮 : Schema} (k : Kit 𝒮) : Set where
 module ⟦K⟧ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
     open ⟦Kit⟧ ⟦k⟧
     open Kit k
+
     -- Denotation of substitutions as a map between contexts
     ⟦subst⟧ : ∀{Γ Δ} -> Subst 𝒮 Γ Δ -> ⟦ Δ ⟧ₓ ⇴ ⟦ Γ ⟧ₓ
     ⟦subst⟧ ●       = !
     ⟦subst⟧ (σ ▸ T) = ⟨ ⟦subst⟧ σ , ⟦ T ⟧ ⟩
+
+    -- Simplified context stabilisation lemma for non-boxed stabilisation
+    ⟦𝒶⟧′ : ∀{A Δ} (T : 𝒮 Δ (A always))
+       -> ⟦ 𝒶 T ⟧ ∘ ⟦ Δ ⟧ˢₓ ≈ ⟦ T ⟧
+    ⟦𝒶⟧′ {A} {Δ} T {n} {⟦Δ⟧} rewrite ⟦⟧ˢₓ-factor Δ {n} {⟦Δ⟧}
+                           = □-≡ n n (⟦𝒶⟧ T) n
+
 
     -- Denotation of weakening
     ⟦⁺⟧ : ∀ A {Γ Δ} -> (σ : Subst 𝒮 Γ Δ)
@@ -70,15 +78,35 @@ module ⟦K⟧ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
                                    | ⟦𝓌⟧ A T {n} {a}
                                    | ⟦𝓋⟧ A Δ {n} {a} = refl
 
+    -- Denotation of stabilisation (naturality condition for ⟦_⟧ˢₓ-□)
+    ⟦↓ˢ⟧ : ∀ {Γ Δ} -> (σ : Subst 𝒮 Γ Δ)
+       -> F-□.fmap (⟦subst⟧ (σ ↓ˢ k)) ∘ ⟦ Δ ⟧ˢₓ-□ ≈ ⟦ Γ ⟧ˢₓ-□ ∘ ⟦subst⟧ σ
+    ⟦↓ˢ⟧ ● = refl
+    ⟦↓ˢ⟧ (_▸_ {A now} σ T) {n} {a} rewrite ⟦↓ˢ⟧ σ {n} {a} = refl
+    ⟦↓ˢ⟧ {Δ = Δ} (_▸_ {A always}{Γ} σ T) {n} {a}  = ext lemma
+        where
+        lemma : ∀ l -> (F-□.fmap (⟦subst⟧ ((σ ▸ T) ↓ˢ k)) ∘ ⟦ Δ ⟧ˢₓ-□) n a l
+                     ≡ (⟦ Γ ,, A always ⟧ˢₓ-□ ∘ ⟦subst⟧ (σ ▸ T)) n a l
+        lemma l rewrite □-≡ n l (⟦↓ˢ⟧ σ {n} {a}) l
+                      | □-≡ n l (⟦𝒶⟧ T {n} {a}) l = refl
+
+    -- Simplified denotation of stabilisation
+    ⟦↓ˢ⟧′ : ∀ {Γ Δ} -> (σ : Subst 𝒮 Γ Δ)
+       -> ⟦subst⟧ (σ ↓ˢ k) ∘ ⟦ Δ ⟧ˢₓ ≈ ⟦ Γ ⟧ˢₓ ∘ ⟦subst⟧ σ
+    ⟦↓ˢ⟧′ {Γ} {Δ} σ {n} {a} rewrite ⟦⟧ˢₓ-factor Δ {n} {a}
+                                | □-≡ n n (⟦↓ˢ⟧ σ {n} {a}) n
+                                | ⟦⟧ˢₓ-factor Γ {n} {(⟦subst⟧ σ n a)} = refl
+
     -- Denotation of stabilisation idempotence
     ⟦ˢˢ⟧ : ∀ Γ -> F-□.fmap (⟦subst⟧ (Γ ˢˢₛ k)) ∘ ⟦ Γ ˢ ⟧ˢₓ-□ ∘ ⟦ Γ ⟧ˢₓ ≈ ⟦ Γ ⟧ˢₓ-□
     ⟦ˢˢ⟧ ∙ = refl
     ⟦ˢˢ⟧ (Γ ,, B now) = ⟦ˢˢ⟧ Γ
     ⟦ˢˢ⟧ (Γ ,, B always) {n} {⟦Γˢ⟧ , □⟦B⟧} = ext lemma
         where
-        lemma : ∀ l → (⟦subst⟧ (_⁺_ {B always} (Γ ˢˢₛ k) k) l (⟦ Γ ˢ ⟧ˢₓ-□ n (⟦ Γ ⟧ˢₓ n ⟦Γˢ⟧) l , □⟦B⟧) ,
-                                   ⟦ 𝓋 {Γ ˢ ˢ ,, B always}{B always} top ⟧ l (⟦ Γ ˢ ⟧ˢₓ-□ n (⟦ Γ ⟧ˢₓ n ⟦Γˢ⟧) l , □⟦B⟧))
-                            ≡ (⟦ Γ ⟧ˢₓ-□ n ⟦Γˢ⟧ l , □⟦B⟧)
+        lemma : ∀ l → (F-□.fmap (⟦subst⟧ ((Γ ,, B always) ˢˢₛ k))
+                        ∘ ⟦ (Γ ,, B always) ˢ ⟧ˢₓ-□
+                        ∘ ⟦ Γ ,, B always ⟧ˢₓ) n (⟦Γˢ⟧ , □⟦B⟧) l
+                    ≡ (⟦ Γ ⟧ˢₓ-□ n ⟦Γˢ⟧ l , □⟦B⟧)
         lemma l rewrite ⟦𝓋⟧ (B always) (Γ ˢ ˢ) {l} {⟦ Γ ˢ ⟧ˢₓ-□ n (⟦ Γ ⟧ˢₓ n ⟦Γˢ⟧) l , □⟦B⟧}
                       | ⟦⁺⟧ (B always) (Γ ˢˢₛ k) {l} {(⟦ Γ ˢ ⟧ˢₓ-□ n (⟦ Γ ⟧ˢₓ n ⟦Γˢ⟧) l , □⟦B⟧)}
                       | □-≡ n l (⟦ˢˢ⟧ Γ {n} {⟦Γˢ⟧}) l = refl
@@ -91,35 +119,18 @@ module ⟦K⟧ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
               | ⟦idₛ⟧ {Γ} {n} {⟦Γ⟧}
               | ⟦𝓋⟧ A Γ {n} {⟦Γ⟧ , ⟦A⟧} = refl
 
-    -- Simplified context stabilisation lemma for non-boxed stabilisation
-    ⟦𝒶⟧′ : ∀{A Δ} (T : 𝒮 Δ (A always))
-       -> ⟦ 𝒶 T ⟧ ∘ ⟦ Δ ⟧ˢₓ ≈ ⟦ T ⟧
-    ⟦𝒶⟧′ {A} {Δ} T {n} {⟦Δ⟧} rewrite ⟦⟧ˢₓ-factor Δ {n} {⟦Δ⟧}
-                           = □-≡ n n (⟦𝒶⟧ T) n
 
-    -- | Commutativity lemmas
+    -- | Other lemmas
 
-    -- Interpretation of substitution and context stabilisation
-    -- can be commuted (naturality condition for ⟦_⟧ˢₓ)
-    ⟦subst⟧-⟦⟧ˢₓ : ∀{Γ Δ} -> (σ : Subst 𝒮 Γ Δ)
-              -> ⟦subst⟧ (σ ↓ˢ k) ∘ ⟦ Δ ⟧ˢₓ ≈ ⟦ Γ ⟧ˢₓ ∘ ⟦subst⟧ σ
-    ⟦subst⟧-⟦⟧ˢₓ ● = refl
-    ⟦subst⟧-⟦⟧ˢₓ (_▸_ {A now} σ T) = ⟦subst⟧-⟦⟧ˢₓ σ
-    ⟦subst⟧-⟦⟧ˢₓ (_▸_ {A always} σ T) {n} {⟦Δ⟧}
-        rewrite ⟦subst⟧-⟦⟧ˢₓ σ {n} {⟦Δ⟧}
-              | ⟦𝒶⟧′ T {n} {⟦Δ⟧} = refl
-
-    ⟦subst⟧-⟦⟧ˢₓ-□ : ∀{Γ Δ} -> (σ : Subst 𝒮 Γ Δ)
-              -> F-□.fmap (⟦subst⟧ (σ ↓ˢ k)) ∘ ⟦ Δ ⟧ˢₓ-□
-               ≈ ⟦ Γ ⟧ˢₓ-□ ∘ ⟦subst⟧ σ
-    ⟦subst⟧-⟦⟧ˢₓ-□ ● = refl
-    ⟦subst⟧-⟦⟧ˢₓ-□ (_▸_ {A now} σ T) = ⟦subst⟧-⟦⟧ˢₓ-□ σ
-    ⟦subst⟧-⟦⟧ˢₓ-□ {Δ = Δ} (_▸_ {A always} {Γ} σ T) {n} {⟦Δ⟧} = ext lemma
-        where
-        lemma : ∀ l -> (F-□.fmap (⟦subst⟧ ((σ ▸ T) ↓ˢ k)) ∘ ⟦ Δ ⟧ˢₓ-□) n ⟦Δ⟧ l
-                        ≡ (⟦ Γ ,, A always ⟧ˢₓ-□  ∘ ⟦subst⟧ (σ ▸ T)) n ⟦Δ⟧ l
-        lemma l rewrite □-≡ n l (⟦𝒶⟧ T {n} {⟦Δ⟧}) l
-                      | □-≡ n l (⟦subst⟧-⟦⟧ˢₓ-□ σ {n} {⟦Δ⟧}) l = refl
+    -- Substitution by the Γ ˢ ⊆ Γ subcontext substitution is the same as
+    -- stabilising the context
+    ⟦subst⟧-Γˢ⊆Γ : ∀ Γ -> ⟦subst⟧ (Γˢ⊆Γ Γ ⊆ₛ k) ≈ ⟦ Γ ⟧ˢₓ
+    ⟦subst⟧-Γˢ⊆Γ ∙ = refl
+    ⟦subst⟧-Γˢ⊆Γ (Γ ,, A now) {n} {⟦Γ⟧ , ⟦A⟧}
+        rewrite ⟦⁺⟧ (A now) (Γˢ⊆Γ Γ ⊆ₛ k) {n} {⟦Γ⟧ , ⟦A⟧} = ⟦subst⟧-Γˢ⊆Γ Γ
+    ⟦subst⟧-Γˢ⊆Γ (Γ ,, A always) {n} {⟦Γ⟧ , ⟦A⟧}
+        rewrite ⟦↑⟧ (A always) (Γˢ⊆Γ Γ ⊆ₛ k) {n} {⟦Γ⟧ , ⟦A⟧}
+              | ⟦subst⟧-Γˢ⊆Γ Γ {n} {⟦Γ⟧} = refl
 
     -- Interpretation of substitution and selection can be commuted
     ⟦subst⟧-⟦select⟧ : ∀{Δ Γ C} A B -> (σ : Subst 𝒮 Γ Δ)
