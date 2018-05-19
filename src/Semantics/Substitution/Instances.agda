@@ -23,6 +23,7 @@ open import CategoryTheory.Comonad
 open import CategoryTheory.Instances.Reactive renaming (top to ⊤)
 open import TemporalOps.Diamond
 open import TemporalOps.Box
+open import TemporalOps.Common.Rewriting
 
 open import Data.Sum
 open import Data.Product
@@ -89,7 +90,7 @@ open Comonad W-□
 
     ⟦𝒶⟧-term : ∀{A Δ} (M : Δ ⊢ A always)
            -> F-□.fmap ⟦ 𝒶 M ⟧ₘ ∘ ⟦ Δ ⟧ˢₓ-□ ≈ δ.at ⟦ A ⟧ₜ ∘ ⟦ M ⟧ₘ
-    ⟦𝒶⟧-term {A} {∙} (svar ())
+    ⟦𝒶⟧-term {A} {∙} (var ())
     ⟦𝒶⟧-term {A} {∙} (stable M) = refl
     ⟦𝒶⟧-term {A} {Δ ,, B now} (var (pop x)) = ⟦𝒶⟧-term (var x)
     ⟦𝒶⟧-term {A} {Δ ,, B now} (stable M) = ⟦𝒶⟧-term {A} {Δ} (stable M)
@@ -102,13 +103,55 @@ open Comonad W-□
                       | ⟦⁺⟧ (B always) {Δ ˢ} (idₛ 𝒱ar) {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , □⟦B⟧}
                       | ⟦idₛ⟧ {Δ ˢ} {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l}
                       | □-≡ n l (⟦𝒶⟧-term (var x) {n} {⟦Δ⟧}) l = refl
-    ⟦𝒶⟧-term {A} {Δ ,, B always} (stable M) {n} {⟦Δ⟧ , □⟦B⟧} = ext λ l → ext (lemma l)
+    ⟦𝒶⟧-term {A} {Δ ,, B always} (stable M) {n} {⟦Δ⟧ , □⟦B⟧} = ext λ x → ext (lemma2 x)
         where
-        postulate
-            duh : ∀ {A : Set}{x y : A} -> x ≡ y
-        lemma : ∀ l m -> ⟦ subst (λ x₁ → x₁ ,, B always ⊢ A now) (sym (ˢ-idemp Δ)) M ⟧ₘ m
-                            (⟦ Δ ˢ ⟧ˢₓ-□ l (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l) m , □⟦B⟧)
-                          ≡ ⟦ M ⟧ₘ m (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ m , □⟦B⟧)
-        lemma l m
-            rewrite □-≡ l m (□-≡ n l (⟦⟧ˢₓ-□-twice Δ {n} {⟦Δ⟧}) l) m
-            = duh
+        lemma1 : ∀ Δ (n l m : ℕ) (⟦Δ⟧ : ⟦ Δ ⟧ₓ n)
+                 -> (F-□.fmap ⟦ Δ ˢ ⟧ˢₓ-□ ∘ ⟦ Δ ⟧ˢₓ-□) n ⟦Δ⟧ l m
+                  ≡ (F-□.fmap ⟦ Δ ˢ ⟧ˢₓ ∘ ⟦ Δ ⟧ˢₓ-□) n ⟦Δ⟧ m
+        lemma1 Δ n l m ⟦Δ⟧ rewrite □-≡ l m (□-≡ n l (⟦⟧ˢₓ-□-twice Δ {n} {⟦Δ⟧}) l) m
+                = □-≡ n m (⟦⟧ˢₓ-comm Δ) m
+
+        lemma2 : ∀ l j
+              -> (F-□.fmap ⟦ 𝒶 {Δ ,, B always} (stable M) ⟧ₘ ∘ ⟦ Δ ,, B always ⟧ˢₓ-□) n (⟦Δ⟧ , □⟦B⟧) l j
+               ≡ (δ.at ⟦ A ⟧ₜ ∘ ⟦ stable {Δ ,, B always} M ⟧ₘ) n (⟦Δ⟧ , □⟦B⟧) l j
+        lemma2 l j =
+            begin
+                ⟦ subst (λ x → x ,, B always ⊢ A now) (ˢ-idemp′ Δ) M ⟧ₘ j (⟦ Δ ˢ ⟧ˢₓ-□ l (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l) j  , □⟦B⟧)
+            ≡⟨ cong (λ x → ⟦ subst (λ x → x ,, B always ⊢ A now) (ˢ-idemp′ Δ) M ⟧ₘ j (x , □⟦B⟧)) (lemma1 Δ n l j ⟦Δ⟧) ⟩
+                ⟦ subst (λ x → x ,, B always ⊢ A now) (ˢ-idemp′ Δ) M ⟧ₘ j (⟦ Δ ˢ ⟧ˢₓ j (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ j) , □⟦B⟧)
+            ≡⟨ cong (λ x → ⟦ subst (λ x → x ,, B always ⊢ A now) (ˢ-idemp′ Δ) M ⟧ₘ j (x , □⟦B⟧)) (⟦⟧ˢₓ-rew Δ n j ⟦Δ⟧) ⟩
+                ⟦ subst (λ x → x ,, B always ⊢ A now) (ˢ-idemp′ Δ) M ⟧ₘ j (rew (⟦ˢ⟧-idemp Δ j) (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ j) , □⟦B⟧)
+            ≅⟨ full-eq j M-eq (≅.sym (rew-to-≅ (⟦ˢ⟧-idemp Δ j))) □⟦B⟧ ⟩
+                ⟦ M ⟧ₘ j (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ j , □⟦B⟧)
+            ∎
+
+         where
+            ˢ-idemp′ : ∀ Γ -> Γ ˢ ≡ Γ ˢ ˢ
+            ˢ-idemp′ Γ = sym (ˢ-idemp Γ)
+
+            ⟦ˢ⟧-idemp : ∀ Δ n -> ⟦ Δ ˢ ⟧ₓ n ≡ ⟦ Δ ˢ ˢ ⟧ₓ n
+            ⟦ˢ⟧-idemp Δ n = cong (λ x → ⟦ x ⟧ₓ n) (ˢ-idemp′ Δ)
+
+            rew-lemma : ∀ Δ A n l ⟦Δ⟧ □⟦A⟧
+                 -> (rew (cong (λ x → ⟦ x ⟧ₓ l) (ˢ-idemp′ Δ)) (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l) , □⟦A⟧)
+                  ≡ rew (cong (λ x → ⟦ x ⟧ₓ l) (ˢ-idemp′ (Δ ,, A always))) (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , □⟦A⟧)
+            rew-lemma Δ A n l ⟦Δ⟧ □⟦A⟧ rewrite ˢ-idemp Δ = refl
+
+            ⟦⟧ˢₓ-rew : ∀ Δ n l ⟦Δ⟧ -> ⟦ Δ ˢ ⟧ˢₓ l (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l)
+                                  ≡ rew (⟦ˢ⟧-idemp Δ l) (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l)
+            ⟦⟧ˢₓ-rew ∙ n l ⟦Δ⟧ = refl
+            ⟦⟧ˢₓ-rew (Δ ,, A now) n l (⟦Δ⟧ , ⟦A⟧) = ⟦⟧ˢₓ-rew Δ n l ⟦Δ⟧
+            ⟦⟧ˢₓ-rew (Δ ,, A always) n l (⟦Δ⟧ , □⟦A⟧)
+                    rewrite ⟦⟧ˢₓ-rew Δ n l ⟦Δ⟧
+                          | rew-lemma Δ A n l ⟦Δ⟧ □⟦A⟧ = refl
+
+            M-eq : subst (λ x → x ,, B always ⊢ A now) (ˢ-idemp′ Δ) M  ≅ M
+            M-eq = ≅.≡-subst-removable (λ x → x ,, B always ⊢ A now) (ˢ-idemp′ Δ) M
+
+            full-eq : ∀ j {M₁ : Δ ˢ ˢ ,, B always ⊢ A now}
+                          {M₂ : Δ ˢ ,, B always ⊢ A now}
+                          {⟦Δ⟧₁ : ⟦ Δ ˢ ˢ ⟧ₓ j} {⟦Δ⟧₂ : ⟦ Δ ˢ ⟧ₓ j}
+                          (p-M : M₁ ≅ M₂) (p-⟦Δ⟧ : ⟦Δ⟧₁ ≅ ⟦Δ⟧₂) □⟦B⟧
+                   -> ⟦ M₁ ⟧ₘ j (⟦Δ⟧₁ , □⟦B⟧) ≅ ⟦ M₂ ⟧ₘ j (⟦Δ⟧₂ , □⟦B⟧)
+            full-eq j p-M p-⟦Δ⟧ □⟦B⟧ rewrite ˢ-idemp Δ
+                    = ≅.cong₂ ((λ x y → ⟦ x ⟧ₘ j (y , □⟦B⟧))) p-M p-⟦Δ⟧
