@@ -5,6 +5,7 @@ module TemporalOps.Delay where
 open import CategoryTheory.Categories
 open import CategoryTheory.Instances.Reactive
 open import CategoryTheory.Functor
+open import CategoryTheory.CartesianStrength
 open import TemporalOps.Common
 open import TemporalOps.Next
 
@@ -150,13 +151,43 @@ fmap-delay-+-k {A} {B} {f} n k l v =
     v≅v′ : v′ ≅ v
     v≅v′ = ≅.sym (rew-to-≅ (sym (delay-+ n k l)))
 
--- Delay preserves products
-pair-delay : ∀{A B : τ} -> (k : ℕ) -> (delay A by k ⊗ delay B by k) ⇴ delay (A ⊗ B) by k
-pair-delay zero n p = p
-pair-delay (suc k) n p =
-    Functor.fmap F-▹ (pair-delay k) n (pair-▹ n p)
 
--- Delay preserves coproducts
-sum-delay : ∀{A B : τ} -> (k : ℕ) -> (delay A by k ⊕ delay B by k) ⇴ delay (A ⊕ B) by k
-sum-delay zero n s = s
-sum-delay (suc k) n s = Functor.fmap F-▹ (sum-delay k) n (sum-▹ n s)
+-- Delay is a Cartesian functor
+F-cart-delay : ∀ k -> CartesianFunctor (F-delay k) ℝeactive-cart ℝeactive-cart
+F-cart-delay k = record
+    { u = u-delay k
+    ; m = m-delay k
+    ; associative = assoc-delay k
+    ; unital-right = unit-right-delay k
+    ; unital-left = λ {B} {n} {a} -> unit-left-delay k {B} {n} {a}
+    }
+    where
+    open CartesianFunctor F-cart-▹
+
+    u-delay : ∀ k -> ⊤ ⇴ delay ⊤ by k
+    u-delay zero = λ n _ → top.tt
+    u-delay (suc k) zero top.tt = top.tt
+    u-delay (suc k) (suc n) top.tt = u-delay k n top.tt
+
+    m-delay : ∀ k (A B : τ) -> (delay A by k ⊗ delay B by k) ⇴ delay (A ⊗ B) by k
+    m-delay zero A B = λ n x → x
+    m-delay (suc k) A B = Functor.fmap F-▹ (m-delay k A B) ∘ m (delay A by k) (delay B by k)
+
+    assoc-delay : ∀ k {A B C : τ}
+           -> m-delay k A (B ⊗ C) ∘ id * m-delay k B C ∘ assoc-right
+            ≈ Functor.fmap (F-delay k) assoc-right ∘ m-delay k (A ⊗ B) C ∘ m-delay k A B * id
+    assoc-delay zero = refl
+    assoc-delay (suc k) {A} {B} {C} {zero} = refl
+    assoc-delay (suc k) {A} {B} {C} {suc n} = assoc-delay k
+
+    unit-right-delay : ∀ k {A : τ} ->
+        Functor.fmap (F-delay k) unit-right ∘ m-delay k A ⊤ ∘ (id * u-delay k) ≈ unit-right
+    unit-right-delay zero {A} {n} = refl
+    unit-right-delay (suc k) {A} {zero} = refl
+    unit-right-delay (suc k) {A} {suc n} = unit-right-delay k
+
+    unit-left-delay : ∀ k {B : τ} ->
+        Functor.fmap (F-delay k) unit-left ∘ m-delay k ⊤ B ∘ (u-delay k * id) ≈ unit-left
+    unit-left-delay zero = refl
+    unit-left-delay (suc k) {B} {zero} = refl
+    unit-left-delay (suc k) {B} {suc n} = unit-left-delay k
