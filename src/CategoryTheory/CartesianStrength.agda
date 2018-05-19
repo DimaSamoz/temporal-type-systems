@@ -1,5 +1,5 @@
 
-module CategoryTheory.CartesianFunctor where
+module CategoryTheory.CartesianStrength where
 
 open import CategoryTheory.Categories
 open import CategoryTheory.Functor
@@ -40,7 +40,6 @@ record CartesianFunctor {n}
 record CartesianComonad {n}
         {ℂ : Category n} (C : Comonad ℂ)
         (ℂ-cart : Cartesian ℂ) : Set (lsuc n) where
-    -- private module ℂ = Category ℂ
     open Category ℂ
     open Comonad C
     open Functor W renaming (omap to F)
@@ -56,4 +55,4 @@ record CartesianComonad {n}
         u-δ : δ.at ⊤ ∘ u ≈ fmap u ∘ u
         m-ε : ∀{A B : obj} -> ε.at (A ⊗ B) ∘ m A B ≈ ε.at A * ε.at B
         m-δ : ∀{A B : obj} -> fmap (m A B) ∘ m (F A) (F B) ∘ δ.at A * δ.at B
-                            ≈ δ.at (A ⊗ B) ∘ m A B 
+                            ≈ δ.at (A ⊗ B) ∘ m A B

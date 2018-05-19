@@ -7,7 +7,7 @@ open import CategoryTheory.Instances.Sets
 open import CategoryTheory.Instances.Reactive
 open import CategoryTheory.BCCCs
 open import CategoryTheory.Functor
-open import CategoryTheory.CartesianFunctor
+open import CategoryTheory.CartesianStrength
 open import CategoryTheory.NatTrans
 open import CategoryTheory.Adjunction
 open import CategoryTheory.Comonad
