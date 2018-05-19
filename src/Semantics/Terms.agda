@@ -43,7 +43,7 @@ mutual
     ⟦ inr M         ⟧ₘ = ι₂ ∘ ⟦ M ⟧ₘ
     ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ = [ ⟦ B₁ ⟧ₘ ⁏ ⟦ B₂ ⟧ₘ ] ∘ dist ∘ ⟨ id , ⟦ M ⟧ₘ ⟩
     ⟦ sample {A} S  ⟧ₘ = ε.at ⟦ A ⟧ₜ ∘ ⟦ S ⟧ₘ
-    ⟦ stable {Γ} S  ⟧ₘ = F-□.fmap ⟦ S ⟧ₘ ∘ ⟦ Γ ⟧ˢₓ-□
+    ⟦ stable {Γ} S  ⟧ₘ = F-□.fmap ⟦ S ⟧ₘ ∘ ⟦ Γ ˢ⟧□
     ⟦ sig S         ⟧ₘ = ⟦ S ⟧ₘ
     ⟦ letSig S In B ⟧ₘ = ⟦ B ⟧ₘ ∘ ⟨ id , ⟦ S ⟧ₘ ⟩
     ⟦ event E       ⟧ₘ = ⟦ E ⟧ᵐ
@@ -53,11 +53,11 @@ mutual
     ⟦ pure {A} M     ⟧ᵐ = η.at ⟦ A ⟧ⱼ ∘ ⟦ M ⟧ₘ
     ⟦ letSig S InC C ⟧ᵐ = ⟦ C ⟧ᵐ ∘ ⟨ id , ⟦ S ⟧ₘ ⟩
     ⟦ letEvt_In_ {Γ} {A} E C ⟧ᵐ n env =
-        ⟦ E ⟧ₘ n env >>= λ k ⟦A⟧ → ⟦ C ⟧ᵐ k (⟦ Γ ⟧ˢₓ-□ n env k , ⟦A⟧)
+        ⟦ E ⟧ₘ n env >>= λ k ⟦A⟧ → ⟦ C ⟧ᵐ k (⟦ Γ ˢ⟧□ n env k , ⟦A⟧)
     ⟦ select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ n env =
         ◇-select n (⟦ E₁ ⟧ₘ n env , ⟦ E₂ ⟧ₘ n env)
         >>= ⟦select⟧ Γ A B C n env ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ
-    -- ⟦ letEvt_In_ {Γ} E C ⟧ᵐ = (⟦ C ⟧ᵐ ⋆) ∘ ◇-sample ∘ ⟨ ⟦ Γ ⟧ˢₓ-□ , ⟦ E ⟧ₘ ⟩
+    -- ⟦ letEvt_In_ {Γ} E C ⟧ᵐ = (⟦ C ⟧ᵐ ⋆) ∘ ◇-sample ∘ ⟨ ⟦ Γ ˢ⟧□ , ⟦ E ⟧ₘ ⟩
     -- ⟦ select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ =
     --       (⟦select⟧ Γ A B C ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ ⋆)
-    --     ∘ ◇-sample ∘ ⟨ ⟦ Γ ⟧ˢₓ-□ , ◇-select ∘ ⟨ ⟦ E₁ ⟧ₘ , ⟦ E₂ ⟧ₘ ⟩ ⟩
+    --     ∘ ◇-sample ∘ ⟨ ⟦ Γ ˢ⟧□ , ◇-select ∘ ⟨ ⟦ E₁ ⟧ₘ , ⟦ E₂ ⟧ₘ ⟩ ⟩

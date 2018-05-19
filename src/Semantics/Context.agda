@@ -34,39 +34,39 @@ infix 50 ⟦_⟧ₓ
 
 -- Denotation of context to denotation of stabilised context
 -- Standard morphism arising from Γ ˢ ⊆ Γ
-⟦_⟧ˢₓ : ∀ Γ -> ⟦ Γ ⟧ₓ ⇴ ⟦ Γ ˢ ⟧ₓ
-⟦ ∙            ⟧ˢₓ = !
-⟦ Γ , A now    ⟧ˢₓ = ⟦ Γ ⟧ˢₓ ∘ π₁
-⟦ Γ , A always ⟧ˢₓ = ⟦ Γ ⟧ˢₓ * id
+⟦_ˢ⟧ : ∀ Γ -> ⟦ Γ ⟧ₓ ⇴ ⟦ Γ ˢ ⟧ₓ
+⟦ ∙            ˢ⟧ = !
+⟦ Γ , A now    ˢ⟧ = ⟦ Γ ˢ⟧ ∘ π₁
+⟦ Γ , A always ˢ⟧ = ⟦ Γ ˢ⟧ * id
 
 -- Denotation of context to stable denotation of stabilised context
 -- Uses the Cartesian functor property of the □ comonad
-⟦_⟧ˢₓ-□ : ∀ Γ -> ⟦ Γ ⟧ₓ ⇴ □ ⟦ Γ ˢ ⟧ₓ
-⟦ ∙            ⟧ˢₓ-□ = u
-⟦ Γ , A now    ⟧ˢₓ-□ = ⟦ Γ ⟧ˢₓ-□ ∘ π₁
-⟦ Γ , A always ⟧ˢₓ-□ = m (⟦ Γ ˢ ⟧ₓ) (□ ⟦ A ⟧ₜ) ∘ (⟦ Γ ⟧ˢₓ-□ * δ.at ⟦ A ⟧ₜ)
+⟦_ˢ⟧□ : ∀ Γ -> ⟦ Γ ⟧ₓ ⇴ □ ⟦ Γ ˢ ⟧ₓ
+⟦ ∙            ˢ⟧□ = u
+⟦ Γ , A now    ˢ⟧□ = ⟦ Γ ˢ⟧□ ∘ π₁
+⟦ Γ , A always ˢ⟧□ = m (⟦ Γ ˢ ⟧ₓ) (□ ⟦ A ⟧ₜ) ∘ (⟦ Γ ˢ⟧□ * δ.at ⟦ A ⟧ₜ)
 
 -- The normal stabilisation transformation factors through
 -- the comonadic one via ε
-⟦⟧ˢₓ-factor : ∀ Γ -> ⟦ Γ ⟧ˢₓ ≈ ε.at ⟦ Γ ˢ ⟧ₓ ∘ ⟦ Γ ⟧ˢₓ-□
-⟦⟧ˢₓ-factor ∙ = refl
-⟦⟧ˢₓ-factor (Γ , A now) {n} {x ,, y} = ⟦⟧ˢₓ-factor Γ
-⟦⟧ˢₓ-factor (Γ , A always) {n} {x ,, y} rewrite ⟦⟧ˢₓ-factor Γ {n} {x} = refl
+⟦ˢ⟧-factor : ∀ Γ -> ⟦ Γ ˢ⟧ ≈ ε.at ⟦ Γ ˢ ⟧ₓ ∘ ⟦ Γ ˢ⟧□
+⟦ˢ⟧-factor ∙ = refl
+⟦ˢ⟧-factor (Γ , A now) {n} {x ,, y} = ⟦ˢ⟧-factor Γ
+⟦ˢ⟧-factor (Γ , A always) {n} {x ,, y} rewrite ⟦ˢ⟧-factor Γ {n} {x} = refl
 
--- Applying ⟦⟧ˢₓ-□ twice can be replaced with one ⟦⟧ˢₓ-□ and duplication
-⟦⟧ˢₓ-□-twice : ∀ Δ -> F-□.fmap ⟦ Δ ˢ ⟧ˢₓ-□ ∘ ⟦ Δ ⟧ˢₓ-□ ≈ δ.at ⟦ Δ ˢ ˢ ⟧ₓ ∘ ⟦ Δ ˢ ⟧ˢₓ-□ ∘ ⟦ Δ ⟧ˢₓ
-⟦⟧ˢₓ-□-twice ∙ = refl
-⟦⟧ˢₓ-□-twice (Δ , A now) = ⟦⟧ˢₓ-□-twice Δ
-⟦⟧ˢₓ-□-twice (Δ , A always) {n} {⟦Δ⟧ ,, □⟦A⟧} = ext λ k → ext λ l → cong (_,, □⟦A⟧) (lemma k l)
-    where lemma : ∀ k l -> ⟦ Δ ˢ ⟧ˢₓ-□ k (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ k) l
-                         ≡ ⟦ Δ ˢ ⟧ˢₓ-□ n (⟦ Δ ⟧ˢₓ n ⟦Δ⟧) l
-          lemma k l = □-≡ k l (□-≡ n k (⟦⟧ˢₓ-□-twice Δ {n} {⟦Δ⟧}) k) l
+-- Applying ⟦ˢ⟧□ twice can be replaced with one ⟦ˢ⟧□ and duplication
+⟦ˢ⟧□-twice : ∀ Δ -> F-□.fmap ⟦ Δ ˢ ˢ⟧□ ∘ ⟦ Δ ˢ⟧□ ≈ δ.at ⟦ Δ ˢ ˢ ⟧ₓ ∘ ⟦ Δ ˢ ˢ⟧□ ∘ ⟦ Δ ˢ⟧
+⟦ˢ⟧□-twice ∙ = refl
+⟦ˢ⟧□-twice (Δ , A now) = ⟦ˢ⟧□-twice Δ
+⟦ˢ⟧□-twice (Δ , A always) {n} {⟦Δ⟧ ,, □⟦A⟧} = ext λ k → ext λ l → cong (_,, □⟦A⟧) (lemma k l)
+    where lemma : ∀ k l -> ⟦ Δ ˢ ˢ⟧□ k (⟦ Δ ˢ⟧□ n ⟦Δ⟧ k) l
+                         ≡ ⟦ Δ ˢ ˢ⟧□ n (⟦ Δ ˢ⟧ n ⟦Δ⟧) l
+          lemma k l = □-≡ k l (□-≡ n k (⟦ˢ⟧□-twice Δ {n} {⟦Δ⟧}) k) l
 
--- Applying ⟦⟧ˢₓ-□ and ⟦⟧ˢₓ can be commuted
-⟦⟧ˢₓ-comm : ∀ Δ -> ⟦ Δ ˢ ⟧ˢₓ-□ ∘ ⟦ Δ ⟧ˢₓ ≈ F-□.fmap ⟦ Δ ˢ ⟧ˢₓ ∘ ⟦ Δ ⟧ˢₓ-□
-⟦⟧ˢₓ-comm Δ {n} {⟦Δ⟧} = ext (lemma Δ ⟦Δ⟧)
+-- Applying ⟦ˢ⟧□ and ⟦ˢ⟧ can be commuted
+⟦ˢ⟧-comm : ∀ Δ -> ⟦ Δ ˢ ˢ⟧□ ∘ ⟦ Δ ˢ⟧ ≈ F-□.fmap ⟦ Δ ˢ ˢ⟧ ∘ ⟦ Δ ˢ⟧□
+⟦ˢ⟧-comm Δ {n} {⟦Δ⟧} = ext (lemma Δ ⟦Δ⟧)
     where
-    lemma : ∀ Δ ⟦Δ⟧ l -> (⟦ Δ ˢ ⟧ˢₓ-□ ∘ ⟦ Δ ⟧ˢₓ) n ⟦Δ⟧ l ≡ (F-□.fmap ⟦ Δ ˢ ⟧ˢₓ ∘ ⟦ Δ ⟧ˢₓ-□) n ⟦Δ⟧ l
+    lemma : ∀ Δ ⟦Δ⟧ l -> (⟦ Δ ˢ ˢ⟧□ ∘ ⟦ Δ ˢ⟧) n ⟦Δ⟧ l ≡ (F-□.fmap ⟦ Δ ˢ ˢ⟧ ∘ ⟦ Δ ˢ⟧□) n ⟦Δ⟧ l
     lemma ∙ ⟦Δ⟧ l = refl
     lemma (Δ , A now) (⟦Δ⟧ ,, ⟦A⟧) l = lemma Δ ⟦Δ⟧ l
     lemma (Δ , A always) (⟦Δ⟧ ,, □⟦A⟧) l = cong (_,, □⟦A⟧) (lemma Δ ⟦Δ⟧ l)

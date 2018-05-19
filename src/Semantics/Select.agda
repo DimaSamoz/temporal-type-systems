@@ -36,6 +36,6 @@ open import Data.Sum
           -> (  ⟦ A ⟧ₜ ⊗ ◇ ⟦ B ⟧ₜ)
            ⊕ (◇ ⟦ A ⟧ₜ ⊗   ⟦ B ⟧ₜ)
            ⊕ (  ⟦ A ⟧ₜ ⊗   ⟦ B ⟧ₜ) ⇴ ◇ ⟦ C ⟧ₜ
-⟦select⟧ Γ _ _ _ n env ⟦C₁⟧ _ _ k (inj₁ (inj₁ (⟦A⟧ , ⟦◇B⟧))) = ⟦C₁⟧ k ((⟦ Γ ⟧ˢₓ-□ n env k , ⟦◇B⟧) , ⟦A⟧)
-⟦select⟧ Γ _ _ _ n env _ ⟦C₂⟧ _ k (inj₁ (inj₂ (⟦◇A⟧ , ⟦B⟧))) = ⟦C₂⟧ k ((⟦ Γ ⟧ˢₓ-□ n env k , ⟦◇A⟧) , ⟦B⟧)
-⟦select⟧ Γ _ _ _ n env _ _ ⟦C₃⟧ k (inj₂ (⟦A⟧ , ⟦B⟧))         = ⟦C₃⟧ k ((⟦ Γ ⟧ˢₓ-□ n env k , ⟦A⟧)  , ⟦B⟧)
+⟦select⟧ Γ _ _ _ n env ⟦C₁⟧ _ _ k (inj₁ (inj₁ (⟦A⟧ , ⟦◇B⟧))) = ⟦C₁⟧ k ((⟦ Γ ˢ⟧□ n env k , ⟦◇B⟧) , ⟦A⟧)
+⟦select⟧ Γ _ _ _ n env _ ⟦C₂⟧ _ k (inj₁ (inj₂ (⟦◇A⟧ , ⟦B⟧))) = ⟦C₂⟧ k ((⟦ Γ ˢ⟧□ n env k , ⟦◇A⟧) , ⟦B⟧)
+⟦select⟧ Γ _ _ _ n env _ _ ⟦C₃⟧ k (inj₂ (⟦A⟧ , ⟦B⟧))         = ⟦C₃⟧ k ((⟦ Γ ˢ⟧□ n env k , ⟦A⟧)  , ⟦B⟧)
