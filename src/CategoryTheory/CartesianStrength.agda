@@ -65,8 +65,8 @@ record CartesianComonad {n}
                             ≈ δ.at (A ⊗ B) ∘ m A B
 
 record WStrongMonad {n}
-        {ℂ : Category n} {Co : Comonad ℂ} (Mo : Monad ℂ)
-        (ℂ-cart : Cartesian ℂ) (W-cart-com : CartesianComonad Co ℂ-cart)
+        {ℂ : Category n} (ℂ-cart : Cartesian ℂ) {Co : Comonad ℂ}
+        (Mo : Monad ℂ) (W-cart-com : CartesianComonad Co ℂ-cart)
         : Set (lsuc n) where
     open Category ℂ
     open Comonad Co
