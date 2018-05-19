@@ -5,6 +5,7 @@ module TemporalOps.Next where
 open import CategoryTheory.Categories
 open import CategoryTheory.Instances.Reactive
 open import CategoryTheory.Functor
+open import CategoryTheory.CartesianStrength
 open import TemporalOps.Common
 
 open import Data.Product
@@ -48,6 +49,42 @@ F-▹ = record
                                         ≡ (fmap-▹ f′ at n) a)
     fmap-▹-cong e {zero} = refl
     fmap-▹-cong e {suc n} = e
+
+-- ▹ is a Cartesian functor
+F-cart-▹ : CartesianFunctor F-▹ ℝeactive-cart ℝeactive-cart
+F-cart-▹ = record
+    { u = u-▹
+    ; m = m-▹
+    ; associative = λ {A}{B}{C}{n}{a} -> assoc-▹ {A}{B}{C}{n}{a}
+    ; unital-right = λ {A}{n}{a} -> unit-right-▹ {A}{n}{a}
+    ; unital-left = λ {A}{n}{a} -> unit-left-▹ {A}{n}{a}
+    }
+    where
+    open Functor F-▹
+
+    u-▹ : ⊤ ⇴ ▹ ⊤
+    u-▹ zero t = top.tt
+    u-▹ (suc n) t = top.tt
+
+    m-▹ : ∀(A B : τ) -> ▹ A ⊗ ▹ B ⇴ ▹ (A ⊗ B)
+    m-▹ A B zero _ = top.tt
+    m-▹ A B (suc n) p = p
+
+    assoc-▹ : ∀{A B C : τ}
+           -> m-▹ A (B ⊗ C) ∘ id * m-▹ B C ∘ assoc-right
+            ≈ fmap assoc-right ∘ m-▹ (A ⊗ B) C ∘ m-▹ A B * id
+    assoc-▹ {A} {B} {C} {zero} {a} = refl
+    assoc-▹ {A} {B} {C} {suc n} {(▹A , ▹B) , ▹C} = refl
+
+    unit-right-▹ : ∀{A : τ} ->
+        fmap unit-right ∘ m-▹ A ⊤ ∘ (id * u-▹) ≈ unit-right
+    unit-right-▹ {A} {zero} {a} = refl
+    unit-right-▹ {A} {suc n} {a} = refl
+
+    unit-left-▹ : ∀{A : τ} ->
+        fmap unit-left ∘ m-▹ ⊤ A ∘ (u-▹ * id) ≈ unit-left
+    unit-left-▹ {A} {zero} {a} = refl
+    unit-left-▹ {A} {suc n} {a} = refl
 
 -- ▹ preserves products
 pair-▹ : ∀{A B : τ} -> (▹ A ⊗ ▹ B) ⇴ ▹ (A ⊗ B)
