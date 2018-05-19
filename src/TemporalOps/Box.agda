@@ -80,3 +80,10 @@ F-cart-□ = record
     m-□ A B n (a , b) = λ k → a k , b k
 
 open CartesianFunctor F-cart-□ public
+
+-- □ is a Cartesian comonad
+W-cart-□ : CartesianComonad W-□ ℝeactive-cart
+W-cart-□ = record { cart-fun = F-cart-□ ; u-ε = refl ; u-δ = refl
+                                        ; m-ε = refl ; m-δ = refl }
+
+open CartesianComonad W-cart-□ public

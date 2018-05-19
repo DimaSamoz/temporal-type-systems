@@ -4,6 +4,7 @@ module CategoryTheory.CartesianFunctor where
 open import CategoryTheory.Categories
 open import CategoryTheory.Functor
 open import CategoryTheory.BCCCs.Cartesian
+open import CategoryTheory.Comonad
 
 -- Type class for Cartesian functors
 record CartesianFunctor {n}
@@ -35,3 +36,24 @@ record CartesianFunctor {n}
             fmap ρᶜ ∘ m A ⊤ᶜ ∘ (id *ᵈ u) ≈ ρᵈ
         unital-left : ∀{B : ℂ.obj} ->
             fmap λᶜ ∘ m ⊤ᶜ B ∘ (u *ᵈ id) ≈ λᵈ
+
+record CartesianComonad {n}
+        {ℂ : Category n} (C : Comonad ℂ)
+        (ℂ-cart : Cartesian ℂ) : Set (lsuc n) where
+    -- private module ℂ = Category ℂ
+    open Category ℂ
+    open Comonad C
+    open Functor W renaming (omap to F)
+    open Cartesian ℂ-cart
+
+    field
+        -- Cartesian comonads are Cartesian functors
+        cart-fun : CartesianFunctor W ℂ-cart ℂ-cart
+    open CartesianFunctor cart-fun
+    field
+        -- | Laws
+        u-ε : u ∘ ε.at ⊤ ≈ id
+        u-δ : δ.at ⊤ ∘ u ≈ fmap u ∘ u
+        m-ε : ∀{A B : obj} -> ε.at (A ⊗ B) ∘ m A B ≈ ε.at A * ε.at B
+        m-δ : ∀{A B : obj} -> fmap (m A B) ∘ m (F A) (F B) ∘ δ.at A * δ.at B
+                            ≈ δ.at (A ⊗ B) ∘ m A B 
