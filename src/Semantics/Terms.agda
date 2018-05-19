@@ -42,8 +42,6 @@ mutual
     ⟦ inl M         ⟧ₘ = ι₁ ∘ ⟦ M ⟧ₘ
     ⟦ inr M         ⟧ₘ = ι₂ ∘ ⟦ M ⟧ₘ
     ⟦ case M inl↦ B₁ ||inr↦ B₂ ⟧ₘ = [ ⟦ B₁ ⟧ₘ ⁏ ⟦ B₂ ⟧ₘ ] ∘ dist ∘ ⟨ id , ⟦ M ⟧ₘ ⟩
-    ⟦ svar top      ⟧ₘ = π₂
-    ⟦ svar (pop x)  ⟧ₘ = ⟦ svar x ⟧ₘ ∘ π₁
     ⟦ sample {A} S  ⟧ₘ = ε.at ⟦ A ⟧ₜ ∘ ⟦ S ⟧ₘ
     ⟦ stable {Γ} S  ⟧ₘ = F-□.fmap ⟦ S ⟧ₘ ∘ ⟦ Γ ⟧ˢₓ-□
     ⟦ sig S         ⟧ₘ = ⟦ S ⟧ₘ

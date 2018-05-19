@@ -27,6 +27,10 @@ open import TemporalOps.Box
 open import Data.Sum
 open import Data.Product
 open import Relation.Binary.PropositionalEquality
+open import Relation.Binary.HeterogeneousEquality as ≅ using (_≅_)
+
+open import Holes.Term using (⌞_⌟)
+open import Holes.Cong.Propositional
 
 open ≡-Reasoning
 private module F-□ = Functor F-□
@@ -65,7 +69,7 @@ open Comonad W-□
 ⟦𝒯erm⟧ : ⟦Kit⟧ 𝒯erm
 ⟦𝒯erm⟧ = record
     { ⟦_⟧ = ⟦_⟧ₘ
-    ; ⟦𝓋⟧ = λ A Δ → ⟦𝓉⟧ {A} top
+    ; ⟦𝓋⟧ = λ A Δ → refl
     ; ⟦𝓉⟧ = λ T → refl
     ; ⟦𝓌⟧ = ⟦𝓌⟧-term
     ; ⟦𝒶⟧ = ⟦𝒶⟧-term
@@ -87,24 +91,24 @@ open Comonad W-□
            -> F-□.fmap ⟦ 𝒶 M ⟧ₘ ∘ ⟦ Δ ⟧ˢₓ-□ ≈ δ.at ⟦ A ⟧ₜ ∘ ⟦ M ⟧ₘ
     ⟦𝒶⟧-term {A} {∙} (svar ())
     ⟦𝒶⟧-term {A} {∙} (stable M) = refl
-    ⟦𝒶⟧-term {A} {Δ ,, B now} (svar (pop x)) = ⟦𝒶⟧-term (svar x)
+    ⟦𝒶⟧-term {A} {Δ ,, B now} (var (pop x)) = ⟦𝒶⟧-term (var x)
     ⟦𝒶⟧-term {A} {Δ ,, B now} (stable M) = ⟦𝒶⟧-term {A} {Δ} (stable M)
-    ⟦𝒶⟧-term {.B} {Δ ,, B always} (svar top) = refl
-    ⟦𝒶⟧-term {A} {Δ ,, B always} (svar (pop x)) {n} {⟦Δ⟧ , ⟦□B⟧} = ext lemma
+    ⟦𝒶⟧-term {.B} {Δ ,, B always} (var top) = refl
+    ⟦𝒶⟧-term {A} {Δ ,, B always} (var (pop x)) {n} {⟦Δ⟧ , □⟦B⟧} = ext lemma
         where
-        lemma : ∀ l -> ⟦ traverse 𝒱ar (_⁺_ {B always} (idₛ 𝒱ar) 𝒱ar) (𝒶 (svar x)) ⟧ₘ l (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , ⟦□B⟧)
-                     ≡ ⟦ svar x ⟧ₘ n ⟦Δ⟧
-        lemma l rewrite traverse-sound ⟦𝒱ar⟧ (_⁺_ {B always} (idₛ 𝒱ar) 𝒱ar) (𝒶 (svar x)) {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , ⟦□B⟧}
-                      | ⟦⁺⟧ (B always) {Δ ˢ} (idₛ 𝒱ar) {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , ⟦□B⟧}
+        lemma : ∀ l -> ⟦ traverse 𝒱ar (_⁺_ {B always} (idₛ 𝒱ar) 𝒱ar) (𝒶 (var x)) ⟧ₘ l (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , □⟦B⟧)
+                     ≡ ⟦ var x ⟧ₘ n ⟦Δ⟧
+        lemma l rewrite traverse-sound ⟦𝒱ar⟧ (_⁺_ {B always} (idₛ 𝒱ar) 𝒱ar) (𝒶 (var x)) {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , □⟦B⟧}
+                      | ⟦⁺⟧ (B always) {Δ ˢ} (idₛ 𝒱ar) {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l , □⟦B⟧}
                       | ⟦idₛ⟧ {Δ ˢ} {l} {⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l}
-                      | □-≡ n l (⟦𝒶⟧-term (svar x) {n} {⟦Δ⟧}) l = refl
-    ⟦𝒶⟧-term {A} {Δ ,, B always} (stable M) {n} {⟦Δ⟧ , ⟦□B⟧} = ext λ l → ext (lemma l)
+                      | □-≡ n l (⟦𝒶⟧-term (var x) {n} {⟦Δ⟧}) l = refl
+    ⟦𝒶⟧-term {A} {Δ ,, B always} (stable M) {n} {⟦Δ⟧ , □⟦B⟧} = ext λ l → ext (lemma l)
         where
         postulate
             duh : ∀ {A : Set}{x y : A} -> x ≡ y
         lemma : ∀ l m -> ⟦ subst (λ x₁ → x₁ ,, B always ⊢ A now) (sym (ˢ-idemp Δ)) M ⟧ₘ m
-                            (⟦ Δ ˢ ⟧ˢₓ-□ l (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l) m , ⟦□B⟧)
-                          ≡ ⟦ M ⟧ₘ m (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ m , ⟦□B⟧)
+                            (⟦ Δ ˢ ⟧ˢₓ-□ l (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ l) m , □⟦B⟧)
+                          ≡ ⟦ M ⟧ₘ m (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ m , □⟦B⟧)
         lemma l m
             rewrite □-≡ l m (□-≡ n l (⟦⟧ˢₓ-□-twice Δ {n} {⟦Δ⟧}) l) m
             = duh

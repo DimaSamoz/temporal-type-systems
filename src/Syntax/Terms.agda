@@ -13,9 +13,9 @@ mutual
     data _⊢_ : Context -> Judgement -> Set where
         -- | Simply typed lambda calculus
         -- Variables
-        var : ∀{Γ A}            ->                 A now ∈ Γ
-                                                  -----------
-                                ->                 Γ ⊢ A now
+        var : ∀{Γ A}            ->                   A ∈ Γ
+                                                    -------
+                                ->                   Γ ⊢ A
 
         -- Lambda abstraction
         lam : ∀{Γ A B}          ->             Γ , A now ⊢ B now
@@ -64,11 +64,6 @@ mutual
                                 ->                   Γ ⊢ C now
 
         -- | Modal operators
-        -- Stable variables
-        svar : ∀{Γ A}           ->                 A always ∈ Γ
-                                                  --------------
-                                ->                 Γ ⊢ A always
-
         -- A stable type can be sampled now
         sample : ∀{A Γ}         ->                 Γ ⊢ A always
                                                   --------------

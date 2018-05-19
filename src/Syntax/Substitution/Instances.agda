@@ -26,21 +26,11 @@ Term = _⊢_
 𝒱ar : Kit Var
 𝒱ar = record
     { 𝓋 = id
-    ; 𝓉 = 𝓉-var
+    ; 𝓉 = var
     ; 𝓌 = pop
     ; 𝒶 = 𝒶-var
     }
     where
-    𝓉-var : {Γ : Context} {A : Judgement} → Var Γ A → Γ ⊢ A
-    𝓉-var {Γ} {A now} = var
-    𝓉-var {Γ} {A always} = svar
-
-    𝓌-var : {Γ Δ : Context} {A : Judgement} → Γ ⊆ Δ → Var Γ A → Var Δ A
-    𝓌-var refl v = v
-    𝓌-var (keep s) top = top
-    𝓌-var (keep s) (pop v) = pop (𝓌-var s v)
-    𝓌-var (drop s) v = pop (𝓌-var s v)
-
     𝒶-var : ∀{A Γ} → Var Γ (A always) → Var (Γ ˢ) (A always)
     𝒶-var top = top
     𝒶-var (pop {B = B now} v) = 𝒶-var v
@@ -79,7 +69,6 @@ module K {𝒮 : Schema} (k : Kit 𝒮) where
                                = case traverse σ M
                                    inl↦ traverse (σ ↑ k) N₁
                                  ||inr↦ traverse (σ ↑ k) N₂
-        traverse σ (svar x)    = 𝓉 (subst-var σ x)
         traverse σ (sample M) = sample (traverse σ M)
         traverse σ (stable M)  = stable (traverse (σ ↓ˢ k) M)
         traverse σ (sig M)     = sig (traverse σ M)
@@ -116,9 +105,9 @@ weaken′-top = traverse′ 𝒱ar (weak-topₛ 𝒱arₛ)
 -- | Term kit
 
 -- Term kit
-𝒯erm : Kit _⊢_
+𝒯erm : Kit Term
 𝒯erm = record
-    { 𝓋 = Kit.𝓉 𝒱ar
+    { 𝓋 = var
     ; 𝓉 = id
     ; 𝓌 = weaken-top
     ; 𝒶 = 𝒶-term
@@ -126,16 +115,12 @@ weaken′-top = traverse′ 𝒱ar (weak-topₛ 𝒱arₛ)
     where
     𝒶-term : {Γ : Context} {A : Type} → Γ ⊢ A always → Γ ˢ ⊢ A always
     𝒶-term {∙} M = M
-    𝒶-term {Γ , B now} (svar (pop x)) = 𝒶-term (svar x)
+    𝒶-term {Γ , B now} (var (pop x)) = 𝒶-term (var x)
+    𝒶-term {Γ , B always} (var top) = var top
+    𝒶-term {Γ , B always} (var {A = A} (pop x)) = weaken-top (𝒶-term (var x))
     𝒶-term {Γ , B now} (stable M) = 𝒶-term {Γ} (stable M)
-    𝒶-term {Γ , B always} (svar {A = .B} top) = svar top
-    𝒶-term {Γ , B always} (svar {A = A} (pop x)) = weaken-top (𝒶-term (svar x))
-    -- 𝒶-term {Γ , B always} (stable {A = A} M) = stable (ˢ-dup (Γ , B always) M)
     𝒶-term {Γ , B always} (stable {A = A} M) =
         stable (subst (λ x → x , B always ⊢ A now) (sym (ˢ-idemp Γ)) M)
-        -- where
-        -- M′ : Γ ˢ ˢ , B always ⊢ A now
-        -- M′ rewrite (ˢ-idemp Γ) = M
 
 -- Substitution is a traversal with term substitutions
 substitute : ∀{Γ Δ A} -> Subst Term Γ Δ -> Γ ⊢ A -> Δ ⊢ A

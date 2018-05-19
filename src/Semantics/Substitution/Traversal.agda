@@ -79,9 +79,6 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
     traverse-sound σ (case_inl↦_||inr↦_ {B = B} M N₁ N₂) {n} {⟦Δ⟧} | inj₂ ⟦B⟧
         rewrite traverse-sound (σ ↑ k) N₂ {n} {⟦Δ⟧ , ⟦B⟧}
               | ⟦↑⟧ (B now) σ {n} {⟦Δ⟧ , ⟦B⟧} = refl
-    traverse-sound ● (svar ())
-    traverse-sound (σ ▸ T) (svar top) = ⟦𝓉⟧ T
-    traverse-sound (σ ▸ T) (svar (pop x)) = traverse-sound σ (svar x)
     traverse-sound σ (sample M) {n} {⟦Δ⟧} rewrite traverse-sound σ M {n} {⟦Δ⟧} = refl
     traverse-sound {Γ} {Δ} {A} σ (stable M) {n} {⟦Δ⟧} = ext lemma
         where
