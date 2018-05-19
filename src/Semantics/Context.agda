@@ -53,6 +53,7 @@ infix 50 ⟦_⟧ₓ
 ⟦⟧ˢₓ-factor (Γ , A now) {n} {x ,, y} = ⟦⟧ˢₓ-factor Γ
 ⟦⟧ˢₓ-factor (Γ , A always) {n} {x ,, y} rewrite ⟦⟧ˢₓ-factor Γ {n} {x} = refl
 
+-- Applying ⟦⟧ˢₓ-□ twice can be replaced with one ⟦⟧ˢₓ-□ and duplication
 ⟦⟧ˢₓ-□-twice : ∀ Δ -> F-□.fmap ⟦ Δ ˢ ⟧ˢₓ-□ ∘ ⟦ Δ ⟧ˢₓ-□ ≈ δ.at ⟦ Δ ˢ ˢ ⟧ₓ ∘ ⟦ Δ ˢ ⟧ˢₓ-□ ∘ ⟦ Δ ⟧ˢₓ
 ⟦⟧ˢₓ-□-twice ∙ = refl
 ⟦⟧ˢₓ-□-twice (Δ , A now) = ⟦⟧ˢₓ-□-twice Δ
@@ -60,3 +61,12 @@ infix 50 ⟦_⟧ₓ
     where lemma : ∀ k l -> ⟦ Δ ˢ ⟧ˢₓ-□ k (⟦ Δ ⟧ˢₓ-□ n ⟦Δ⟧ k) l
                          ≡ ⟦ Δ ˢ ⟧ˢₓ-□ n (⟦ Δ ⟧ˢₓ n ⟦Δ⟧) l
           lemma k l = □-≡ k l (□-≡ n k (⟦⟧ˢₓ-□-twice Δ {n} {⟦Δ⟧}) k) l
+
+-- Applying ⟦⟧ˢₓ-□ and ⟦⟧ˢₓ can be commuted
+⟦⟧ˢₓ-comm : ∀ Δ -> ⟦ Δ ˢ ⟧ˢₓ-□ ∘ ⟦ Δ ⟧ˢₓ ≈ F-□.fmap ⟦ Δ ˢ ⟧ˢₓ ∘ ⟦ Δ ⟧ˢₓ-□
+⟦⟧ˢₓ-comm Δ {n} {⟦Δ⟧} = ext (lemma Δ ⟦Δ⟧)
+    where
+    lemma : ∀ Δ ⟦Δ⟧ l -> (⟦ Δ ˢ ⟧ˢₓ-□ ∘ ⟦ Δ ⟧ˢₓ) n ⟦Δ⟧ l ≡ (F-□.fmap ⟦ Δ ˢ ⟧ˢₓ ∘ ⟦ Δ ⟧ˢₓ-□) n ⟦Δ⟧ l
+    lemma ∙ ⟦Δ⟧ l = refl
+    lemma (Δ , A now) (⟦Δ⟧ ,, ⟦A⟧) l = lemma Δ ⟦Δ⟧ l
+    lemma (Δ , A always) (⟦Δ⟧ ,, □⟦A⟧) l = cong (_,, □⟦A⟧) (lemma Δ ⟦Δ⟧ l)
