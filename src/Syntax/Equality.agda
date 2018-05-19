@@ -25,16 +25,16 @@ x₄ : ∀{Γ A B C D} -> Γ , A now , B , C , D ⊢ A now
 x₄ = var (pop (pop (pop top)))
 
 s₁ : ∀{Γ A} -> Γ , A always ⊢ A always
-s₁ = svar top
+s₁ = var top
 
 s₂ : ∀{Γ A B} -> Γ , A always , B ⊢ A always
-s₂ = svar (pop top)
+s₂ = var (pop top)
 
 s₃ : ∀{Γ A B C} -> Γ , A always , B , C ⊢ A always
-s₃ = svar (pop (pop top))
+s₃ = var (pop (pop top))
 
 s₄ : ∀{Γ A B C D} -> Γ , A always , B , C , D ⊢ A always
-s₄ = svar (pop (pop (pop top)))
+s₄ = var (pop (pop (pop top)))
 
 
 -- β-η equality of terms
@@ -314,7 +314,7 @@ t5 : ∀{A B} -> ∙ , Signal A now , Event (A => B) now ⊨ B now
 t5 = letSig (var (pop top)) InC (letEvt (var (pop top)) In pure (x₁ $ sample s₂))
 
 t6 : ∀{A B} -> ∙ , Event (Signal A) now , Signal B now ⊢ Event (Signal (A & B)) now
-t6 = event (letSig x₁ InC (letEvt x₃ In (pure (letSig x₁ In (sig (stable [ sample (svar top) ,, sample (svar (pop top)) ]))))))
+t6 = event (letSig x₁ InC (letEvt x₃ In (pure (letSig x₁ In (sig (stable [ sample s₁ ,, sample s₂ ]))))))
 -- t6 = event (letSig x₁ InC (letEvt x₃ In (letSig x₁ InC (pure [ sample s₁ ,, sample s₃ ]))))
 
 too : ∀{A B} -> ∙ ⊢ Signal (A => B) => (Event A => Event B) now
