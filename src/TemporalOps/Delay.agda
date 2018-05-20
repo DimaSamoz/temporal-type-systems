@@ -157,6 +157,8 @@ F-cart-delay : ∀ k -> CartesianFunctor (F-delay k) ℝeactive-cart ℝeactive-
 F-cart-delay k = record
     { u = u-delay k
     ; m = m-delay k
+    ; m-nat₁ = m-nat₁-delay k
+    ; m-nat₂ = m-nat₂-delay k
     ; associative = assoc-delay k
     ; unital-right = unit-right-delay k
     ; unital-left = λ {B} {n} {a} -> unit-left-delay k {B} {n} {a}
@@ -172,6 +174,20 @@ F-cart-delay k = record
     m-delay : ∀ k (A B : τ) -> (delay A by k ⊗ delay B by k) ⇴ delay (A ⊗ B) by k
     m-delay zero A B = λ n x → x
     m-delay (suc k) A B = Functor.fmap F-▹ (m-delay k A B) ∘ m (delay A by k) (delay B by k)
+
+    m-nat₁-delay : ∀ k {A B C : τ} (f : A ⇴ B)
+          -> Functor.fmap (F-delay k) (f * id) ∘ m-delay k A C
+           ≈ m-delay k B C ∘ Functor.fmap (F-delay k) f * id
+    m-nat₁-delay zero f = refl
+    m-nat₁-delay (suc k) f {zero} = refl
+    m-nat₁-delay (suc k) f {suc n} = m-nat₁-delay k f
+
+    m-nat₂-delay : ∀ k {A B C : τ} (f : A ⇴ B)
+          -> Functor.fmap (F-delay k) (id * f) ∘ m-delay k C A
+           ≈ m-delay k C B ∘ id * Functor.fmap (F-delay k) f
+    m-nat₂-delay zero f = refl
+    m-nat₂-delay (suc k) f {zero} = refl
+    m-nat₂-delay (suc k) f {suc n} = m-nat₂-delay k f
 
     assoc-delay : ∀ k {A B C : τ}
            -> m-delay k A (B ⊗ C) ∘ id * m-delay k B C ∘ assoc-right
@@ -191,3 +207,8 @@ F-cart-delay k = record
     unit-left-delay zero = refl
     unit-left-delay (suc k) {B} {zero} = refl
     unit-left-delay (suc k) {B} {suc n} = unit-left-delay k
+
+-- Delay preserves coproducts
+sum-delay : ∀{A B : τ} -> (k : ℕ) -> (delay A by k ⊕ delay B by k) ⇴ delay (A ⊕ B) by k
+sum-delay zero n s = s
+sum-delay (suc k) n s = Functor.fmap F-▹ (sum-delay k) n (sum-▹ n s)

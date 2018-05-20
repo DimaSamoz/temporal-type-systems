@@ -71,6 +71,8 @@ F-cart-□ : CartesianFunctor F-□ ℝeactive-cart ℝeactive-cart
 F-cart-□ = record
     { u = λ n a _ → a
     ; m = m-□
+    ; m-nat₁ = λ f → refl
+    ; m-nat₂ = λ f → refl
     ; associative = refl
     ; unital-right = refl
     ; unital-left = refl

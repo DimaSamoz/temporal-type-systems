@@ -30,6 +30,13 @@ record CartesianFunctor {n}
         m : ∀(A B : ℂ.obj) -> F A ⊗ᵈ F B ~> F (A ⊗ᶜ B)
 
         -- | Laws
+        -- Naturality conditions
+        m-nat₁ : ∀{A B C : ℂ.obj} (f : A ℂ.~> B)
+              -> fmap (f *ᶜ ℂ.id) ∘ m A C ≈ m B C ∘ fmap f *ᵈ id
+        m-nat₂ : ∀{A B C : ℂ.obj} (f : A ℂ.~> B)
+              -> fmap (ℂ.id *ᶜ f) ∘ m C A ≈ m C B ∘ id *ᵈ fmap f
+
+        -- Monoid laws
         associative : ∀{A B C : ℂ.obj} ->
               m A (B ⊗ᶜ C) ∘ (id *ᵈ m B C) ∘ αᵈ
             ≈ fmap αᶜ ∘ m (A ⊗ᶜ B) C ∘ (m A B *ᵈ id)

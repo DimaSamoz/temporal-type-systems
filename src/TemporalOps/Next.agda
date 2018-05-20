@@ -55,6 +55,8 @@ F-cart-▹ : CartesianFunctor F-▹ ℝeactive-cart ℝeactive-cart
 F-cart-▹ = record
     { u = u-▹
     ; m = m-▹
+    ; m-nat₁ = m-nat₁-▹
+    ; m-nat₂ = m-nat₂-▹
     ; associative = λ {A}{B}{C}{n}{a} -> assoc-▹ {A}{B}{C}{n}{a}
     ; unital-right = λ {A}{n}{a} -> unit-right-▹ {A}{n}{a}
     ; unital-left = λ {A}{n}{a} -> unit-left-▹ {A}{n}{a}
@@ -69,6 +71,16 @@ F-cart-▹ = record
     m-▹ : ∀(A B : τ) -> ▹ A ⊗ ▹ B ⇴ ▹ (A ⊗ B)
     m-▹ A B zero _ = top.tt
     m-▹ A B (suc n) p = p
+
+    m-nat₁-▹ : ∀{A B C : τ} (f : A ⇴ B)
+          -> fmap (f * id) ∘ m-▹ A C ≈ m-▹ B C ∘ fmap f * id
+    m-nat₁-▹ f {zero} {a} = refl
+    m-nat₁-▹ f {suc n} {a} = refl
+
+    m-nat₂-▹ : ∀{A B C : τ} (f : A ⇴ B)
+          -> fmap (id * f) ∘ m-▹ C A ≈ m-▹ C B ∘ id * fmap f
+    m-nat₂-▹ f {zero} {a} = refl
+    m-nat₂-▹ f {suc n} {a} = refl
 
     assoc-▹ : ∀{A B C : τ}
            -> m-▹ A (B ⊗ C) ∘ id * m-▹ B C ∘ assoc-right
@@ -85,3 +97,8 @@ F-cart-▹ = record
         fmap unit-left ∘ m-▹ ⊤ A ∘ (u-▹ * id) ≈ unit-left
     unit-left-▹ {A} {zero} {a} = refl
     unit-left-▹ {A} {suc n} {a} = refl
+
+-- ▹ preserves coproducts
+sum-▹ : ∀{A B : τ} -> (▹ A ⊕ ▹ B) ⇴ ▹ (A ⊕ B)
+sum-▹ zero v = top.tt
+sum-▹ (suc n) v = v
