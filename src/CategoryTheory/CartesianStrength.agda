@@ -97,9 +97,9 @@ record WStrongMonad {n}
         -- | Laws
         -- Naturality conditions
         st-nat₁ : ∀{A B D : obj} (f : A ~> B)
-               -> M-f (id * f) ∘ st D A ≈ st D B ∘ id * M-f f
-        st-nat₂ : ∀{A B D : obj} (f : A ~> B)
                -> M-f (C-f f * id) ∘ st A D ≈ st B D ∘ C-f f * id
+        st-nat₂ : ∀{A B D : obj} (f : A ~> B)
+               -> M-f (id * f) ∘ st D A ≈ st D B ∘ id * M-f f
 
         -- Strength and left unit
         st-λ : ∀{A} -> M-f (λᶜ A) ∘ st ⊤ A ≈ λᶜ (M A)
