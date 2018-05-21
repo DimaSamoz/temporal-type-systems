@@ -113,13 +113,11 @@ open ≡.≡-Reasoning
     st-α-◇ : ∀{A B C : τ}
           -> st-◇ A (□ B ⊗ C) ∘ id * st-◇ B C ∘ assoc-right ∘ m⁻¹ A B * id
            ≈ ◇-f (assoc-right ∘ m⁻¹ A B * id) ∘ st-◇ (A ⊗ B) C
-    st-α-◇ {A} {B} {C} {n} {□A⊗B , (zero , a)} = refl
-    st-α-◇ {A} {B} {C} {zero} {□A⊗B , (suc k , a)} = refl
-    st-α-◇ {A} {B} {C} {suc n} {□A⊗B , (suc k , a)} =
+    st-α-◇ {A} {B} {C} {n} {□A⊗B , (k , a)} =
         begin
-            st-◇ A (□ B ⊗ C) (suc n)
-                (□-f π₁ (suc n) □A⊗B , st-◇ B C (suc n) (□-f π₂ (suc n) □A⊗B , ((suc k) , a)))
-        ≡⟨ cong (λ x → (suc k) , x) (
+            st-◇ A (□ B ⊗ C) n
+                (□-f π₁ n □A⊗B , st-◇ B C n (□-f π₂ n □A⊗B , (k , a)))
+        ≡⟨ cong (λ x → k , x) (
             begin
                 ▹ᵏ-C.m k (□ A) (□ B ⊗ C) n
                     ( □-▹ᵏ.at k (□ A) n (δ.at A k (□-f π₁ n □A⊗B))
@@ -165,11 +163,11 @@ open ≡.≡-Reasoning
                     (▹ᵏ-C.m k (□ (A ⊗ B)) C n (□-▹ᵏ.at k (□ (A ⊗ B)) n (δ.at (A ⊗ B) k □A⊗B) , a))
             ≡⟨⟩
 
-                ▹ᵏ-F.fmap (suc k) (assoc-right ∘ m⁻¹ A B * id) (suc n)
-                    (▹ᵏ-C.m (suc k) (□ (A ⊗ B)) C (suc n) (□-▹ᵏ.at (suc k) (□ (A ⊗ B)) (suc n) (δ.at (A ⊗ B) (suc k) □A⊗B) , a))
+                ▹ᵏ-F.fmap k (assoc-right ∘ m⁻¹ A B * id) n
+                    (▹ᵏ-C.m k (□ (A ⊗ B)) C n (□-▹ᵏ.at k (□ (A ⊗ B)) n (δ.at (A ⊗ B) k □A⊗B) , a))
             ∎
         ) ⟩
-            ◇-f (assoc-right ∘ m⁻¹ A B * id) (suc n) (st-◇ (A ⊗ B) C (suc n) (□A⊗B , ((suc k) , a)))
+            ◇-f (assoc-right ∘ m⁻¹ A B * id) n (st-◇ (A ⊗ B) C n (□A⊗B , (k , a)))
         ∎
         where
         lemma : ∀ k -> ▹ᵏ-C.m k (□ A) (□ B) ∘ □-▹ᵏ.at k (□ A) * □-▹ᵏ.at k (□ B)
