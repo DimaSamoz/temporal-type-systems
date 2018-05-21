@@ -71,6 +71,7 @@ record CartesianComonad {n}
         m-δ : ∀{A B : obj} -> fmap (m A B) ∘ m (F A) (F B) ∘ δ.at A * δ.at B
                             ≈ δ.at (A ⊗ B) ∘ m A B
 
+-- Type class for W-strong monads (for a Cartesian comonad W)
 record WStrongMonad {n}
         {ℂ : Category n} (ℂ-cart : Cartesian ℂ) {Co : Comonad ℂ}
         (Mo : Monad ℂ) (W-cart-com : CartesianComonad Co ℂ-cart)
