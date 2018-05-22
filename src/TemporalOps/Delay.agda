@@ -137,6 +137,14 @@ fmap-delay-+-n+k {A} n k l v =
     v≅v′ : v ≅ v′
     v≅v′ = rew-to-≅ (delay-+ n k l)
 
+-- Lifted delay lemma with delay-+-left0
+fmap-delay-+-n+0 : ∀ {A B : τ} {f : A ⇴ B} (n l : ℕ)
+               -> {v : delay A by n at (n + l)}
+               -> rew (delay-+-left0 n l) ((Functor.fmap (F-delay n) f at (n + l)) v)
+                ≡ f l (rew (delay-+-left0 n l) v)
+fmap-delay-+-n+0 {A} zero l = refl
+fmap-delay-+-n+0 {A} (suc n) l = fmap-delay-+-n+0 n l
+
 -- Specialised version with v of type delay A by k at l
 -- Uses explicit rewrites and homogeneous equality
 fmap-delay-+-k : ∀ {A B : τ} {f : A ⇴ B} (n k l : ℕ)
@@ -212,3 +220,18 @@ F-cart-delay k = record
 sum-delay : ∀{A B : τ} -> (k : ℕ) -> (delay A by k ⊕ delay B by k) ⇴ delay (A ⊕ B) by k
 sum-delay zero n s = s
 sum-delay (suc k) n s = Functor.fmap F-▹ (sum-delay k) n (sum-▹ n s)
+
+m-delay-+-n+0 : ∀ {A B} k l {a b}
+      -> (rew (delay-+-left0 k l)
+          (CartesianFunctor.m (F-cart-delay k) A B (k + l) (a , b)))
+       ≡ (rew (delay-+-left0 k l) a , rew (delay-+-left0 k l) b)
+m-delay-+-n+0 zero l = refl
+m-delay-+-n+0 (suc k) l = m-delay-+-n+0 k l
+
+m-delay-+-sym : ∀ {A B} k l m{a b}
+      -> rew (sym (delay-+ k m l))
+            (CartesianFunctor.m (F-cart-delay m) A B l (a , b))
+       ≡ CartesianFunctor.m (F-cart-delay (k + m)) A B (k + l)
+            ((rew (sym (delay-+ k m l)) a) , (rew (sym (delay-+ k m l)) b))
+m-delay-+-sym zero l m = refl
+m-delay-+-sym (suc k) l m = m-delay-+-sym k l m
