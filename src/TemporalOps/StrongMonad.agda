@@ -292,3 +292,5 @@ open ≡.≡-Reasoning
                                             , rew (delay-⊤ n l) top.tt)
         lemma zero l = refl
         lemma (suc n) l = lemma n l
+
+open WStrongMonad ◇-□-Strong public

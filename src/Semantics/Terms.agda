@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+
 {- Denotational semantics of the terms in the category of temporal types. -}
 module Semantics.Terms where
 
@@ -14,6 +14,7 @@ open import CategoryTheory.Instances.Reactive
 open import TemporalOps.Box
 open import TemporalOps.Diamond
 open import TemporalOps.OtherOps
+open import TemporalOps.StrongMonad
 open import CategoryTheory.Functor
 open import CategoryTheory.NatTrans renaming (_⟹_ to ⟹)
 import CategoryTheory.Monad as M
@@ -52,12 +53,11 @@ mutual
     ⟦_⟧ᵐ : ∀{Γ A} -> Γ ⊨ A -> (⟦ Γ ⟧ₓ ⇴ ◇ ⟦ A ⟧ⱼ)
     ⟦ pure {A} M     ⟧ᵐ = η.at ⟦ A ⟧ⱼ ∘ ⟦ M ⟧ₘ
     ⟦ letSig S InC C ⟧ᵐ = ⟦ C ⟧ᵐ ∘ ⟨ id , ⟦ S ⟧ₘ ⟩
-    ⟦ letEvt_In_ {Γ} {A} E C ⟧ᵐ n env =
-        ⟦ E ⟧ₘ n env >>= λ k ⟦A⟧ → ⟦ C ⟧ᵐ k (⟦ Γ ˢ⟧□ n env k , ⟦A⟧)
+    ⟦ letEvt_In_ {Γ} {A} E C ⟧ᵐ =
+        (⟦ C ⟧ᵐ ⋆) ∘ F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) ∘ st ⟦ Γ ˢ ⟧ₓ ⟦ A ⟧ₜ ∘ ⟨ ⟦ Γ ˢ⟧□ , ⟦ E ⟧ₘ ⟩
     ⟦ select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ n env =
         ◇-select n (⟦ E₁ ⟧ₘ n env , ⟦ E₂ ⟧ₘ n env)
         >>= ⟦select⟧ Γ A B C n env ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ
-    -- ⟦ letEvt_In_ {Γ} E C ⟧ᵐ = (⟦ C ⟧ᵐ ⋆) ∘ ◇-sample ∘ ⟨ ⟦ Γ ˢ⟧□ , ⟦ E ⟧ₘ ⟩
     -- ⟦ select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ =
     --       (⟦select⟧ Γ A B C ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ ⋆)
     --     ∘ ◇-sample ∘ ⟨ ⟦ Γ ˢ⟧□ , ◇-select ∘ ⟨ ⟦ E₁ ⟧ₘ , ⟦ E₂ ⟧ₘ ⟩ ⟩

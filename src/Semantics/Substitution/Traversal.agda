@@ -23,6 +23,7 @@ open import CategoryTheory.Instances.Reactive renaming (top to ⊤)
 open import TemporalOps.Diamond
 open import TemporalOps.Box
 open import TemporalOps.OtherOps
+open import TemporalOps.StrongMonad
 
 open import Data.Sum
 open import Data.Product using (_,_)
@@ -31,7 +32,12 @@ open import Relation.Binary.PropositionalEquality as ≡
 
 open ≡.≡-Reasoning
 private module F-□ = Functor F-□
+private module F-◇ = Functor F-◇
 open Comonad W-□
+open Monad M-◇
+open import Holes.Term using (⌞_⌟)
+open import Holes.Cong.Propositional
+
 
 module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
     open ⟦Kit⟧ ⟦k⟧
@@ -56,12 +62,6 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
                 Λ ⟦ traverse (σ ↑ k) M ⟧ₘ n ⟦Δ⟧ ⟦A⟧ ≡ (Λ ⟦ M ⟧ₘ ∘ ⟦subst⟧ σ) n ⟦Δ⟧ ⟦A⟧
         lemma ⟦A⟧ rewrite traverse-sound (σ ↑ k) M {n} {⟦Δ⟧ , ⟦A⟧}
                         | ⟦↑⟧ (A now) σ {n} {⟦Δ⟧ , ⟦A⟧} = refl
-        -- begin
-        --     Λ ⟦ traverse (σ ↑ k) M ⟧ₘ      ≈⟨ Λ-cong (traverse-sound (σ ↑ k) M) ⟩
-        --     Λ (⟦ M ⟧ₘ ∘ ⟦subst⟧ (σ ↑ k))    ≈⟨ Λ-cong (≈-cong-right (⟦↑⟧ (A now) σ)) ⟩
-        --     Λ (⟦ M ⟧ₘ ∘ (⟦subst⟧ σ * id))   ≈⟨ Λ-*id ⟩
-        --     Λ ⟦ M ⟧ₘ ∘ ⟦subst⟧ σ
-        -- ∎
     traverse-sound σ (M $ N) {n} {⟦Δ⟧} rewrite traverse-sound σ M {n} {⟦Δ⟧}
                                              | traverse-sound σ N {n} {⟦Δ⟧} = refl
     traverse-sound σ unit = refl
@@ -99,25 +99,66 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
                       | traverse′-sound (σ ↑ k) C {n} {⟦Δ⟧ , ⟦ S ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)}
                       | ⟦↑⟧ (A always) σ {n} {⟦Δ⟧ , (⟦ S ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧))} = refl
 
-    traverse′-sound {Γ} {Δ} σ (letEvt_In_ {A = A} E C) {n} {⟦Δ⟧}
-        rewrite traverse-sound σ E {n} {⟦Δ⟧} =
+    traverse′-sound {Γ} {Δ} σ (letEvt_In_ {A = A} {B} E C) {n} {⟦Δ⟧}
+        rewrite traverse-sound σ E {n} {⟦Δ⟧}
+              | (ext λ m → ext λ b → traverse′-sound (σ ↓ˢ k ↑ k) C {m} {b}) =
         begin
-            ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧) >>= (λ l ⟦A⟧ → ⟦ traverse′ (σ ↓ˢ k ↑ k) C ⟧ᵐ l (⟦ Δ ˢ⟧□ n ⟦Δ⟧ l , ⟦A⟧))
-        ≡⟨ cong (λ x → ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧) >>= x) (ext λ l → ext λ ⟦A⟧ →
-            begin
-                ⟦ traverse′ (σ ↓ˢ k ↑ k) C ⟧ᵐ l (⟦ Δ ˢ⟧□ n ⟦Δ⟧ l , ⟦A⟧)
-            ≡⟨ traverse′-sound (σ ↓ˢ k ↑ k) C {l} {⟦ Δ ˢ⟧□ n ⟦Δ⟧ l , ⟦A⟧} ⟩
-                ⟦ C ⟧ᵐ l (⟦subst⟧ (_↑_ {A now} (σ ↓ˢ k) k) l (⟦ Δ ˢ⟧□ n ⟦Δ⟧ l , ⟦A⟧))
-            ≡⟨ cong (⟦ C ⟧ᵐ l) (⟦↑⟧ (A now) (σ ↓ˢ k) {l} {⟦ Δ ˢ⟧□ n ⟦Δ⟧ l , ⟦A⟧}) ⟩
-                ⟦ C ⟧ᵐ l (⟦subst⟧ (σ ↓ˢ k) l (⟦ Δ ˢ⟧□ n ⟦Δ⟧ l) , ⟦A⟧)
-            ≡⟨ cong (λ x → ⟦ C ⟧ᵐ l (x , ⟦A⟧)) (□-≡ n l (⟦↓ˢ⟧ σ) l) ⟩
-                ⟦ C ⟧ᵐ l (⟦ Γ ˢ⟧□ n (⟦subst⟧ σ n ⟦Δ⟧) l , ⟦A⟧)
-            ∎)
+            μ.at ⟦ B ⟧ₜ n (F-◇.fmap (⟦ C ⟧ᵐ ∘ ⟦subst⟧ (_↑_ {A = A now} (σ ↓ˢ k) k)) n
+                         (F-◇.fmap (ε.at ⟦ Δ ˢ ⟧ₓ * id) n
+                         (st ⟦ Δ ˢ ⟧ₓ ⟦ A ⟧ₜ n (⟦ Δ ˢ⟧□ n ⟦Δ⟧ , ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)))))
+        ≡⟨ cong (μ.at ⟦ B ⟧ₜ n) (F-◇.fmap-∘ {g = ⟦ C ⟧ᵐ}
+                    {f = ⟦subst⟧ (_↑_ {A = A now} (σ ↓ˢ k) k)} {n}
+                    {F-◇.fmap (ε.at ⟦ Δ ˢ ⟧ₓ * id) n (st ⟦ Δ ˢ ⟧ₓ ⟦ A ⟧ₜ n
+                        (⟦ Δ ˢ⟧□ n ⟦Δ⟧ , ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)))})
          ⟩
-            ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧) >>= (λ l ⟦A⟧ → ⟦ C ⟧ᵐ l (⟦ Γ ˢ⟧□ n (⟦subst⟧ σ n ⟦Δ⟧) l , ⟦A⟧))
+            μ.at ⟦ B ⟧ₜ n (F-◇.fmap ⟦ C ⟧ᵐ n
+                (F-◇.fmap (⌞ ⟦subst⟧ (_↑_ {A = A now} (σ ↓ˢ k) k) ⌟) n
+                (F-◇.fmap (ε.at ⟦ Δ ˢ ⟧ₓ * id) n
+                (st ⟦ Δ ˢ ⟧ₓ ⟦ A ⟧ₜ n ( ⟦ Δ ˢ⟧□ n ⟦Δ⟧
+                                   , ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧))))))
+        ≡⟨ cong (λ x -> μ.at ⟦ B ⟧ₜ n (F-◇.fmap ⟦ C ⟧ᵐ n x)) (
+            begin
+                F-◇.fmap (⌞ ⟦subst⟧ (_↑_ {A = A now} (σ ↓ˢ k) k) ⌟) n
+                (F-◇.fmap (ε.at ⟦ Δ ˢ ⟧ₓ * id) n
+                (st ⟦ Δ ˢ ⟧ₓ ⟦ A ⟧ₜ n ( ⟦ Δ ˢ⟧□ n ⟦Δ⟧
+                                   , ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧))))
+            ≡⟨ cong! (ext λ m -> ext λ b → ⟦↑⟧ (A now) (σ ↓ˢ k) {m} {b}) ⟩
+                F-◇.fmap (⟦subst⟧ (σ ↓ˢ k) * id) n
+                (F-◇.fmap (ε.at ⟦ Δ ˢ ⟧ₓ * id) n
+                    (st ⟦ Δ ˢ ⟧ₓ ⟦ A ⟧ₜ n ( ⟦ Δ ˢ⟧□ n ⟦Δ⟧
+                                        , ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧))))
+            ≡⟨ sym F-◇.fmap-∘ ⟩
+                F-◇.fmap (⟦subst⟧ (σ ↓ˢ k) * id ∘ ε.at ⟦ Δ ˢ ⟧ₓ * id) n
+                    (st ⟦ Δ ˢ ⟧ₓ ⟦ A ⟧ₜ n ( ⟦ Δ ˢ⟧□ n ⟦Δ⟧
+                                       , ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)))
+            ≡⟨⟩
+                F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id ∘ F-□.fmap (⟦subst⟧ (σ ↓ˢ k)) * id) n
+                        (st ⟦ Δ ˢ ⟧ₓ ⟦ A ⟧ₜ n ( ⟦ Δ ˢ⟧□ n ⟦Δ⟧
+                                           , ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)))
+            ≡⟨ F-◇.fmap-∘ ⟩
+                F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) n
+                    (F-◇.fmap (F-□.fmap (⟦subst⟧ (σ ↓ˢ k)) * id) n
+                        (st ⟦ Δ ˢ ⟧ₓ ⟦ A ⟧ₜ n ( ⟦ Δ ˢ⟧□ n ⟦Δ⟧
+                                           , ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧))))
+            ≡⟨ cong (F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) n)
+                    (st-nat₁ (⟦subst⟧ (σ ↓ˢ k))) ⟩
+                F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) n
+                (st ⟦ Γ ˢ ⟧ₓ ⟦ A ⟧ₜ n ( ⌞ F-□.fmap (⟦subst⟧ (σ ↓ˢ k)) n (⟦ Δ ˢ⟧□ n ⟦Δ⟧) ⌟
+                                   , ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)))
+            ≡⟨ cong! (⟦↓ˢ⟧ σ) ⟩
+                F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) n
+                (st ⟦ Γ ˢ ⟧ₓ ⟦ A ⟧ₜ n ( ⟦ Γ ˢ⟧□ n (⟦subst⟧ σ n ⟦Δ⟧)
+                                   , ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)))
+            ∎
+        ) ⟩
+            μ.at ⟦ B ⟧ₜ n (F-◇.fmap ⟦ C ⟧ᵐ n
+                (F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) n
+                (st ⟦ Γ ˢ ⟧ₓ ⟦ A ⟧ₜ n ( ⟦ Γ ˢ⟧□ n (⟦subst⟧ σ n ⟦Δ⟧)
+                                   , ⟦ E ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧)))))
         ≡⟨⟩
             ⟦ letEvt E In C ⟧ᵐ n (⟦subst⟧ σ n ⟦Δ⟧)
         ∎
+
     traverse′-sound {_} {Δ} σ (select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃) {n} {⟦Δ⟧} =
         begin
             ⟦ traverse′ σ (select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃) ⟧ᵐ n ⟦Δ⟧

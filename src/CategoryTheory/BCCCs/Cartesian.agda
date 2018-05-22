@@ -110,6 +110,11 @@ record Cartesian {n} (ℂ : Category n) : Set (lsuc n) where
           ≈> ∘-assoc ≈> ≈-cong-right π₂-comm
           ≈> ∘-assoc [sym] ≈> ≈-cong-left idemp
 
+    -- Parallel product with an idempotent morphism distributes over ∘
+    *-id-dist-∘ : {A B C : obj}{g : B ~> C}{f : A ~> B}
+            -> (_*_ {B = B} g id) ∘ f * id ≈ (g ∘ f) * id
+    *-id-dist-∘ = *-idemp-dist-∘ id-right
+
     -- Commutativity of product
     comm : {A B : obj} -> A ⊗ B ~> B ⊗ A
     comm {A}{B} = ⟨ π₂ , π₁ ⟩

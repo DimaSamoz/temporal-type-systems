@@ -82,7 +82,7 @@ return {A} = η.at A
 
 -- Monadic extension
 _⋆ : ∀{A B : τ} -> (A ⇴ ◇ B) -> (◇ A ⇴ ◇ B)
-_⋆ {A} {B} f n a = μ.at B n (F-◇.fmap f n a)
+_⋆ {A} {B} f = μ.at B ∘ F-◇.fmap f
 infixl 55 _⋆
 
 -- Bind operator
