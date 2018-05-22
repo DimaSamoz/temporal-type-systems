@@ -25,3 +25,6 @@ record BicartesianClosed {n} (ℂ : Category n) : Set (lsuc n) where
         cart   : Cartesian ℂ
         cocart : Cocartesian ℂ
         closed : Closed cart
+    open Cartesian cart public
+    open Cocartesian cocart public
+    open Closed closed public

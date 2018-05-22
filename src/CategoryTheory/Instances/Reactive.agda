@@ -121,12 +121,8 @@ infixr 10 _⇴_
 
 
 -- | Top-level shorthands for distinguished BCCC objects and morphisms
-open BicartesianClosed ℝeactive-BCCC
+open BicartesianClosed ℝeactive-BCCC public
 open Category ℝeactive hiding (begin_ ; _∎) public
-
-open Cartesian cart public
-open Cocartesian cocart public
-open Closed closed public
 
 ℝeactive-cart : Cartesian ℝeactive
 ℝeactive-cart = cart
