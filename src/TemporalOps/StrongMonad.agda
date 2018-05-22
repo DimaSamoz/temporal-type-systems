@@ -12,11 +12,14 @@ open import CategoryTheory.CartesianStrength
 open import TemporalOps.Next
 open import TemporalOps.Delay
 open import TemporalOps.Diamond
+open import TemporalOps.Diamond.Join
 open import TemporalOps.Box
 open import TemporalOps.Common.Other
+open import TemporalOps.Common.Compare
+open import TemporalOps.Common.Rewriting
 open import TemporalOps.OtherOps
 
-open import Relation.Binary.PropositionalEquality as ≡
+open import Relation.Binary.PropositionalEquality as ≡ hiding (inspect)
 open import Data.Product
 open import Data.Sum
 open import Data.Nat hiding (_*_)
@@ -39,8 +42,8 @@ open ≡.≡-Reasoning
     ; st-nat₂ = st-nat₂-◇
     ; st-λ = st-λ-◇
     ; st-α = st-α-◇
-    ; st-η = {!   !}
-    ; st-μ = {!   !}
+    ; st-η = refl
+    ; st-μ = λ{A}{B}{n}{a} -> st-μ-◇ {A}{B}{n}{a}
     }
     where
     open Functor F-◇ renaming (fmap to ◇-f ; omap to ◇-o)
@@ -175,3 +178,117 @@ open ≡.≡-Reasoning
         lemma zero = refl
         lemma (suc k) {zero} {□□A , □□B} = refl
         lemma (suc k) {suc n} {□□A , □□B} = lemma k
+
+    st-μ-◇ : ∀{A B : τ}
+          -> μ.at (□ A ⊗ B) ∘ ◇-f (st-◇ A B) ∘ st-◇ A (◇ B)
+           ≈ st-◇ A B ∘ (id * μ.at B)
+    st-μ-◇ {A} {B} {n} {□A , (k , a)} with inspect (compareLeq k n)
+    st-μ-◇ {A} {B} {.(k + l)} {□A , k , a} | snd==[ .k + l ] with≡ pf =
+        begin
+            μ.at (□ A ⊗ B) (k + l) (◇-f (st-◇ A B) (k + l) (st-◇ A (◇ B) (k + l) (□A , (k , a))))
+        ≡⟨⟩
+            μ-compare (□ A ⊗ B) (k + l) k
+                (▹ᵏ-F.fmap k (st-◇ A B) (k + l)
+                    (▹ᵏ-C.m k (□ A) (◇ B) (k + l)
+                        (□-▹ᵏ.at k (□ A) (k + l) (δ.at A (k + l) □A) , a)))
+                            (⌞ compareLeq k (k + l) ⌟)
+        ≡⟨ cong! pf ⟩
+            μ-compare (□ A ⊗ B) (k + l) k
+                (▹ᵏ-F.fmap k (st-◇ A B) (k + l)
+                    (▹ᵏ-C.m k (□ A) (◇ B) (k + l)
+                        (□-▹ᵏ.at k (□ A) (k + l) (δ.at A (k + l) □A) , a)))
+                            (snd==[ k + l ])
+        ≡⟨⟩
+            μ-shift k l
+                (rew (delay-+-left0 k l)
+                    (▹ᵏ-F.fmap k (st-◇ A B) (k + l)
+                        (▹ᵏ-C.m k (□ A) (◇ B) (k + l)
+                            ( □-▹ᵏ.at k (□ A) (k + l) (δ.at A (k + l) □A)
+                            , a))))
+        ≡⟨ cong (μ-shift k l) (fmap-delay-+-n+0 k l) ⟩
+            μ-shift k l
+                (st-◇ A B l
+                    (rew (delay-+-left0 k l)
+                        (▹ᵏ-C.m k (□ A) (◇ B) (k + l)
+                            ( □-▹ᵏ.at k (□ A) (k + l) (δ.at A (k + l) □A)
+                            , a))))
+        ≡⟨ cong (λ x → μ-shift k l (st-◇ A B l x)) (m-delay-+-n+0 k l) ⟩
+            μ-shift k l
+                (st-◇ A B l
+                    ( rew (delay-+-left0 k l) (□-▹ᵏ.at k (□ A) (k + l) (δ.at A (k + l) □A))
+                    , rew (delay-+-left0 k l) a))
+        ≡⟨ cong (λ x → μ-shift k l (st-◇ A B l (x , _))) (rew-□-left0 k l) ⟩
+            μ-shift k l (st-◇ A B l (□A , rew (delay-+-left0 k l) a))
+         ≡⟨ lemma k l (rew (delay-+-left0 k l) a) ⟩
+            st-◇ A B (k + l) (□A , μ-shift k l (rew (delay-+-left0 k l) a))
+        ≡⟨⟩
+            st-◇ A B (k + l) (□A , μ-compare B (k + l) k a (⌞ snd==[ k + l ] ⌟))
+        ≡⟨ cong! pf ⟩
+            st-◇ A B (k + l) (□A , μ.at B (k + l) (k , a))
+        ∎
+        where
+        rew-□-left0 : ∀ k l
+             -> rew (delay-+-left0 k l) (□-▹ᵏ.at k (□ A) (k + l) (δ.at A (k + l) □A))
+              ≡ □A
+        rew-□-left0 zero l = refl
+        rew-□-left0 (suc k) l = rew-□-left0 k l
+
+        rew-□ : ∀ k l m
+             -> rew (sym (delay-+ k m l)) (□-▹ᵏ.at m (□ A) l (δ.at A m □A))
+              ≡ □-▹ᵏ.at (k + m) (□ A) (k + l) (δ.at A (k + m) □A)
+        rew-□ zero l m = refl
+        rew-□ (suc k) l m = rew-□ k l m
+
+        lemma : ∀ k l a
+             -> μ-shift k l (st-◇ A B l (□A , a))
+              ≡ st-◇ A B (k + l) (□A , μ-shift k l a)
+        lemma k l (m , a) =
+            begin
+                μ-shift k l (st-◇ A B l (□A , (m , a)))
+            ≡⟨⟩
+                k + m , rew (sym (delay-+ k m l)) (▹ᵏ-C.m m (□ A) B l (□-▹ᵏ.at m (□ A) l (δ.at A m □A) , a))
+            ≡⟨ cong (λ x -> _ , x) (m-delay-+-sym k l m) ⟩
+                k + m , ▹ᵏ-C.m (k + m) (□ A) B (k + l)
+                            ( rew (sym (delay-+ k m l)) (□-▹ᵏ.at m (□ A) l (δ.at A m □A))
+                            , rew (sym (delay-+ k m l)) a)
+            ≡⟨ cong (λ x → _ , ▹ᵏ-C.m (k + m) (□ A) B (k + l) (x , _)) (rew-□ k l m) ⟩
+                k + m , ▹ᵏ-C.m (k + m) (□ A) B (k + l)
+                            ( □-▹ᵏ.at (k + m) (□ A) (k + l) (δ.at A (k + m) □A)
+                            , rew (sym (delay-+ k m l)) a)
+            ≡⟨⟩
+                st-◇ A B (k + l) (□A , (k + m , rew (sym (delay-+ k m l)) a))
+            ∎
+
+    st-μ-◇ {A} {B} {.n} {□A , .(n + suc l) , a} | fst==suc[ n + l ] with≡ pf =
+        begin
+            μ.at (□ A ⊗ B) n (◇-f (st-◇ A B) n (st-◇ A (◇ B) n (□A , (n + suc l , a))))
+        ≡⟨⟩
+            μ-compare (□ A ⊗ B) n (n + suc l)
+                (▹ᵏ-F.fmap (n + suc l) (st-◇ A B) n
+                    (▹ᵏ-C.m (n + suc l) (□ A) (◇ B) n
+                    (□-▹ᵏ.at (n + suc l) (□ A) n
+                    (δ.at A (n + suc l) □A) , a)))
+                    (⌞ compareLeq (n + suc l) n ⌟)
+        ≡⟨ cong! pf ⟩
+            μ-compare (□ A ⊗ B) n (n + suc l)
+                (▹ᵏ-F.fmap (n + suc l) (st-◇ A B) n
+                    (▹ᵏ-C.m (n + suc l) (□ A) (◇ B) n
+                    (□-▹ᵏ.at (n + suc l) (□ A) n
+                    (δ.at A (n + suc l) □A) , a)))
+                    (fst==suc[ n + l ])
+        ≡⟨⟩
+            n + suc l , rew (delay-⊤ n l) top.tt
+        ≡⟨ cong (λ x -> _ , x) (lemma n l) ⟩
+            n + suc l , ▹ᵏ-C.m (n + suc l) (□ A) B n (□-▹ᵏ.at (n + suc l) (□ A) n (δ.at A (n + suc l) □A) , rew (delay-⊤ n l) top.tt)
+        ≡⟨⟩
+            st-◇ A B n (□A , μ-compare B n (n + suc l) a (⌞ fst==suc[ n + l ] ⌟))
+        ≡⟨ cong! pf ⟩
+            st-◇ A B n (□A , μ.at B n ((n + suc l) , a))
+        ∎
+        where
+        lemma : ∀ n l
+             -> rew (delay-⊤ n l) top.tt
+              ≡ ▹ᵏ-C.m (n + suc l) (□ A) B n (□-▹ᵏ.at (n + suc l) (□ A) n (δ.at A (n + suc l) □A)
+                                            , rew (delay-⊤ n l) top.tt)
+        lemma zero l = refl
+        lemma (suc n) l = lemma n l
