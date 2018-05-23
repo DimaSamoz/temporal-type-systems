@@ -86,6 +86,11 @@ record Cocartesian {n} (ℂ : Category n) : Set (lsuc n) where
     A ⊕ B = A⊕B {A} {B}
 
     -- Parallel sum of morphisms
+    infixl 65 _⊹_
     _⊹_ : {A B P Q : obj} -> (A ~> P) -> (B ~> Q)
        -> (A ⊕ B ~> P ⊕ Q)
     _⊹_ {A} {B} {P} {Q} f g = [ ι₁ ∘ f ⁏ ι₂ ∘ g ]
+
+    -- Sum of three morphisms
+    [_⁏_⁏_] : ∀{S A B C : obj} -> (A ~> S) -> (B ~> S) -> (C ~> S) -> (A ⊕ B ⊕ C ~> S)
+    [ f ⁏ g ⁏ h ] = [ [ f ⁏ g ] ⁏ h ]

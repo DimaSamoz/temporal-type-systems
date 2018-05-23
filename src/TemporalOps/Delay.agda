@@ -216,11 +216,6 @@ F-cart-delay k = record
     unit-left-delay (suc k) {B} {zero} = refl
     unit-left-delay (suc k) {B} {suc n} = unit-left-delay k
 
--- Delay preserves coproducts
-sum-delay : ∀{A B : τ} -> (k : ℕ) -> (delay A by k ⊕ delay B by k) ⇴ delay (A ⊕ B) by k
-sum-delay zero n s = s
-sum-delay (suc k) n s = Functor.fmap F-▹ (sum-delay k) n (sum-▹ n s)
-
 m-delay-+-n+0 : ∀ {A B} k l {a b}
       -> (rew (delay-+-left0 k l)
           (CartesianFunctor.m (F-cart-delay k) A B (k + l) (a , b)))

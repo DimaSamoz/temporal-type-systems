@@ -127,10 +127,6 @@ open Category ℝeactive hiding (begin_ ; _∎) public
 ℝeactive-cart : Cartesian ℝeactive
 ℝeactive-cart = cart
 
--- Sum of three morphisms
-[_⁏_⁏_] : ∀{S A B C : τ} -> (A ⇴ S) -> (B ⇴ S) -> (C ⇴ S) -> (A ⊕ B ⊕ C ⇴ S)
-[ f ⁏ g ⁏ h ] = [ [ f ⁏ g ] ⁏ h ]
-
 -- Non-canonical distribution morphism
 dist : ∀{A B C : τ} ->  A ⊗ (B ⊕ C) ⇴ (A ⊗ B) ⊕ (A ⊗ C)
 dist n (a , inj₁ b) = inj₁ (a , b)
