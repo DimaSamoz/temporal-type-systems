@@ -8,13 +8,15 @@ open import Syntax.Types
 
 open import Semantics.Types
 open import Semantics.Context
-open import Semantics.Select
 
 open import CategoryTheory.Instances.Reactive
+open import CategoryTheory.Linear
 open import TemporalOps.Box
 open import TemporalOps.Diamond
 open import TemporalOps.OtherOps
+open import TemporalOps.Linear
 open import TemporalOps.StrongMonad
+
 open import CategoryTheory.Functor
 open import CategoryTheory.NatTrans renaming (_⟹_ to ⟹)
 import CategoryTheory.Monad as M
@@ -28,6 +30,7 @@ open W.Comonad W-□
 open M.Monad M-◇
 private module F-◇ = Functor F-◇
 private module F-□ = Functor F-□
+-- open Linear ℝeactive-linear
 
 mutual
     -- Denotation of pure terms as morphisms from contexts to types.
@@ -55,9 +58,6 @@ mutual
     ⟦ letSig S InC C ⟧ᵐ = ⟦ C ⟧ᵐ ∘ ⟨ id , ⟦ S ⟧ₘ ⟩
     ⟦ letEvt_In_ {Γ} {A} E C ⟧ᵐ =
         (⟦ C ⟧ᵐ ⋆) ∘ F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) ∘ st ⟦ Γ ˢ ⟧ₓ ⟦ A ⟧ₜ ∘ ⟨ ⟦ Γ ˢ⟧□ , ⟦ E ⟧ₘ ⟩
-    ⟦ select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ n env =
-        ◇-select n (⟦ E₁ ⟧ₘ n env , ⟦ E₂ ⟧ₘ n env)
-        >>= ⟦select⟧ Γ A B C n env ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ
-    -- ⟦ select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ =
-    --       (⟦select⟧ Γ A B C ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ ⋆)
-    --     ∘ ◇-sample ∘ ⟨ ⟦ Γ ˢ⟧□ , ◇-select ∘ ⟨ ⟦ E₁ ⟧ₘ , ⟦ E₂ ⟧ₘ ⟩ ⟩
+    ⟦ select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ =
+          (handle ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ ⋆)
+        ∘ F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) ∘ st ⟦ Γ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) ∘ ⟨ ⟦ Γ ˢ⟧□ , ⟪ ⟦ E₁ ⟧ₘ , ⟦ E₂ ⟧ₘ ⟫ ⟩

@@ -66,3 +66,5 @@ record Linear {n} {ℂ : Category n}
 
     field
         linprod : ∀(A B : obj) -> LinearProduct A B
+
+    open module Li {A} {B} = LinearProduct (linprod A B) public

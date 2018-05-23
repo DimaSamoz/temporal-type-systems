@@ -31,7 +31,7 @@ open import Holes.Cong.Propositional
 
 open ≡-Reasoning
 
-open L ℝeactive-BCCC M-◇
+open L ℝeactive-BCCC M-◇ public
 
 ℝeactive-linear : Linear ℝeactive-BCCC M-◇
 ℝeactive-linear = record
@@ -187,3 +187,14 @@ open L ℝeactive-BCCC M-◇
 
     *π₁-comm-◇ {l₁ = l₁} {l₂} {n} {a} | ((k₁ , a₁) , .k₁ , a₂) with≡ pf
                                       | equal .k₁  with≡ cpf = {!   !}
+
+
+open Linear ℝeactive-linear public
+
+-- Handle a linear product with three continuations
+handle : ∀ {A B C D : τ}
+          -> (A ⊗   B ⊗ ◇ C ⇴ ◇ D)
+          -> (A ⊗ ◇ B ⊗   C ⇴ ◇ D)
+          -> (A ⊗   B ⊗   C ⇴ ◇ D)
+          -> A ⊗ (B ⊛ C)    ⇴ ◇ D
+handle a b c = [ a ∘ assoc-left ⁏ b ∘ assoc-left ⁏ c ∘ assoc-left ] ∘ dist2

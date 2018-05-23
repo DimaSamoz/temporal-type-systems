@@ -10,7 +10,6 @@ open import Syntax.Substitution
 
 open import Semantics.Types
 open import Semantics.Context
-open import Semantics.Select
 open import Semantics.Terms
 open import Semantics.Substitution
 

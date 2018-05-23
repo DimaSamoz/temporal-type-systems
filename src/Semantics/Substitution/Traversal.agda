@@ -10,7 +10,6 @@ open import Syntax.Substitution.Instances
 
 open import Semantics.Types
 open import Semantics.Context
-open import Semantics.Select
 open import Semantics.Terms
 open import Semantics.Substitution.Kits
 
@@ -23,6 +22,7 @@ open import CategoryTheory.Instances.Reactive renaming (top to ⊤)
 open import TemporalOps.Diamond
 open import TemporalOps.Box
 open import TemporalOps.OtherOps
+open import TemporalOps.Linear
 open import TemporalOps.StrongMonad
 
 open import Data.Sum
@@ -159,52 +159,85 @@ module _ {𝒮} {k : Kit 𝒮} (⟦k⟧ : ⟦Kit⟧ k) where
             ⟦ letEvt E In C ⟧ᵐ n (⟦subst⟧ σ n ⟦Δ⟧)
         ∎
 
-    traverse′-sound {_} {Δ} σ (select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃) {n} {⟦Δ⟧} =
+    traverse′-sound {_} {Δ} σ (select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃) {n} {⟦Δ⟧}
+        rewrite traverse-sound σ E₁ {n} {⟦Δ⟧}
+              | traverse-sound σ E₂ {n} {⟦Δ⟧} =
         begin
-            ⟦ traverse′ σ (select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃) ⟧ᵐ n ⟦Δ⟧
-        ≡⟨⟩
-            ⟦ select traverse σ E₁ ↦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₁
-                  || traverse σ E₂ ↦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₂
-                  ||both↦            traverse′ (σ ↓ˢ k ↑ k ↑ k) C₃ ⟧ᵐ n ⟦Δ⟧
-        ≡⟨⟩
-            (◇-select n (⟦ traverse σ E₁ ⟧ₘ n ⟦Δ⟧ , ⟦ traverse σ E₂ ⟧ₘ n ⟦Δ⟧)
-            >>= ⟦select⟧ Δ A B C n ⟦Δ⟧
-                    ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₁ ⟧ᵐ
-                    ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₂ ⟧ᵐ
-                    ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₃ ⟧ᵐ)
-        ≡⟨ cong (λ x → ◇-select n (⟦ traverse σ E₁ ⟧ₘ n ⟦Δ⟧ , ⟦ traverse σ E₂ ⟧ₘ n ⟦Δ⟧) >>= x)
-            (ext λ l → ext λ c →
-            begin
-                ⟦select⟧ Δ A B C n ⟦Δ⟧
-                    ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₁ ⟧ᵐ
-                    ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₂ ⟧ᵐ
-                    ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₃ ⟧ᵐ l c
-            ≡⟨ ind-hyp l c ⟩
-                ⟦select⟧ Δ A B C n ⟦Δ⟧
-                    (⟦ C₁ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {A now} (_↑_ {Event B now} (σ ↓ˢ k) k) k)))
-                    (⟦ C₂ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {B now} (_↑_ {Event A now} (σ ↓ˢ k) k) k)))
-                    (⟦ C₃ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {B now} (_↑_ {A now}       (σ ↓ˢ k) k) k))) l c
-            ≡⟨ ⟦subst⟧-⟦select⟧ A B σ n l c ⟦Δ⟧ ⟩
-                ⟦select⟧ Γ A B C n (⟦subst⟧ σ n ⟦Δ⟧) ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ l c
-            ∎)
+            μ.at ⟦ C ⟧ₜ n
+                (F-◇.fmap (⌞ handle ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₁ ⟧ᵐ
+                                    ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₂ ⟧ᵐ
+                                    ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₃ ⟧ᵐ ⌟) n
+                (F-◇.fmap (ε.at ⟦ Δ ˢ ⟧ₓ * id) n
+                (st ⟦ Δ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) n
+                (⟦ Δ ˢ⟧□ n ⟦Δ⟧ , ⟪ ⟦ E₁ ⟧ₘ ∘ ⟦subst⟧ σ , ⟦ E₂ ⟧ₘ ∘ ⟦subst⟧ σ ⟫ n ⟦Δ⟧))))
+        ≡⟨ cong! (ext λ m → ext λ b → ind-hyp m b) ⟩
+            μ.at ⟦ C ⟧ₜ n
+                (F-◇.fmap (⌞ handle
+                       (⟦ C₁ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {Event B now} (_↑_ {A now} (σ ↓ˢ k) k) k)))
+                       (⟦ C₂ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {B now} (_↑_ {Event A now} (σ ↓ˢ k) k) k)))
+                       (⟦ C₃ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {B now} (_↑_ {A now}       (σ ↓ˢ k) k) k))) ⌟) n
+                (F-◇.fmap (ε.at ⟦ Δ ˢ ⟧ₓ * id) n
+                (st ⟦ Δ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) n
+                (⟦ Δ ˢ⟧□ n ⟦Δ⟧ , ⟪ ⟦ E₁ ⟧ₘ ∘ ⟦subst⟧ σ , ⟦ E₂ ⟧ₘ ∘ ⟦subst⟧ σ ⟫ n ⟦Δ⟧))))
+        ≡⟨ cong! (ext λ m → ext λ b →
+            ⟦subst⟧-handle {Δ}{Γ}{A}{B}{C} σ {⟦ C₁ ⟧ᵐ}{⟦ C₂ ⟧ᵐ}{⟦ C₃ ⟧ᵐ}{n = m} {b}) ⟩
+            μ.at ⟦ C ⟧ₜ n
+                (F-◇.fmap (handle ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ ∘ ⟦subst⟧ (σ ↓ˢ k) * id) n
+                (F-◇.fmap (ε.at ⟦ Δ ˢ ⟧ₓ * id) n
+                (st ⟦ Δ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) n
+                (⟦ Δ ˢ⟧□ n ⟦Δ⟧ , ⟪ ⟦ E₁ ⟧ₘ ∘ ⟦subst⟧ σ , ⟦ E₂ ⟧ₘ ∘ ⟦subst⟧ σ ⟫ n ⟦Δ⟧))))
+        ≡⟨ cong (μ.at ⟦ C ⟧ₜ n) (F-◇.fmap-∘ {g = handle ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ}
+                      {f = ⟦subst⟧ (σ ↓ˢ k) * id} {n}
+                      {F-◇.fmap (ε.at ⟦ Δ ˢ ⟧ₓ * id) n
+                      (st ⟦ Δ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) n
+                      (⟦ Δ ˢ⟧□ n ⟦Δ⟧ , ⟪ ⟦ E₁ ⟧ₘ ∘ ⟦subst⟧ σ , ⟦ E₂ ⟧ₘ ∘ ⟦subst⟧ σ ⟫ n ⟦Δ⟧))})
          ⟩
-            ◇-select n ( ⟦ traverse σ E₁ ⟧ₘ n ⟦Δ⟧ , ⟦ traverse σ E₂ ⟧ₘ n ⟦Δ⟧)
-            >>= ⟦select⟧ Γ A B C n (⟦subst⟧ σ n ⟦Δ⟧) ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ
-        ≡⟨ cong₂ (λ y z → ◇-select n (y , z) >>= _) (traverse-sound σ E₁)
-                                                    (traverse-sound σ E₂) ⟩
-            ◇-select n (⟦ E₁ ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧) , ⟦ E₂ ⟧ₘ n (⟦subst⟧ σ n ⟦Δ⟧))
-            >>= ⟦select⟧ Γ A B C n (⟦subst⟧ σ n ⟦Δ⟧) ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ
+            μ.at ⟦ C ⟧ₜ n (F-◇.fmap (handle ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ) n
+              ⌞ (F-◇.fmap (⟦subst⟧ (σ ↓ˢ k) * id) n
+                (F-◇.fmap (ε.at ⟦ Δ ˢ ⟧ₓ * id) n
+                (st ⟦ Δ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) n
+                (⟦ Δ ˢ⟧□ n ⟦Δ⟧ , ⟪ ⟦ E₁ ⟧ₘ ∘ ⟦subst⟧ σ , ⟦ E₂ ⟧ₘ ∘ ⟦subst⟧ σ ⟫ n ⟦Δ⟧)))) ⌟)
+        ≡⟨ cong (λ x → μ.at ⟦ C ⟧ₜ n (F-◇.fmap (handle ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ) n x)) (
+            begin
+                (F-◇.fmap (⟦subst⟧ (σ ↓ˢ k) * id) n
+                (F-◇.fmap (ε.at ⟦ Δ ˢ ⟧ₓ * id) n
+                (st ⟦ Δ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) n
+                (⟦ Δ ˢ⟧□ n ⟦Δ⟧ , ⟪ ⟦ E₁ ⟧ₘ ∘ ⟦subst⟧ σ , ⟦ E₂ ⟧ₘ ∘ ⟦subst⟧ σ ⟫ n ⟦Δ⟧))))
+            ≡⟨ sym F-◇.fmap-∘ ⟩
+                F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id ∘ F-□.fmap (⟦subst⟧ (σ ↓ˢ k)) * id) n
+                (st ⟦ Δ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) n
+                (⟦ Δ ˢ⟧□ n ⟦Δ⟧ , ⟪ ⟦ E₁ ⟧ₘ ∘ ⟦subst⟧ σ , ⟦ E₂ ⟧ₘ ∘ ⟦subst⟧ σ ⟫ n ⟦Δ⟧))
+            ≡⟨ F-◇.fmap-∘ ⟩
+                F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) n
+                (F-◇.fmap (F-□.fmap (⟦subst⟧ (σ ↓ˢ k)) * id) n
+                (st ⟦ Δ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) n
+                (⟦ Δ ˢ⟧□ n ⟦Δ⟧ , ⟪ ⟦ E₁ ⟧ₘ ∘ ⟦subst⟧ σ , ⟦ E₂ ⟧ₘ ∘ ⟦subst⟧ σ ⟫ n ⟦Δ⟧)))
+            ≡⟨ cong (F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) n)
+                    (st-nat₁ (⟦subst⟧ (σ ↓ˢ k))) ⟩
+                F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) n
+                (st ⟦ Γ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) n
+                (⌞ F-□.fmap (⟦subst⟧ (σ ↓ˢ k)) n (⟦ Δ ˢ⟧□ n ⟦Δ⟧) ⌟ , ⟪ ⟦ E₁ ⟧ₘ , ⟦ E₂ ⟧ₘ ⟫  n (⟦subst⟧ σ n ⟦Δ⟧)))
+            ≡⟨ cong! (⟦↓ˢ⟧ σ) ⟩
+                F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) n
+                (st ⟦ Γ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) n
+                (⟦ Γ ˢ⟧□  n (⟦subst⟧ σ n ⟦Δ⟧) , ⟪ ⟦ E₁ ⟧ₘ , ⟦ E₂ ⟧ₘ ⟫  n (⟦subst⟧ σ n ⟦Δ⟧)))
+            ∎
+        ) ⟩
+            μ.at ⟦ C ⟧ₜ n (F-◇.fmap (handle ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ) n
+                (F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) n
+                (st ⟦ Γ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) n
+                (⟦ Γ ˢ⟧□  n (⟦subst⟧ σ n ⟦Δ⟧) , ⟪ ⟦ E₁ ⟧ₘ , ⟦ E₂ ⟧ₘ ⟫  n (⟦subst⟧ σ n ⟦Δ⟧)))))
         ≡⟨⟩
             ⟦ select E₁ ↦ C₁ || E₂ ↦ C₂ ||both↦ C₃ ⟧ᵐ n (⟦subst⟧ σ n ⟦Δ⟧)
         ∎
         where
         ind-hyp : ∀ l c
-            -> ⟦select⟧ Δ A B C n ⟦Δ⟧
+            -> handle
                     ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₁ ⟧ᵐ
                     ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₂ ⟧ᵐ
                     ⟦ traverse′ (σ ↓ˢ k ↑ k ↑ k) C₃ ⟧ᵐ l c
-             ≡ ⟦select⟧ Δ A B C n ⟦Δ⟧
-                    (⟦ C₁ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {A now} (_↑_ {Event B now} (σ ↓ˢ k) k) k)))
+             ≡ handle
+                    (⟦ C₁ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {Event B now} (_↑_ {A now} (σ ↓ˢ k) k) k)))
                     (⟦ C₂ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {B now} (_↑_ {Event A now} (σ ↓ˢ k) k) k)))
                     (⟦ C₃ ⟧ᵐ ∘ (⟦subst⟧ (_↑_ {B now} (_↑_ {A now}       (σ ↓ˢ k) k) k))) l c
         ind-hyp l c rewrite ext (λ n -> (ext λ ⟦Δ⟧ -> (traverse′-sound (σ ↓ˢ k ↑ k ↑ k) C₁ {n} {⟦Δ⟧})))
