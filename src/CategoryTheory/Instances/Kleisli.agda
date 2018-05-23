@@ -27,8 +27,7 @@ Kleisli ℂ M = record
     private module ℂ = Category ℂ
     open Monad M renaming (T to F)
     open Functor F renaming (omap to T)
-    private module μ = _⟹_ μ
-    private module η = _⟹_ η
+    
     id-right-K : {A B : ℂ.obj} {f : A ℂ.~> T B} → (μ.at B ℂ.∘ fmap f) ℂ.∘ η.at A ℂ.≈ f
     id-right-K {A}{B}{f}=
         ℂ.begin
