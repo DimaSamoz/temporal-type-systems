@@ -52,12 +52,16 @@ mutual
     ⟦ letSig S In B ⟧ₘ = ⟦ B ⟧ₘ ∘ ⟨ id , ⟦ S ⟧ₘ ⟩
     ⟦ event E       ⟧ₘ = ⟦ E ⟧ᵐ
 
+    -- Helper function for interpreting bound events
+    bindEvent : ∀ Γ {⟦A⟧ ⟦B⟧} -> (⟦E⟧ : ⟦ Γ ⟧ₓ ⇴ ◇ ⟦A⟧) (⟦C⟧ : ⟦ Γ ˢ ⟧ₓ ⊗ ⟦A⟧ ⇴ ◇ ⟦B⟧)
+                  -> (⟦ Γ ⟧ₓ ⇴ ◇ ⟦B⟧)
+    bindEvent Γ {⟦A⟧}{⟦B⟧} ⟦E⟧ ⟦C⟧ =
+        μ.at ⟦B⟧ ∘ F-◇.fmap (⟦C⟧ ∘ ε.at ⟦ Γ ˢ ⟧ₓ * id) ∘ st ⟦ Γ ˢ ⟧ₓ ⟦A⟧ ∘ ⟨ ⟦ Γ ˢ⟧□ , ⟦E⟧ ⟩
+
     -- Denotation of computational terms as Kleisli morphisms from contexts to types.
     ⟦_⟧ᵐ : ∀{Γ A} -> Γ ⊨ A -> (⟦ Γ ⟧ₓ ⇴ ◇ ⟦ A ⟧ⱼ)
     ⟦ pure {A} M     ⟧ᵐ = η.at ⟦ A ⟧ⱼ ∘ ⟦ M ⟧ₘ
     ⟦ letSig S InC C ⟧ᵐ = ⟦ C ⟧ᵐ ∘ ⟨ id , ⟦ S ⟧ₘ ⟩
-    ⟦ letEvt_In_ {Γ} {A} E C ⟧ᵐ =
-        (⟦ C ⟧ᵐ ⋆) ∘ F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) ∘ st ⟦ Γ ˢ ⟧ₓ ⟦ A ⟧ₜ ∘ ⟨ ⟦ Γ ˢ⟧□ , ⟦ E ⟧ₘ ⟩
-    ⟦ select_↦_||_↦_||both↦_ {Γ} {A} {B} {C} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ =
-          (handle ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ ⋆)
-        ∘ F-◇.fmap (ε.at ⟦ Γ ˢ ⟧ₓ * id) ∘ st ⟦ Γ ˢ ⟧ₓ (⟦ A ⟧ₜ ⊛ ⟦ B ⟧ₜ) ∘ ⟨ ⟦ Γ ˢ⟧□ , ⟪ ⟦ E₁ ⟧ₘ , ⟦ E₂ ⟧ₘ ⟫ ⟩
+    ⟦ letEvt_In_ {Γ} E C ⟧ᵐ = bindEvent Γ ⟦ E ⟧ₘ ⟦ C ⟧ᵐ
+    ⟦ select_↦_||_↦_||both↦_ {Γ} E₁ C₁ E₂ C₂ C₃ ⟧ᵐ =
+        bindEvent Γ (⟪ ⟦ E₁ ⟧ₘ , ⟦ E₂ ⟧ₘ ⟫) (handle ⟦ C₁ ⟧ᵐ ⟦ C₂ ⟧ᵐ ⟦ C₃ ⟧ᵐ)
