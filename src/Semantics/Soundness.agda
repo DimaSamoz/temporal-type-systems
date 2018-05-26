@@ -12,6 +12,7 @@ open import Semantics.Types
 open import Semantics.Context
 open import Semantics.Terms
 open import Semantics.Substitution
+open import Semantics.Bind
 
 open import CategoryTheory.Categories using (ext)
 open import CategoryTheory.BCCCs.Cartesian using (Product)
@@ -61,7 +62,9 @@ mutual
     sound (η-sum M) {n} {a} | inj₁ _ = refl
     sound (η-sum M) {n} {a} | inj₂ _ = refl
     sound (η-sig M) = refl
-    sound (η-evt M) {n} {a} = ≡.sym (>>=-unit-right (⟦ M ⟧ₘ n a))
+    sound {Γ = Γ} (η-evt {A} M) {n} {a}
+        rewrite bind-to->>= Γ (⟦ M ⟧ₘ) (η.at ⟦ A ⟧ₜ ∘ π₂) n a
+              = ≡.sym (>>=-unit-right (⟦ M ⟧ₘ n a))
 
     sound (cong-pair eq₁ eq₂) {n} {a} rewrite sound eq₁ {n} {a}
                                             | sound eq₂ {n} {a} = refl
@@ -87,7 +90,7 @@ mutual
     sound′ (Eq′.sym eq) = ≡.sym (sound′ eq)
     sound′ (Eq′.trans eq₁ eq₂) = ≡.trans (sound′ eq₁) (sound′ eq₂)
     sound′ (β-sig′ C M) {n} {⟦Γ⟧} rewrite subst′-sound M C {n} {⟦Γ⟧} = refl
-    sound′ (β-evt′ C D) {n} {⟦Γ⟧} rewrite subst″-sound D C n ⟦Γ⟧ = refl
+    sound′ (β-evt′ C D) {n} {⟦Γ⟧} rewrite subst″-sound D C {n} {⟦Γ⟧} = refl
     sound′ {_}{Γ} (β-selectₚ {A}{B}{C} C₁ C₂ C₃ M₁ M₂) {n} {⟦Γ⟧} =
         begin
             ⟦ select event (pure M₁) ↦ C₁ || event (pure M₂) ↦ C₂ ||both↦ C₃ ⟧ᵐ n ⟦Γ⟧
